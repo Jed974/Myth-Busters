@@ -16,18 +16,69 @@ public:
 	// Sets default values for this component's properties
 	UGodMovementComponent();
 
+public:
 	/** The maximum speed when flying. 1: Lateral speed; 2: Upward speed; 3: Downward speed; */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 	float MaxHorizontalFlySpeed;
 
+	/** The maximum speed when flying. 1: Lateral speed; 2: Upward speed; 3: Downward speed; */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+	float MaxVerticalFlySpeed;
+
+	enum EHorizontalMovementState
+	{
+		HorizontalNeutral,
+		FlyLeftStartup,
+		FlyLeft,
+		FlyRightStartup,
+		FlyRight,
+		FlyTurnAroundLeft,
+		FlyTurnAroundRight,
+		HorizontalFlyStop,
+		SprintLeftStartup,
+		SprintLeft,
+		SprintRightStartup,
+		SprintRight,
+		SprintTurnaroundLeft,
+		SprintTurnaroundRight,
+		HorizontalSprintStop
+	};
+
+	enum EVerticalMovementState
+	{
+		VerticalNeutral,
+		FlyDownStartup,
+		FlyDown,
+		FlyUpStartup,
+		FlyUp,
+		FlyTurnAroundDown,
+		FlyTurnAroundUp,
+		VerticalFlyStop,
+		SprintDownStartup,
+		SprintDown,
+		SprintUpStartup,
+		SprintUp,
+		SprintTurnaroundDown,
+		SprintTurnaroundUp,
+		VerticalSprintStop
+	};
+
+	EHorizontalMovementState HorizontalMovementState;
+	EVerticalMovementState VerticalMovementState;
+
+protected:
+	FVector2D _MovementInput;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	
+	virtual void AddMovementInput(FVector2D Direction, float amount);
 		
 };

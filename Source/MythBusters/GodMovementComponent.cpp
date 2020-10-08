@@ -23,12 +23,34 @@ void UGodMovementComponent::BeginPlay()
 	
 }
 
-
 // Called every frame
 void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	FVector location = GetOwner()->GetActorLocation();
+	/*switch (HorizontalMovementState)
+	{
+		case FlyLeft:
+			if (_MovementInput.X <= 0)
+			{
+				location.X += _MovementInput.X * MaxHorizontalFlySpeed * DeltaTime;
+			}
+			else
+			{
+				HorizontalMovementState = FlyTurnAroundLeft;
+			}
+			break;
+		case FlyTurnAroundLeft:
 
-	// ...
+	}*/
+	
+	location.X += _MovementInput.X * MaxHorizontalFlySpeed * DeltaTime;
+	location.Z += _MovementInput.Y * MaxVerticalFlySpeed * DeltaTime;
+	GetOwner()->SetActorLocation(location);
+	_MovementInput = FVector2D(0.0, 0.0);
 }
 
+void UGodMovementComponent::AddMovementInput(const FVector2D Direction, const float Amount)
+{
+	_MovementInput += Direction*Amount;
+}
