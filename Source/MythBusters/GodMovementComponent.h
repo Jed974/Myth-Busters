@@ -17,24 +17,43 @@ public:
 	UGodMovementComponent();
 
 public:
-	/** The maximum speed when flying. 1: Lateral speed; 2: Upward speed; 3: Downward speed; */
+	/** The maximum speed when flying. */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
-	float MaxHorizontalFlySpeed;
+		float MaxHorizontalFlySpeed;
+
+
+	/** The time (in frames) it takes to reach inputted horizontal fly speed */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		int HorizontalFlyStartupTime;
+	
+	/** The time (in frames) it takes to decrease speed to 0 when flying horizontally */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		int HorizontalFlyStopTime;
 
 	/** The maximum speed when flying. 1: Lateral speed; 2: Upward speed; 3: Downward speed; */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
-	float MaxVerticalFlySpeed;
+		float MaxVerticalFlySpeed;
+
+	/** The time (in frames) it takes to reach inputted vertical fly speed */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		int VerticalFlyStartupTime;
+
+	/** The time (in frames) it takes to decrease speed to 0 when flying vertically */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		int VerticalFlyStopTime;
 
 	enum EHorizontalMovementState
 	{
 		HorizontalNeutral,
+		HorizontalTurnaround,
 		FlyLeftStartup,
 		FlyLeft,
 		FlyRightStartup,
 		FlyRight,
-		FlyTurnAroundLeft,
-		FlyTurnAroundRight,
-		HorizontalFlyStop,
+		FlyLeftTurnaround,
+		FlyRightTurnaround,
+		FlyLeftStop,
+		FlyRightStop,
 		SprintLeftStartup,
 		SprintLeft,
 		SprintRightStartup,
@@ -51,9 +70,10 @@ public:
 		FlyDown,
 		FlyUpStartup,
 		FlyUp,
-		FlyTurnAroundDown,
-		FlyTurnAroundUp,
-		VerticalFlyStop,
+		FlyDownTurnAround,
+		FlyUpTurnAround,
+		FlyDownStop,
+		FlyUpStop,
 		SprintDownStartup,
 		SprintDown,
 		SprintUpStartup,
@@ -69,9 +89,20 @@ public:
 protected:
 	FVector2D _MovementInput;
 
+	float HorizontalSpeed;
+	int CurrentHorizontalStateTimer;
+	
+	int CurrentVerticalStateTimer;
+	float VerticalSpeed;
+	float DELTA_TIME;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	virtual void ChangeHorizontalMovementState(EHorizontalMovementState NewState);
+
+	virtual void ChangeVerticalMovementState(EVerticalMovementState NewState);
 
 
 
