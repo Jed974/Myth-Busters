@@ -8,8 +8,13 @@ Agod::Agod()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("StaticMeshComponent");
+	
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("CapsuleComponent");
+	CapsuleComponent->SetupAttachment(GetRootComponent());
+	
+	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("SkeletalMesh");
+	SkeletalMesh->SetupAttachment(CapsuleComponent);
+	
 	GodMovement = CreateDefaultSubobject<UGodMovementComponent>("GodMovementComponent");
 
 }

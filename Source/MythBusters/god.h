@@ -19,12 +19,14 @@ public:
 
 
 protected:
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* SkeletalMesh;
+		UCapsuleComponent* CapsuleComponent;
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
+		USkeletalMeshComponent* SkeletalMesh;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Movement", meta = (AllowPrivateAccess = "true"))
-    UGodMovementComponent* GodMovement;
+		UGodMovementComponent* GodMovement;
 
 protected:
 	// Called when the game starts or when spawned

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GodMovementComponent.generated.h"
 
 
@@ -30,6 +31,14 @@ public:
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int HorizontalFlyStopTime;
 
+	/** The extra time (in frames) it takes to start flying horizontally behind the character  */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		int HorizontalTurnaroundTime;
+
+	/** The extra time (in frames) it takes to turn around when flying horizontally  */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		int HorizontalFlyTurnaroundTime;
+
 	/** The maximum speed when flying. 1: Lateral speed; 2: Upward speed; 3: Downward speed; */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float MaxVerticalFlySpeed;
@@ -42,23 +51,27 @@ public:
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int VerticalFlyStopTime;
 
+	/** The extra time (in frames) it takes to start flying vertically in the opposite direction of current movement  */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		int VerticalTurnaroundTime;
+
+	/** The extra time (in frames) it takes to change direction when flying vertically  */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		int VerticalFlyTurnaroundTime;
+
 	enum EHorizontalMovementState
 	{
 		HorizontalNeutral,
-		HorizontalTurnaround,
-		FlyLeftStartup,
-		FlyLeft,
-		FlyRightStartup,
-		FlyRight,
-		FlyLeftTurnaround,
-		FlyRightTurnaround,
-		FlyLeftStop,
-		FlyRightStop,
+		HorizontalTurnAround,
+		FlyHorizontalStartup,
+		FlyHorizontal,
+		FlyHorizontalTurnAround,
+		FlyHorizontalStop,
 		SprintLeftStartup,
 		SprintLeft,
 		SprintRightStartup,
 		SprintRight,
-		SprintTurnaroundLeft,
+		SprintTurnAroundLeft,
 		SprintTurnaroundRight,
 		HorizontalSprintStop
 	};
@@ -66,14 +79,11 @@ public:
 	enum EVerticalMovementState
 	{
 		VerticalNeutral,
-		FlyDownStartup,
-		FlyDown,
-		FlyUpStartup,
-		FlyUp,
-		FlyDownTurnAround,
-		FlyUpTurnAround,
-		FlyDownStop,
-		FlyUpStop,
+		VerticalTurnAround,
+		FlyVerticalStartup,
+		FlyVertical,
+		FlyVerticalTurnAround,
+		FlyVerticalStop,
 		SprintDownStartup,
 		SprintDown,
 		SprintUpStartup,
@@ -94,7 +104,15 @@ protected:
 	
 	int CurrentVerticalStateTimer;
 	float VerticalSpeed;
+	
 	float DELTA_TIME;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool isFacingRight;
+	UPROPERTY(BlueprintReadOnly)
+	bool isFacingUp;
+
+	UCapsuleComponent* CapsuleComponent;
 
 protected:
 	// Called when the game starts
@@ -111,5 +129,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	virtual void AddMovementInput(FVector2D Direction, float amount);
+
+	virtual void ComputeNewLocation(FVector & Location);
 		
 };
