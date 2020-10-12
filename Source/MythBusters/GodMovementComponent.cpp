@@ -61,11 +61,10 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 	FVector Location = GetOwner()->GetActorLocation();
 	ComputeNewLocation(Location);
-
-	//static_cast<Agod>(GetOwner()).CapsuleComponent->
-	GetOwner()->SetActorLocation(Location);
+	FHitResult hitInfo = FHitResult();
+	GetOwner()->SetActorLocation(Location, true, &hitInfo);
 	
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Location.ToString());
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, hitInfo.ImpactPoint.ToString());
 	_MovementInput = FVector2D(0.0, 0.0);
 }
 
