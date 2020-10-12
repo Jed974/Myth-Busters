@@ -32,10 +32,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void MoveHorizontal(float AxisValue);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void MoveVertical(float AxisValue);
 
 
