@@ -16,11 +16,11 @@ class MYTHBUSTERS_API Agod : public APawn
 public:	
 	// Sets default values for this actor's properties
 	Agod();
-
-
-protected:
+	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
 		UCapsuleComponent* CapsuleComponent;
+
+protected:
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
 		USkeletalMeshComponent* SkeletalMesh;

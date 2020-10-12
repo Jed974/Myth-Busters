@@ -2,6 +2,7 @@
 
 
 #include "GodMovementComponent.h"
+#include "god.h"
 
 
 
@@ -45,8 +46,8 @@ void UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState N
 	switch (NewState)
 	{
 		case FlyVerticalStartup:
-		isFacingUp = _MovementInput.Y > 0;
-		break;
+			isFacingUp = _MovementInput.Y > 0;
+			break;
 	}
 }
 
@@ -60,9 +61,11 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 	FVector Location = GetOwner()->GetActorLocation();
 	ComputeNewLocation(Location);
+
+	//static_cast<Agod>(GetOwner()).CapsuleComponent->
 	GetOwner()->SetActorLocation(Location);
 	
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Location.ToString());
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Location.ToString());
 	_MovementInput = FVector2D(0.0, 0.0);
 }
 
