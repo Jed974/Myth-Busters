@@ -100,10 +100,15 @@ protected:
 	FVector2D _MovementInput;
 
 	float HorizontalSpeed;
+	float HorizontalPreviousSpeed;
 	int CurrentHorizontalStateTimer;
 	
 	int CurrentVerticalStateTimer;
 	float VerticalSpeed;
+	float VerticalPreviousSpeed;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector2D Velocity;
 	
 	float DELTA_TIME;
 

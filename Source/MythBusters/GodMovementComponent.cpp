@@ -31,6 +31,7 @@ void UGodMovementComponent::ChangeHorizontalMovementState(EHorizontalMovementSta
 {
 	CurrentHorizontalStateTimer = 0;
 	HorizontalMovementState = NewState;
+	HorizontalPreviousSpeed = Velocity.X;
 	switch (NewState)
 	{
 		case FlyHorizontalStartup:
@@ -43,6 +44,7 @@ void UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState N
 {
 	CurrentVerticalStateTimer = 0;
 	VerticalMovementState = NewState;
+	VerticalPreviousSpeed = Velocity.Y;
 	switch (NewState)
 	{
 		case FlyVerticalStartup:
@@ -57,14 +59,13 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 {
 	Super::TickComponent(DELTA_TIME, TickType, ThisTickFunction);
 
-	//FVector NewLocation = ComputeNewLocation();
-
 	FVector Location = GetOwner()->GetActorLocation();
 	ComputeNewLocation(Location);
+	Velocity = FVector2D((Location.X - GetOwner()->GetActorLocation().X)/DELTA_TIME, (Location.Z - GetOwner()->GetActorLocation().Z)/DELTA_TIME);
 	FHitResult hitInfo = FHitResult();
 	GetOwner()->SetActorLocation(Location, true, &hitInfo);
 	
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, hitInfo.ImpactPoint.ToString());
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
 	_MovementInput = FVector2D(0.0, 0.0);
 }
 
@@ -91,7 +92,7 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 	case FlyHorizontalStop:
 		if (CurrentHorizontalStateTimer * DELTA_TIME < HorizontalFlyStopTime * DELTA_TIME)
 		{
-			HorizontalSpeed -= MaxHorizontalFlySpeed / HorizontalFlyStopTime;
+			HorizontalSpeed -= HorizontalPreviousSpeed / HorizontalFlyStopTime;
 			CurrentHorizontalStateTimer++;
 			if (isFacingRight)
 			{
@@ -190,7 +191,7 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 	case FlyVerticalStop:
 		if (CurrentVerticalStateTimer * DELTA_TIME < VerticalFlyStopTime * DELTA_TIME)
 		{
-			VerticalSpeed -= MaxVerticalFlySpeed / VerticalFlyStopTime;
+			VerticalSpeed -= VerticalPreviousSpeed / VerticalFlyStopTime;
 			CurrentVerticalStateTimer++;
 			if (isFacingUp)
 			{
