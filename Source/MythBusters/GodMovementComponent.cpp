@@ -12,7 +12,7 @@ UGodMovementComponent::UGodMovementComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	// ...
+
 	isFacingRight = true;
 	isFacingUp = true;
 }
@@ -23,7 +23,6 @@ void UGodMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	DELTA_TIME = 1.0 / GEngine->FixedFrameRate;
-	// ...
 	
 }
 
@@ -60,8 +59,9 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	Super::TickComponent(DELTA_TIME, TickType, ThisTickFunction);
 
 	FVector Location = GetOwner()->GetActorLocation();
-	ComputeNewLocation(Location);
-	Velocity = FVector2D((Location.X - GetOwner()->GetActorLocation().X)/DELTA_TIME, (Location.Z - GetOwner()->GetActorLocation().Z)/DELTA_TIME);
+	ComputeNewVelocity();
+	Location.X += Velocity.X * DELTA_TIME;
+	Location.Z += Velocity.Y * DELTA_TIME;
 	FHitResult hitInfo = FHitResult();
 	GetOwner()->SetActorLocation(Location, true, &hitInfo);
 	
@@ -74,12 +74,13 @@ void UGodMovementComponent::AddMovementInput(const FVector2D Direction, const fl
 	_MovementInput += Direction*Amount;
 }
 
-void UGodMovementComponent::ComputeNewLocation(FVector & Location)
+void UGodMovementComponent::ComputeNewVelocity()
 {
 	switch (HorizontalMovementState)
 	{
 	case HorizontalNeutral:
 		HorizontalSpeed = 0;
+		Velocity.X = HorizontalSpeed;
 		if (_MovementInput.X < 0.0 && isFacingRight || _MovementInput.X > 0.0 && !isFacingRight)
 		{
 			ChangeHorizontalMovementState(HorizontalTurnAround);
@@ -92,15 +93,17 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 	case FlyHorizontalStop:
 		if (CurrentHorizontalStateTimer * DELTA_TIME < HorizontalFlyStopTime * DELTA_TIME)
 		{
-			HorizontalSpeed -= HorizontalPreviousSpeed / HorizontalFlyStopTime;
+			HorizontalSpeed = FMath::Abs(HorizontalPreviousSpeed) * (1 - CurrentHorizontalStateTimer / HorizontalFlyStopTime);
 			CurrentHorizontalStateTimer++;
 			if (isFacingRight)
 			{
-				Location.X += HorizontalSpeed * DELTA_TIME;
+				//Location.X += HorizontalSpeed * DELTA_TIME;
+				Velocity.X = HorizontalSpeed;
 			}
 			else
 			{
-				Location.X += HorizontalSpeed * DELTA_TIME * -1;
+				//Location.X += HorizontalSpeed * DELTA_TIME * -1;
+				Velocity.X = HorizontalSpeed * -1;
 			}
 		}
 		else
@@ -126,12 +129,13 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 			{
 				HorizontalSpeed += MaxHorizontalFlySpeed / HorizontalFlyStartupTime;
 				CurrentHorizontalStateTimer++;
-				Location.X += _MovementInput.X * HorizontalSpeed * DELTA_TIME;
+				//Location.X += _MovementInput.X * HorizontalSpeed * DELTA_TIME;
+				Velocity.X = _MovementInput.X * HorizontalSpeed;
 			}
 			else
 			{
 				ChangeHorizontalMovementState(FlyHorizontal);
-			}
+			}		
 		}
 		else
 		{
@@ -142,7 +146,8 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 	case FlyHorizontal:
 		if (_MovementInput.X > 0.0 && isFacingRight || _MovementInput.X < 0.0 && !isFacingRight)
 		{
-			Location.X += _MovementInput.X * HorizontalSpeed * DELTA_TIME;
+			//Location.X += _MovementInput.X * HorizontalSpeed * DELTA_TIME;
+			Velocity.X = _MovementInput.X * HorizontalSpeed;
 		}
 		else if (_MovementInput.X == 0.0)
 		{
@@ -160,11 +165,13 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 			CurrentHorizontalStateTimer++;
 			if (isFacingRight)
 			{
-				Location.X += HorizontalSpeed * DELTA_TIME;
+				//Location.X += HorizontalSpeed * DELTA_TIME;
+				Velocity.X = HorizontalSpeed;
 			}
 			else
 			{
-				Location.X += HorizontalSpeed * DELTA_TIME * -1;
+				//Location.X += HorizontalSpeed * DELTA_TIME * -1;
+				Velocity.X = HorizontalSpeed * -1;
 			}
 		}
 		else
@@ -179,6 +186,7 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 	{
 	case VerticalNeutral:
 		VerticalSpeed = 0;
+		Velocity.Y = VerticalSpeed;
 		if (_MovementInput.Y < 0.0 && isFacingUp || _MovementInput.Y > 0.0 && !isFacingUp)
 		{
 			ChangeVerticalMovementState(VerticalTurnAround);
@@ -191,15 +199,17 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 	case FlyVerticalStop:
 		if (CurrentVerticalStateTimer * DELTA_TIME < VerticalFlyStopTime * DELTA_TIME)
 		{
-			VerticalSpeed -= VerticalPreviousSpeed / VerticalFlyStopTime;
+			VerticalSpeed = FMath::Abs(VerticalPreviousSpeed) * (1 - CurrentVerticalStateTimer / VerticalFlyStopTime);
 			CurrentVerticalStateTimer++;
 			if (isFacingUp)
 			{
-				Location.Z += VerticalSpeed * DELTA_TIME;
+				//Location.Z += VerticalSpeed * DELTA_TIME;
+				Velocity.Y = VerticalSpeed;
 			}
 			else
 			{
-				Location.Z += VerticalSpeed * DELTA_TIME * -1;
+				//Location.Z += VerticalSpeed * DELTA_TIME * -1;
+				Velocity.Y = VerticalSpeed * -1;
 			}
 		}
 		else
@@ -225,7 +235,8 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 			{
 				VerticalSpeed += MaxVerticalFlySpeed / VerticalFlyStartupTime;
 				CurrentVerticalStateTimer++;
-				Location.Z += _MovementInput.Y * VerticalSpeed * DELTA_TIME;
+				//Location.Z += _MovementInput.Y * VerticalSpeed * DELTA_TIME;
+				Velocity.Y = _MovementInput.Y * VerticalSpeed;
 			}
 			else
 			{
@@ -242,7 +253,8 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 
 		if (_MovementInput.Y > 0.0 && isFacingUp || _MovementInput.Y < 0.0 && !isFacingUp)
 		{
-			Location.Z += _MovementInput.Y * VerticalSpeed * DELTA_TIME;
+			//Location.Z += _MovementInput.Y * VerticalSpeed * DELTA_TIME;
+			Velocity.Y = _MovementInput.Y * VerticalSpeed;
 		}
 		else if (_MovementInput.Y == 0.0)
 		{
@@ -260,11 +272,13 @@ void UGodMovementComponent::ComputeNewLocation(FVector & Location)
 			CurrentVerticalStateTimer++;
 			if (isFacingUp)
 			{
-				Location.Z += VerticalSpeed * DELTA_TIME;
+				//Location.Z += VerticalSpeed * DELTA_TIME;
+				Velocity.Y = VerticalSpeed;
 			}
 			else
 			{
-				Location.Z += VerticalSpeed * DELTA_TIME * -1;
+				//Location.Z += VerticalSpeed * DELTA_TIME * -1;
+				Velocity.Y = VerticalSpeed * -1;
 			}
 			
 		}

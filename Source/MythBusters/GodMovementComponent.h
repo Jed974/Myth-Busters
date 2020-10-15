@@ -135,6 +135,6 @@ public:
 	
 	virtual void AddMovementInput(FVector2D Direction, float amount);
 
-	virtual void ComputeNewLocation(FVector & Location);
+	virtual void ComputeNewVelocity();
 		
 };
