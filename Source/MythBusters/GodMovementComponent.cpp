@@ -71,17 +71,15 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 		if (_MovementInput.Y != 0.f)
 		{
 			Tangent = HitInfo.Normal.RotateAngleAxis((HitInfo.Normal.X > 0.f && HitInfo.Normal.Z < 0.f || HitInfo.Normal.X < 0.f && HitInfo.Normal.Z > 0.f ? -90.f : 90.f), FVector(0.f, 1.f, 0.f)) * 1000;
-			//Tangent = FVector2D(FMath::Sign(HitInfo.Normal.X) * 1000, 0.f);
 		}
 		else if (_MovementInput.X != 0.f)
 		{
 			Tangent = HitInfo.Normal.RotateAngleAxis((HitInfo.Normal.X < 0.f && HitInfo.Normal.Z < 0.f || HitInfo.Normal.X > 0.f && HitInfo.Normal.Z > 0.f ? -90.f : 90.f), FVector(0.f, 1.f, 0.f)) * 1000;
-			//Tangent = FVector2D(0.f, FMath::Sign(HitInfo.Normal.Z) * 1000);
 		}
 		
 		Location.X += Tangent.X * DELTA_TIME;
 		Location.Z += Tangent.Y * DELTA_TIME;
-		GetOwner()->SetActorLocation(Location, true);
+		//GetOwner()->SetActorLocation(Location, true);
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Tangent.ToString());
 	}
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
@@ -116,12 +114,10 @@ void UGodMovementComponent::ComputeNewVelocity()
 			CurrentHorizontalStateTimer++;
 			if (isFacingRight)
 			{
-				//Location.X += HorizontalSpeed * DELTA_TIME;
 				Velocity.X = HorizontalSpeed;
 			}
 			else
 			{
-				//Location.X += HorizontalSpeed * DELTA_TIME * -1;
 				Velocity.X = HorizontalSpeed * -1;
 			}
 		}

@@ -37,13 +37,24 @@ void Agod::Tick(float DeltaTime)
 void Agod::MoveHorizontal(float AxisValue)
 {
 	GodMovement->AddMovementInput(FVector2D(1.0, 0.0), AxisValue);
+	EMoveHorizontal(AxisValue);
 }
 
 void Agod::MoveVertical(float AxisValue)
 {
 	GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
+	EMoveVertical(AxisValue);
 }
 
+void Agod::AttackNormal()
+{
+	EAttackNormal();
+}
+
+void Agod::StopAttackNormal()
+{
+	EStopAttackNormal();
+}
 
 void Agod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 {
@@ -51,6 +62,9 @@ void Agod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 
 	PlayerInputComponent->BindAxis("MoveHorizontal", this, &Agod::MoveHorizontal);
 	PlayerInputComponent->BindAxis("MoveVertical", this, &Agod::MoveVertical);
+	PlayerInputComponent->BindAction("AttackNormal", IE_Pressed, this, &Agod::AttackNormal);
+	PlayerInputComponent->BindAction("AttackNormal", IE_Released, this, &Agod::StopAttackNormal);
+
 }
 
 

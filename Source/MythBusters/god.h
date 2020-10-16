@@ -33,11 +33,24 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void MoveHorizontal(float AxisValue);
+	        virtual void MoveHorizontal(float AxisValue);
+	UFUNCTION(BlueprintImplementableEvent)
+	        void EMoveHorizontal(float AxisValue);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void MoveVertical(float AxisValue);
+	        virtual void MoveVertical(float AxisValue);
+	UFUNCTION(BlueprintImplementableEvent)
+	        void EMoveVertical(float AxisValue);
 
+	UFUNCTION(BlueprintCallable)
+		virtual void AttackNormal();
+	UFUNCTION(BlueprintImplementableEvent)
+	        void EAttackNormal();
+
+	UFUNCTION(BlueprintCallable)
+		virtual void StopAttackNormal();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EStopAttackNormal();
 
 	
 
