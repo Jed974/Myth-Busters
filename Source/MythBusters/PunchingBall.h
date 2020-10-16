@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class MYTHBUSTERS_API APunchingBall : public Agod
+class MYTHBUSTERS_API APunchingBall : public AGod
 {
 	GENERATED_BODY()
 	

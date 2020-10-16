@@ -9,13 +9,13 @@
 #include "god.generated.h"
 
 UCLASS()
-class MYTHBUSTERS_API Agod : public APawn
+class MYTHBUSTERS_API AGod : public APawn
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	Agod();
+	AGod();
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
 		UCapsuleComponent* CapsuleComponent;
@@ -28,34 +28,35 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Movement", meta = (AllowPrivateAccess = "true"))
 		UGodMovementComponent* GodMovement;
 
+	float HorizontalDeadZone = 0.15f;
+	float VerticalDeadZone = 0.15f;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	        virtual void MoveHorizontal(float AxisValue);
+	    virtual void MoveHorizontal(float AxisValue);
 	UFUNCTION(BlueprintImplementableEvent)
-	        void EMoveHorizontal(float AxisValue);
+		void EMoveHorizontal(float AxisValue);
 
 	UFUNCTION(BlueprintCallable)
-	        virtual void MoveVertical(float AxisValue);
+	    virtual void MoveVertical(float AxisValue);
 	UFUNCTION(BlueprintImplementableEvent)
-	        void EMoveVertical(float AxisValue);
+	    void EMoveVertical(float AxisValue);
 
 	UFUNCTION(BlueprintCallable)
-<<<<<<< HEAD
 		virtual void AttackNormal();
 	UFUNCTION(BlueprintImplementableEvent)
-	        void EAttackNormal();
+	    void EAttackNormal();
 
 	UFUNCTION(BlueprintCallable)
 		virtual void StopAttackNormal();
 	UFUNCTION(BlueprintImplementableEvent)
 		void EStopAttackNormal();
-=======
-	virtual void InputDash();
 
->>>>>>> e53ba9f993cc4f74714d3b923f5d7c7c15f2817b
+	virtual void Dash();
+
 
 	
 

@@ -4,7 +4,7 @@
 #include "god.h"
 
 // Sets default values
-Agod::Agod()
+AGod::AGod()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -20,65 +20,68 @@ Agod::Agod()
 }
 
 // Called when the game starts or when spawned
-void Agod::BeginPlay()
+void AGod::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void Agod::Tick(float DeltaTime)
+void AGod::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
 
-void Agod::MoveHorizontal(float AxisValue)
+void AGod::MoveHorizontal(float AxisValue)
 {
-	GodMovement->AddMovementInput(FVector2D(1.0, 0.0), AxisValue);
-	EMoveHorizontal(AxisValue);
+	if (FMath::Abs(AxisValue) > HorizontalDeadZone)
+	{
+		GodMovement->AddMovementInput(FVector2D(1.0, 0.0), AxisValue);
+		EMoveHorizontal(AxisValue);
+	}
 }
 
-void Agod::MoveVertical(float AxisValue)
+void AGod::MoveVertical(float AxisValue)
 {
-	GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
-	EMoveVertical(AxisValue);
+	if (FMath::Abs(AxisValue) > VerticalDeadZone)
+	{
+		GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
+		EMoveVertical(AxisValue);
+	}
+	
 }
 
-<<<<<<< HEAD
-void Agod::AttackNormal()
+
+void AGod::AttackNormal()
 {
 	EAttackNormal();
 }
 
-void Agod::StopAttackNormal()
+void AGod::StopAttackNormal()
 {
 	EStopAttackNormal();
 }
-=======
-void Agod::InputDash()
+
+void AGod::Dash()
 {
 	GodMovement->Dash();
 }
 
 
 
->>>>>>> e53ba9f993cc4f74714d3b923f5d7c7c15f2817b
 
-void Agod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
+void AGod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveHorizontal", this, &Agod::MoveHorizontal);
-	PlayerInputComponent->BindAxis("MoveVertical", this, &Agod::MoveVertical);
-<<<<<<< HEAD
-	PlayerInputComponent->BindAction("AttackNormal", IE_Pressed, this, &Agod::AttackNormal);
-	PlayerInputComponent->BindAction("AttackNormal", IE_Released, this, &Agod::StopAttackNormal);
+	PlayerInputComponent->BindAxis("MoveHorizontal", this, &AGod::MoveHorizontal);
+	PlayerInputComponent->BindAxis("MoveVertical", this, &AGod::MoveVertical);
+	PlayerInputComponent->BindAction("AttackNormal", IE_Pressed, this, &AGod::AttackNormal);
+	PlayerInputComponent->BindAction("AttackNormal", IE_Released, this, &AGod::StopAttackNormal);
 
-=======
-	PlayerInputComponent->BindAction("Dash",IE_Pressed,this, &Agod:: InputDash);
->>>>>>> e53ba9f993cc4f74714d3b923f5d7c7c15f2817b
+	PlayerInputComponent->BindAction("Dash",IE_Pressed,this, &AGod::Dash);
 }
 
 

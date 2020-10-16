@@ -14,7 +14,7 @@ class MYTHBUSTERS_API AHitBoxGroup : public AActor
 
 protected:
 	UPROPERTY(BlueprintReadWrite)
-	TArray<Agod*> AlreadyHitGods;
+	TArray<AGod*> AlreadyHitGods;
 	
 public:	
 	// Sets default values for this actor's properties

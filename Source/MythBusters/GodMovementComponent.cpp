@@ -88,24 +88,24 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UGodMovementComponent::AddMovementInput(const FVector2D Direction, const float Amount)
 {
-	_MovementInput += Direction*Amount;
+	_MovementInput += Direction * FMath::Clamp(Amount, -1.f, 1.f);
 }
 
 void UGodMovementComponent::Dash() {
 	HorizontalDashFrameCounter = 0;
-	UGodMovementComponent::ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalDash);
+	UGodMovementComponent::ChangeHorizontalMovementState(EHorizontalMovementState::DashHorizontal);
 	VerticalDashFrameCounter = 0;
-	UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState::VerticalDash);
+	UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState::DashVertical);
 }
 
-void UGodMovementComponent::EjectGod(FVector2D _EjectionSpeed) {
+void UGodMovementComponent::Eject(FVector2D _EjectionSpeed) {
 	EjectionVelocity.X = _EjectionSpeed.X;
 	EjectionVelocity.Y = _EjectionSpeed.Y;
 	isFacingRight = EjectionVelocity.X < 0;
 	isFacingUp = EjectionVelocity.Y < 0;
 
-	ChangeHorizontalMovementState(HorizontalEjection);
-	ChangeVerticalMovementState(VerticalEjection);
+	ChangeHorizontalMovementState(EjectionHorizontal);
+	ChangeVerticalMovementState(EjectionVertical);
 }
 
 void UGodMovementComponent::ComputeNewVelocity() {
@@ -211,7 +211,7 @@ void UGodMovementComponent::ComputeNewVelocity() {
 			ChangeHorizontalMovementState(HorizontalNeutral);
 		}
 		break;
-	case HorizontalEjection:
+	case EjectionHorizontal:
 		if (CurrentHorizontalStateTimer * DELTA_TIME < EjectionRecoverTime * DELTA_TIME * 60)
 		{
 			const float Alpha = CurrentHorizontalStateTimer / (EjectionRecoverTime * 60);
@@ -238,7 +238,7 @@ void UGodMovementComponent::ComputeNewVelocity() {
 			{
 				ChangeHorizontalMovementState(HorizontalNeutral);
 			}
-	case HorizontalDash:
+	case DashHorizontal:
 		if (HorizontalDashFrameCounter <= DashFrames && (_MovementInput.X > 0.0 && isFacingRight || _MovementInput.X < 0.0 && !isFacingRight))
 		{
 			Velocity.X = _MovementInput.X * HorizontalSpeed * DashingSpeedScale;
@@ -352,18 +352,11 @@ void UGodMovementComponent::ComputeNewVelocity() {
 			ChangeVerticalMovementState(VerticalNeutral);
 		}
 		break;
-	case VerticalEjection:
-		if (CurrentVerticalStateTimer* DELTA_TIME < EjectionRecoverTime* DELTA_TIME * 60)
+	case EjectionVertical:
+		if (CurrentVerticalStateTimer* DELTA_TIME < EjectionRecoverTime * DELTA_TIME * 60)
 		{
-<<<<<<< HEAD
 			const float Alpha = CurrentVerticalStateTimer / (EjectionRecoverTime * 60);
 			VerticalSpeed = FMath::Lerp(EjectionVelocity.Y, _MovementInput.Y * MaxVerticalFlySpeed, Alpha);
-			
-=======
-			float alpha = CurrentVerticalStateTimer / (EjectionRecoverTime * 60);
-			VerticalSpeed = FMath::Lerp(EjectionVelocity.Y, _MovementInput.Y * MaxVerticalFlySpeed, alpha);
-
->>>>>>> e53ba9f993cc4f74714d3b923f5d7c7c15f2817b
 			Velocity.Y = VerticalSpeed;
 			CurrentVerticalStateTimer++;
 		}
@@ -382,7 +375,7 @@ void UGodMovementComponent::ComputeNewVelocity() {
 			{
 				ChangeVerticalMovementState(VerticalNeutral);
 			}
-	case VerticalDash:
+	case DashVertical:
 		if (VerticalDashFrameCounter <= DashFrames && _MovementInput.Y != 0.0)
 		{
 			Velocity.Y = _MovementInput.Y * VerticalSpeed * DashingSpeedScale;

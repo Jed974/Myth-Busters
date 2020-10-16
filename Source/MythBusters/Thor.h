@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class MYTHBUSTERS_API AThor : public Agod
+class MYTHBUSTERS_API AThor : public AGod
 {
 	GENERATED_BODY()
 	

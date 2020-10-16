@@ -58,16 +58,12 @@ public:
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int VerticalFlyTurnaroundTime;
 
-<<<<<<< HEAD
 
 	/** The time it takes to get control over your character again when being ejected. */
-=======
-	/** The maximum speed when flying. */
->>>>>>> e53ba9f993cc4f74714d3b923f5d7c7c15f2817b
 	UPROPERTY(Category = "God Movement: Ejection", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float EjectionRecoverTime;
 
-	/** Dashing speed, as a scale of maximu flying speed */
+	/** Dashing speed, as a scale of maximum flying speed */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float DashingSpeedScale;
 
@@ -83,15 +79,12 @@ public:
 		FlyHorizontal,
 		FlyHorizontalTurnAround,
 		FlyHorizontalStop,
-		SprintLeftStartup,
-		SprintLeft,
-		SprintRightStartup,
-		SprintRight,
-		SprintTurnAroundLeft,
-		SprintTurnaroundRight,
-		HorizontalSprintStop,
-		HorizontalEjection,
-		HorizontalDash
+		SprintHorizontalStartup,
+		SprintHorizontal,
+		SprintHorizontalTurnAround,
+		SprintHorizontalStop,
+		EjectionHorizontal,
+		DashHorizontal
 	};
 
 	enum EVerticalMovementState
@@ -102,15 +95,12 @@ public:
 		FlyVertical,
 		FlyVerticalTurnAround,
 		FlyVerticalStop,
-		SprintDownStartup,
-		SprintDown,
-		SprintUpStartup,
-		SprintUp,
-		SprintTurnaroundDown,
-		SprintTurnaroundUp,
-		VerticalSprintStop,
-		VerticalEjection,
-		VerticalDash
+		SprintVerticalStartup,
+		SprintVertical,
+		SprintVerticalTurnaround,
+		SprintVerticalStop,
+		EjectionVertical,
+		DashVertical
 	};
 
 	EHorizontalMovementState HorizontalMovementState;
@@ -162,7 +152,8 @@ public:
 
 	virtual void ComputeNewVelocity();
 
-	virtual void EjectGod(FVector2D _EjectionSpeed);
+	UFUNCTION(BlueprintCallable)
+	virtual void Eject(FVector2D _EjectionSpeed);
 		
 	virtual void Dash();
 };
