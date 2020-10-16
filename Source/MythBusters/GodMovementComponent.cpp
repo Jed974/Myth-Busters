@@ -180,6 +180,44 @@ void UGodMovementComponent::ComputeNewVelocity()
 			ChangeHorizontalMovementState(HorizontalNeutral);
 		}
 		break;
+	case HorizontalEjection:
+		if (CurrentHorizontalStateTimer * DELTA_TIME < EjectionRecoverTime * DELTA_TIME * 60)
+		{
+			float alpha = CurrentHorizontalStateTimer / (EjectionRecoverTime * 60);
+			HorizontalSpeed = FMath::Lerp(EjectionVelocity.X, _MovementInput.X * MaxHorizontalFlySpeed, alpha);
+			Velocity.X = HorizontalSpeed;
+			
+			CurrentHorizontalStateTimer++;
+		}
+		else
+		{
+			if (GEngine)
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Ejection over");
+
+			EjectionVelocity = FVector2D::ZeroVector;
+			
+			if (_MovementInput.X != 0)
+			{
+				isFacingRight = 0 < _MovementInput.X;
+				Velocity.X = _MovementInput.X * MaxHorizontalFlySpeed;
+				HorizontalSpeed = FMath::Abs(Velocity.X);
+				ChangeHorizontalMovementState(FlyHorizontal);
+			}/*
+			if (_MovementInput.X > 0)
+			{
+				isFacingRight = true;
+				ChangeHorizontalMovementState(FlyHorizontal);
+			}
+			else if (_MovementInput.X > 0)
+			{
+				isFacingRight = false;
+				ChangeHorizontalMovementState(FlyHorizontal);
+			}*/
+			else {
+				ChangeHorizontalMovementState(HorizontalNeutral);
+			}			
+		}
+		break;
 	}
 
 	switch (VerticalMovementState)
@@ -280,7 +318,7 @@ void UGodMovementComponent::ComputeNewVelocity()
 				//Location.Z += VerticalSpeed * DELTA_TIME * -1;
 				Velocity.Y = VerticalSpeed * -1;
 			}
-			
+
 		}
 		else
 		{
@@ -288,5 +326,40 @@ void UGodMovementComponent::ComputeNewVelocity()
 			ChangeVerticalMovementState(VerticalNeutral);
 		}
 		break;
+	case VerticalEjection:
+		if (CurrentVerticalStateTimer * DELTA_TIME < EjectionRecoverTime * DELTA_TIME * 60)
+		{
+			float alpha = CurrentVerticalStateTimer / (EjectionRecoverTime * 60);
+			VerticalSpeed = FMath::Lerp(EjectionVelocity.Y, _MovementInput.Y * MaxVerticalFlySpeed, alpha);
+			
+			Velocity.Y = VerticalSpeed;
+			CurrentVerticalStateTimer++;
+		}
+		else
+		{		
+			EjectionVelocity = FVector2D::ZeroVector;
+
+			if (_MovementInput.Y != 0)
+			{
+				isFacingUp = _MovementInput.Y > 0;
+				Velocity.Y = _MovementInput.Y * MaxVerticalFlySpeed;
+				VerticalSpeed = FMath::Abs(Velocity.Y);
+				ChangeVerticalMovementState(FlyVertical);
+			}
+			else {
+				ChangeVerticalMovementState(VerticalNeutral);
+			}
+		}
+		break;
 	}
+}
+
+void UGodMovementComponent::EjectGod(FVector2D _EjectionSpeed) {
+	EjectionVelocity.X = _EjectionSpeed.X;
+	EjectionVelocity.Y = _EjectionSpeed.Y;
+	isFacingRight = EjectionVelocity.X < 0;
+	isFacingUp = EjectionVelocity.Y < 0;
+
+	ChangeHorizontalMovementState(HorizontalEjection);
+	ChangeVerticalMovementState(VerticalEjection);
 }

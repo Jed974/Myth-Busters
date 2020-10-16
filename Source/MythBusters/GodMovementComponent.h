@@ -22,7 +22,6 @@ public:
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float MaxHorizontalFlySpeed;
 
-
 	/** The time (in frames) it takes to reach inputted horizontal fly speed */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int HorizontalFlyStartupTime;
@@ -59,6 +58,12 @@ public:
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int VerticalFlyTurnaroundTime;
 
+
+	/** The maximum speed when flying. */
+	UPROPERTY(Category = "God Movement: Ejection", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		float EjectionRecoverTime;
+
+
 	enum EHorizontalMovementState
 	{
 		HorizontalNeutral,
@@ -73,7 +78,8 @@ public:
 		SprintRight,
 		SprintTurnAroundLeft,
 		SprintTurnaroundRight,
-		HorizontalSprintStop
+		HorizontalSprintStop,
+		HorizontalEjection
 	};
 
 	enum EVerticalMovementState
@@ -90,7 +96,8 @@ public:
 		SprintUp,
 		SprintTurnaroundDown,
 		SprintTurnaroundUp,
-		VerticalSprintStop
+		VerticalSprintStop,
+		VerticalEjection
 	};
 
 	EHorizontalMovementState HorizontalMovementState;
@@ -109,6 +116,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector2D Velocity;
+	FVector2D EjectionVelocity;
 	
 	float DELTA_TIME;
 
@@ -136,5 +144,8 @@ public:
 	virtual void AddMovementInput(FVector2D Direction, float amount);
 
 	virtual void ComputeNewVelocity();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void EjectGod(FVector2D _EjectionSpeed);
 		
 };
