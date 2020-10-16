@@ -93,7 +93,7 @@ void UGodMovementComponent::ComputeNewVelocity()
 	case FlyHorizontalStop:
 		if (CurrentHorizontalStateTimer * DELTA_TIME < HorizontalFlyStopTime * DELTA_TIME)
 		{
-			HorizontalSpeed = FMath::Abs(HorizontalPreviousSpeed) * (1 - CurrentHorizontalStateTimer / HorizontalFlyStopTime);
+			HorizontalSpeed = FMath::Abs(HorizontalPreviousSpeed) * (1 - static_cast<float>(CurrentHorizontalStateTimer) / HorizontalFlyStopTime);
 			CurrentHorizontalStateTimer++;
 			if (isFacingRight)
 			{
@@ -199,7 +199,7 @@ void UGodMovementComponent::ComputeNewVelocity()
 	case FlyVerticalStop:
 		if (CurrentVerticalStateTimer * DELTA_TIME < VerticalFlyStopTime * DELTA_TIME)
 		{
-			VerticalSpeed = FMath::Abs(VerticalPreviousSpeed) * (1 - CurrentVerticalStateTimer / VerticalFlyStopTime);
+			VerticalSpeed = FMath::Abs(VerticalPreviousSpeed) * (1 - static_cast<float>(CurrentVerticalStateTimer) / VerticalFlyStopTime);
 			CurrentVerticalStateTimer++;
 			if (isFacingUp)
 			{
