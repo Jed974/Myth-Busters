@@ -2,6 +2,9 @@
 
 
 #include "P2CameraController.h"
+#include "Kismet/GameplayStatics.h"
+#include "god.h"
+
 
 // Sets default values for this component's properties
 UP2CameraController::UP2CameraController()
@@ -18,8 +21,6 @@ UP2CameraController::UP2CameraController()
 void UP2CameraController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 	
 }
 
@@ -30,18 +31,14 @@ void UP2CameraController::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	//milieu
-	FVector locationPlayer1 = Player1->GetActorLocation();
-	FVector locationPlayer2 = Player2->GetActorLocation();
-
-
+	FVector locationPlayer1 = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+	FVector locationPlayer2 = FVector(0,0,0);
 	FVector milieuP1P2 = (locationPlayer1 + locationPlayer2 ) / 2;
 
 
 	//zoom
-	float tempX = abs(locationPlayer1.X - locationPlayer2.X) / 2;
-	float reculAxeX = tempX/2 - tempX*tempX/4;
-	float tempZ = abs(locationPlayer1.Z - locationPlayer2.Z) / 2;
-	float reculAxeZ = tempZ / 2 - tempZ * tempZ / 4;
+	float reculAxeX = abs(locationPlayer1.X - locationPlayer2.X);
+	float reculAxeZ = abs(locationPlayer1.Z - locationPlayer2.Z);
 	float CameraYLocation;
 	if (reculAxeX > reculAxeZ) {
 			CameraYLocation = reculAxeX;
@@ -50,14 +47,11 @@ void UP2CameraController::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	{
 			CameraYLocation = reculAxeZ;
 	}
-	FString CameraYLocationStr = FString::SanitizeFloat(CameraYLocation);
-	/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("noucellePos:"));
-	GEngine->AddOnScreenDebugMessage(-1, 1.0, FColor::Red, *CameraYLocationStr);*/
+
 
 
 	//deplacement vers la nouvelle position
-	FVector newCameraLocation = FVector(milieuP1P2.X, - CameraYLocation - initialCameraDistance, milieuP1P2.Z);
-	//En commentaire tant que j'ai pas fini
-	//GetOwner()->SetActorLocation(newCameraLocation);
+	FVector newCameraLocation = FVector(milieuP1P2.X, CameraYLocation + initialCameraDistance, milieuP1P2.Z);
+	GetOwner()->SetActorLocation(newCameraLocation);
 }
 

@@ -24,13 +24,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(EditAnywhere, CATEGORY = "Players")
-	AActor* Player1;
-
-	UPROPERTY(EditAnywhere, CATEGORY = "Players")
-	AActor* Player2;
-
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", UIMin = "0"))
-	float initialCameraDistance;
+	float initialCameraDistance = 600;
 
 };
