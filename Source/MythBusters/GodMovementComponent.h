@@ -59,7 +59,7 @@ public:
 		int VerticalFlyTurnaroundTime;
 
 
-	/** The maximum speed when flying. */
+	/** The time it takes to get control over your character again when being ejected. */
 	UPROPERTY(Category = "God Movement: Ejection", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float EjectionRecoverTime;
 
@@ -116,6 +116,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector2D Velocity;
+	
 	FVector2D EjectionVelocity;
 	
 	float DELTA_TIME;
