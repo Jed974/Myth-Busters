@@ -43,6 +43,7 @@ protected:
 	        void EMoveVertical(float AxisValue);
 
 	UFUNCTION(BlueprintCallable)
+<<<<<<< HEAD
 		virtual void AttackNormal();
 	UFUNCTION(BlueprintImplementableEvent)
 	        void EAttackNormal();
@@ -51,6 +52,10 @@ protected:
 		virtual void StopAttackNormal();
 	UFUNCTION(BlueprintImplementableEvent)
 		void EStopAttackNormal();
+=======
+	virtual void InputDash();
+
+>>>>>>> e53ba9f993cc4f74714d3b923f5d7c7c15f2817b
 
 	
 

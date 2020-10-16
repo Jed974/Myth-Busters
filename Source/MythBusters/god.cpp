@@ -46,6 +46,7 @@ void Agod::MoveVertical(float AxisValue)
 	EMoveVertical(AxisValue);
 }
 
+<<<<<<< HEAD
 void Agod::AttackNormal()
 {
 	EAttackNormal();
@@ -55,6 +56,15 @@ void Agod::StopAttackNormal()
 {
 	EStopAttackNormal();
 }
+=======
+void Agod::InputDash()
+{
+	GodMovement->Dash();
+}
+
+
+
+>>>>>>> e53ba9f993cc4f74714d3b923f5d7c7c15f2817b
 
 void Agod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 {
@@ -62,9 +72,13 @@ void Agod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 
 	PlayerInputComponent->BindAxis("MoveHorizontal", this, &Agod::MoveHorizontal);
 	PlayerInputComponent->BindAxis("MoveVertical", this, &Agod::MoveVertical);
+<<<<<<< HEAD
 	PlayerInputComponent->BindAction("AttackNormal", IE_Pressed, this, &Agod::AttackNormal);
 	PlayerInputComponent->BindAction("AttackNormal", IE_Released, this, &Agod::StopAttackNormal);
 
+=======
+	PlayerInputComponent->BindAction("Dash",IE_Pressed,this, &Agod:: InputDash);
+>>>>>>> e53ba9f993cc4f74714d3b923f5d7c7c15f2817b
 }
 
 
