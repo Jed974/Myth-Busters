@@ -58,13 +58,10 @@ public:
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int VerticalFlyTurnaroundTime;
 
-<<<<<<< HEAD
-
 	/** The maximum speed when flying. */
 	UPROPERTY(Category = "God Movement: Ejection", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float EjectionRecoverTime;
 
-=======
 	/** Dashing speed, as a scale of maximu flying speed */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float DashingSpeedScale;
@@ -72,7 +69,6 @@ public:
 	/** Number of frames in a dash */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, meta = (ClampMin = "0", UIMin = "0"))
 		int DashFrames;
->>>>>>> dev_local
 
 	enum EHorizontalMovementState
 	{
@@ -89,11 +85,8 @@ public:
 		SprintTurnAroundLeft,
 		SprintTurnaroundRight,
 		HorizontalSprintStop,
-<<<<<<< HEAD
-		HorizontalEjection
-=======
+		HorizontalEjection,
 		HorizontalDash
->>>>>>> dev_local
 	};
 
 	enum EVerticalMovementState
@@ -111,11 +104,8 @@ public:
 		SprintTurnaroundDown,
 		SprintTurnaroundUp,
 		VerticalSprintStop,
-<<<<<<< HEAD
-		VerticalEjection
-=======
+		VerticalEjection,
 		VerticalDash
->>>>>>> dev_local
 	};
 
 	EHorizontalMovementState HorizontalMovementState;
@@ -166,7 +156,6 @@ public:
 
 	virtual void ComputeNewVelocity();
 
-	UFUNCTION(BlueprintCallable)
 	virtual void EjectGod(FVector2D _EjectionSpeed);
 		
 	virtual void Dash();
