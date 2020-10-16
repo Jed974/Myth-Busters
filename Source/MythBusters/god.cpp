@@ -44,6 +44,13 @@ void Agod::MoveVertical(float AxisValue)
 	GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
 }
 
+void Agod::InputDash()
+{
+	GodMovement->Dash();
+}
+
+
+
 
 void Agod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 {
@@ -51,6 +58,7 @@ void Agod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 
 	PlayerInputComponent->BindAxis("MoveHorizontal", this, &Agod::MoveHorizontal);
 	PlayerInputComponent->BindAxis("MoveVertical", this, &Agod::MoveVertical);
+	PlayerInputComponent->BindAction("Dash",IE_Pressed,this, &Agod:: InputDash);
 }
 
 

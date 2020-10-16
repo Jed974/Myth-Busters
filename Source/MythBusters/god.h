@@ -38,6 +38,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void MoveVertical(float AxisValue);
 
+	UFUNCTION(BlueprintCallable)
+	virtual void InputDash();
+
 
 	
 

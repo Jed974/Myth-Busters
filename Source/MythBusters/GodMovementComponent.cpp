@@ -74,6 +74,13 @@ void UGodMovementComponent::AddMovementInput(const FVector2D Direction, const fl
 	_MovementInput += Direction*Amount;
 }
 
+void UGodMovementComponent::Dash() {
+	HorizontalDashFrameCounter = 0;
+	UGodMovementComponent::ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalDash);
+	VerticalDashFrameCounter = 0;
+	UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState::VerticalDash);
+}
+
 void UGodMovementComponent::ComputeNewVelocity()
 {
 	switch (HorizontalMovementState)
@@ -180,6 +187,7 @@ void UGodMovementComponent::ComputeNewVelocity()
 			ChangeHorizontalMovementState(HorizontalNeutral);
 		}
 		break;
+<<<<<<< HEAD
 	case HorizontalEjection:
 		if (CurrentHorizontalStateTimer * DELTA_TIME < EjectionRecoverTime * DELTA_TIME * 60)
 		{
@@ -216,6 +224,17 @@ void UGodMovementComponent::ComputeNewVelocity()
 			else {
 				ChangeHorizontalMovementState(HorizontalNeutral);
 			}			
+=======
+	case HorizontalDash:
+		if ( HorizontalDashFrameCounter <= DashFrames && (_MovementInput.X > 0.0 && isFacingRight || _MovementInput.X < 0.0 && !isFacingRight))
+		{
+			Velocity.X = _MovementInput.X * HorizontalSpeed * DashingSpeedScale;
+			HorizontalDashFrameCounter++;
+		}
+		else
+		{
+			ChangeHorizontalMovementState(FlyHorizontal);
+>>>>>>> dev_local
 		}
 		break;
 	}
@@ -326,6 +345,7 @@ void UGodMovementComponent::ComputeNewVelocity()
 			ChangeVerticalMovementState(VerticalNeutral);
 		}
 		break;
+<<<<<<< HEAD
 	case VerticalEjection:
 		if (CurrentVerticalStateTimer * DELTA_TIME < EjectionRecoverTime * DELTA_TIME * 60)
 		{
@@ -349,6 +369,17 @@ void UGodMovementComponent::ComputeNewVelocity()
 			else {
 				ChangeVerticalMovementState(VerticalNeutral);
 			}
+=======
+	case VerticalDash:
+		if (VerticalDashFrameCounter <= DashFrames && _MovementInput.Y != 0.0 )
+		{
+			Velocity.Y = _MovementInput.Y * VerticalSpeed * DashingSpeedScale;
+			VerticalDashFrameCounter++;
+		}
+		else
+		{
+			ChangeVerticalMovementState(FlyVertical);
+>>>>>>> dev_local
 		}
 		break;
 	}
