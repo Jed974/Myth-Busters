@@ -56,7 +56,7 @@ void UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState N
 // Called every frame
 void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DELTA_TIME, TickType, ThisTickFunction);
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	FVector Location = GetOwner()->GetActorLocation();
 	ComputeNewVelocity();
@@ -66,23 +66,25 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	GetOwner()->SetActorLocation(Location, true, &HitInfo);
 	if (HitInfo.GetActor() != nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitInfo.Normal.ToString());
-		FVector Tangent = FVector();
+		Location = GetOwner()->GetActorLocation();
+		FVector Tangent = FVector(0.f, 0.f, 0.f);
 		if (_MovementInput.Y != 0.f)
 		{
-			Tangent = HitInfo.Normal.RotateAngleAxis((HitInfo.Normal.X > 0.f && HitInfo.Normal.Z < 0.f || HitInfo.Normal.X < 0.f && HitInfo.Normal.Z > 0.f ? -90.f : 90.f), FVector(0.f, 1.f, 0.f)) * 1000;
+			Tangent = HitInfo.Normal.RotateAngleAxis((HitInfo.Normal.X > 0.f && HitInfo.Normal.Z < 0.f || HitInfo.Normal.X < 0.f && HitInfo.Normal.Z > 0.f ? -89.f : 89.f), FVector(0.f, 1.f, 0.f)) * MaxVerticalFlySpeed;
 		}
 		else if (_MovementInput.X != 0.f)
 		{
-			Tangent = HitInfo.Normal.RotateAngleAxis((HitInfo.Normal.X < 0.f && HitInfo.Normal.Z < 0.f || HitInfo.Normal.X > 0.f && HitInfo.Normal.Z > 0.f ? -90.f : 90.f), FVector(0.f, 1.f, 0.f)) * 1000;
+			Tangent = HitInfo.Normal.RotateAngleAxis((HitInfo.Normal.X < 0.f && HitInfo.Normal.Z < 0.f || HitInfo.Normal.X > 0.f && HitInfo.Normal.Z > 0.f ? -89.f : 89.f), FVector(0.f, 1.f, 0.f)) * MaxHorizontalFlySpeed;
 		}
 		
 		Location.X += Tangent.X * DELTA_TIME;
-		Location.Z += Tangent.Y * DELTA_TIME;
-		//GetOwner()->SetActorLocation(Location, true);
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Tangent.ToString());
+		Location.Z += Tangent.Z * DELTA_TIME;
+		GetOwner()->SetActorLocation(Location, true);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitInfo.Normal.ToString());
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Tangent.ToString());
 	}
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
+	
 	_MovementInput = FVector2D(0.f, 0.f);
 }
 

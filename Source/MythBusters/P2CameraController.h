@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "god.h"
 #include "Components/ActorComponent.h"
 #include "P2CameraController.generated.h"
 
@@ -19,6 +21,8 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	TArray<AActor*> Gods;
 
 public:	
 	// Called every frame

@@ -2,6 +2,9 @@
 
 
 #include "P2CameraController.h"
+
+#include <string>
+
 #include "Kismet/GameplayStatics.h"
 #include "god.h"
 
@@ -21,7 +24,7 @@ UP2CameraController::UP2CameraController()
 void UP2CameraController::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGod::StaticClass(), Gods);
 }
 
 
@@ -29,7 +32,28 @@ void UP2CameraController::BeginPlay()
 void UP2CameraController::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	/*FVector Barycenter = FVector(0.f, 0.f, 0.f);
+	for (AActor* God : Gods)
+	{
+		Barycenter += God->GetActorLocation();
+	}
+	
+	Barycenter *= 1.f/ Gods.Max();
 
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Barycenter.ToString());
+
+	float GreatestGodDistanceToBarycenter = 0.f;
+	for (AActor* God : Gods)
+	{
+		if (FVector::Dist(God->GetActorLocation(), Barycenter) > GreatestGodDistanceToBarycenter)
+		{
+			GreatestGodDistanceToBarycenter = FVector::Dist(God->GetActorLocation(), Barycenter);
+		}
+	}*/
+
+	//GetOwner()->SetActorLocation(FVector(Barycenter.X, initialCameraDistance + GreatestGodDistanceToBarycenter*1.5f, Barycenter.Z));
+
+	/*
 	//milieu
 	FVector locationPlayer1 = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
 	FVector locationPlayer2 = FVector(0,0,0);
@@ -52,6 +76,6 @@ void UP2CameraController::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 	//deplacement vers la nouvelle position
 	FVector newCameraLocation = FVector(milieuP1P2.X, CameraYLocation + initialCameraDistance, milieuP1P2.Z);
-	GetOwner()->SetActorLocation(newCameraLocation);
+	GetOwner()->SetActorLocation(newCameraLocation);*/
 }
 
