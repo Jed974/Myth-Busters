@@ -94,9 +94,7 @@ void UGodMovementComponent::AddMovementInput(const FVector2D Direction, const fl
 }
 
 void UGodMovementComponent::Dash() {
-	HorizontalDashFrameCounter = 0;
 	UGodMovementComponent::ChangeHorizontalMovementState(EHorizontalMovementState::DashHorizontal);
-	VerticalDashFrameCounter = 0;
 	UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState::DashVertical);
 }
 
@@ -240,18 +238,32 @@ void UGodMovementComponent::ComputeNewVelocity() {
 			{
 				ChangeHorizontalMovementState(HorizontalNeutral);
 			}
+		}
+		break;
 	case DashHorizontal:
-		if (HorizontalDashFrameCounter <= DashFrames && (_MovementInput.X > 0.0 && isFacingRight || _MovementInput.X < 0.0 && !isFacingRight))
+		if (HorizontalDashFrameCounter <= DashFrames)
 		{
-			Velocity.X = _MovementInput.X * HorizontalSpeed * DashingSpeedScale;
+			Velocity.X = (isFacingRight*2-1) * HorizontalSpeed * DashingSpeedScale;
 			HorizontalDashFrameCounter++;
 		}
 		else
 		{
-			ChangeHorizontalMovementState(FlyHorizontal);
+			HorizontalDashFrameCounter = 0;
+			ChangeHorizontalMovementState(SprintHorizontal);
 		}
 		break;
+	case SprintHorizontal:
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Sprint");
+		Velocity.X = (isFacingRight * 2 - 1) * HorizontalSpeed * SprintSpeedScale;
+		if (_MovementInput.X == 0.0)
+		{
+			ChangeHorizontalMovementState(FlyHorizontalStop);
 		}
+		else if ((_MovementInput.X > 0.0 && !isFacingRight || _MovementInput.X < 0.0 && isFacingRight))
+		{
+			ChangeHorizontalMovementState(FlyHorizontalTurnAround);
+		}
+		break;
 	}
 
 	switch (VerticalMovementState)
@@ -373,22 +385,38 @@ void UGodMovementComponent::ComputeNewVelocity() {
 				VerticalSpeed = FMath::Abs(Velocity.Y);
 				ChangeVerticalMovementState(FlyVertical);
 			}
-			else 
+			else
 			{
 				ChangeVerticalMovementState(VerticalNeutral);
 			}
+		}
+		break;
 	case DashVertical:
-		if (VerticalDashFrameCounter <= DashFrames && _MovementInput.Y != 0.0)
+		if (VerticalDashFrameCounter <= DashFrames)
 		{
-			Velocity.Y = _MovementInput.Y * VerticalSpeed * DashingSpeedScale;
+			Velocity.Y = (isFacingUp * 2 - 1) * VerticalSpeed * DashingSpeedScale;
 			VerticalDashFrameCounter++;
 		}
 		else
 		{
-			ChangeVerticalMovementState(FlyVertical);
+			VerticalDashFrameCounter = 0;
+			ChangeVerticalMovementState(SprintVertical);
 		}
 		break;
+	case SprintVertical:
+		if (_MovementInput.Y > 0.0 && isFacingUp || _MovementInput.Y < 0.0 && !isFacingUp)
+		{
+			Velocity.Y = (isFacingUp*2-1) * VerticalSpeed * SprintSpeedScale;
 		}
+		else if (_MovementInput.Y == 0.0)
+		{
+			ChangeVerticalMovementState(FlyVerticalStop);
+		}
+		else
+		{
+			ChangeVerticalMovementState(FlyVerticalTurnAround);
+		}
+		break;
 	}
 
 }
