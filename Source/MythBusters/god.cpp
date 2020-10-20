@@ -85,3 +85,17 @@ void AGod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 }
 
 
+float AGod::GetAnimValues(int _idValueToGet) {
+	switch (_idValueToGet) {
+		case 0 :	// SpeedX
+			return FMath::Abs((GodMovement->Velocity.X / GodMovement->MaxHorizontalFlySpeed) * 100);
+		case 1:		// SpeedY
+			return (GodMovement->Velocity.Y / GodMovement->MaxVerticalFlySpeed) * 100;
+		case 2:		// Eject X
+			return FMath::Abs((GodMovement->EjectionVelocity.X / FMath::Sqrt(FMath::Square(GodMovement->EjectionVelocity.X) + FMath::Square(GodMovement->EjectionVelocity.Y))));
+		case 3:		// Eject Y
+			return (GodMovement->EjectionVelocity.Y / FMath::Sqrt(FMath::Square(GodMovement->EjectionVelocity.X) + FMath::Square(GodMovement->EjectionVelocity.Y)));
+		default:
+			return 0;
+	}
+}

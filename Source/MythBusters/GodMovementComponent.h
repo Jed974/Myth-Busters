@@ -106,6 +106,12 @@ public:
 	EHorizontalMovementState HorizontalMovementState;
 	EVerticalMovementState VerticalMovementState;
 
+	UPROPERTY(BlueprintReadOnly)
+	FVector2D Velocity;
+
+	FVector2D EjectionVelocity;
+
+
 protected:
 	FVector2D _MovementInput;
 
@@ -118,12 +124,7 @@ protected:
 	float VerticalPreviousSpeed;
 
 	int HorizontalDashFrameCounter;
-	int VerticalDashFrameCounter;
-
-	UPROPERTY(BlueprintReadOnly)
-	FVector2D Velocity;
-	
-	FVector2D EjectionVelocity;
+	int VerticalDashFrameCounter;	
 	
 	float DELTA_TIME;
 
