@@ -99,3 +99,7 @@ float AGod::GetAnimValues(int _idValueToGet) {
 			return 0;
 	}
 }
+
+USkeletalMeshComponent* AGod::GetSkeletalMesh() {
+	return SkeletalMesh;
+}

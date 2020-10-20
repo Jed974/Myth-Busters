@@ -6,6 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "god.h"
 #include "HitBoxGroup.h"
+#include "Engine/World.h"
 #include "GodAnimInstance.generated.h"
 
 
@@ -135,4 +136,9 @@ public :
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	UFUNCTION(BlueprintCallable)	
+	virtual void InterruptAttack(bool hurting, bool ejecting);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo);
 };

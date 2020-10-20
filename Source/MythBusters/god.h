@@ -68,4 +68,6 @@ public:
     virtual void SetupPlayerInputComponent(UInputComponent *PlayerInputComponent) override;
 
 	virtual float GetAnimValues(int _idValueToGet);
+
+	virtual USkeletalMeshComponent* GetSkeletalMesh();
 };

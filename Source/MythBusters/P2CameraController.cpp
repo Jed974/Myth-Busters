@@ -24,7 +24,7 @@ UP2CameraController::UP2CameraController()
 void UP2CameraController::BeginPlay()
 {
 	Super::BeginPlay();
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGod::StaticClass(), Gods);
+	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGod::StaticClass(), Gods);
 }
 
 
