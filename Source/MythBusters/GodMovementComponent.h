@@ -63,13 +63,17 @@ public:
 	UPROPERTY(Category = "God Movement: Ejection", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float EjectionRecoverTime;
 
-	/** Dashing speed, as a scale of maximum flying speed */
-	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+	/** Dashing speed, as a multiplier of maximum flying speed */
+	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float DashingSpeedScale;
 
 	/** Number of frames in a dash */
-	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, meta = (ClampMin = "0", UIMin = "0"))
+	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere, meta = (ClampMin = "0", UIMin = "0"))
 		int DashFrames;
+
+	/** Dashing speed, as a multiplier of maximum flying speed */
+	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		float SprintSpeedScale;
 
 	enum EHorizontalMovementState
 	{
@@ -123,8 +127,8 @@ protected:
 	float VerticalSpeed;
 	float VerticalPreviousSpeed;
 
-	int HorizontalDashFrameCounter;
-	int VerticalDashFrameCounter;	
+	int HorizontalDashFrameCounter = 0;
+	int VerticalDashFrameCounter = 0;	
 	
 	float DELTA_TIME;
 
