@@ -47,10 +47,9 @@ void UGodAnimInstance::InterruptAttack(bool hurting, bool ejecting) {
 }
 
 void UGodAnimInstance::StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo) {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Attack Started !");
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Attack Started !");
 
 	FTransform _spawnTransform = God->GetRootComponent()->GetSocketTransform(SocketToAttachTo);
-	_spawnTransform.SetScale3D(FVector(1, 1, 1));
 
 	FActorSpawnParameters _spawnParams;
 	_spawnParams.Instigator = God;
@@ -59,4 +58,15 @@ void UGodAnimInstance::StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassT
 
 	FAttachmentTransformRules _attTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 	InterruptableAttGroup->AttachToComponent(God->GetSkeletalMesh(), _attTransformRules, SocketToAttachTo);
+}
+
+void UGodAnimInstance::StartAttackProjectile(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo) {
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Projectile Launched !");
+
+	FTransform _spawnTransform = God->GetRootComponent()->GetSocketTransform(SocketToAttachTo);
+
+	FActorSpawnParameters _spawnParams;
+	_spawnParams.Instigator = God;
+
+	GetWorld()->SpawnActor<AHitBoxGroup>(ClassToSpwan, _spawnTransform.GetLocation(), God->GetSkeletalMesh()->GetRelativeRotation(), _spawnParams);
 }

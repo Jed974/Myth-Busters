@@ -141,4 +141,7 @@ public :
 
 	UFUNCTION(BlueprintCallable)
 	virtual void StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void StartAttackProjectile(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo);
 };
