@@ -76,7 +76,24 @@ public:
 	/** Variable to set to true to get in a PushAtt SubState */
 	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
 		bool AttCanStop;
-
+	/** Name of the socket where to attach the Normal Forward Attack hitboxes */
+	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
+		FName NormalForwardSocketName;
+	/** The HitBoxGroup Class to spawn for the Normal Forward Attack */
+	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<AHitBoxGroup> NormalForwardHitBoxGroupClass;
+	/** Name of the socket where to attach the Push Forward Attack hitboxes */
+	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
+		FName PushForwardSocketName;
+	/** The HitBoxGroup Class to spawn for the Push Forward Attack */
+	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<AHitBoxGroup> PushForwardHitBoxGroupClass;
+	/** Name of the socket where to attach the Special Forward Attack hitboxes */
+	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
+		FName SpecialForwardSocketName;
+	/** The HitBoxGroup Class to spawn for the Special Forward Attack*/
+	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<AHitBoxGroup> SpecialForwardHitBoxGroupClass;
 	
 	/** Reference to the pawn owner of type God */
 	UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
