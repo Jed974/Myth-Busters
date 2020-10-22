@@ -35,7 +35,7 @@ public:
 
 	/** Variable to set to true to get in the Hurt State */
 	UPROPERTY(Category = "Transition Booleans", EditAnywhere, BlueprintReadWrite)
-		bool Hurted;
+		bool Hurt;
 	/** Variable to set to true to get in the Eject State */
 	UPROPERTY(Category = "Transition Booleans", EditAnywhere, BlueprintReadWrite)
 		bool Ejected;

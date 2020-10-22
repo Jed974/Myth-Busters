@@ -30,7 +30,7 @@ void UGodAnimInstance::InterruptAttack(bool hurting, bool ejecting) {
 	AttPush = false;
 
 	if (hurting)
-		Hurted = true;
+		Hurt = true;
 	else if (ejecting)
 		Ejected = true;
 
