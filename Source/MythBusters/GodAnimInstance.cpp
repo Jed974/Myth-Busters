@@ -4,35 +4,48 @@
 #include "GodAnimInstance.h"
 
 
-void UGodAnimInstance::NativeBeginPlay() {
-	Super::NativeBeginPlay();
 
+void UGodAnimInstance::NativeBeginPlay()
+{
+	Super::NativeBeginPlay();
 	God = Cast<AGod>(GetOwningActor());
+
+	
 }
 
-void UGodAnimInstance::NativeUpdateAnimation(float DeltaSeconds) {
+void UGodAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+{
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (God != nullptr) {
-		SpeedX = God->GetAnimValues(0);
-		SpeedY = God->GetAnimValues(1);
-		if (Ejected) {
+	if (God != nullptr) 
+	{
+		
+		GodState = God->State;
+		switch (GodState)
+		{
+		case EGodState::Flying:
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Flying"));
+			break;
+		case EGodState::Ejected:
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Ejected"));
 			EjectX = God->GetAnimValues(2);
 			EjectY = God->GetAnimValues(3);
+			break;
+		case EGodState::Sprinting:
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Sprinting"));
+			break;
 		}
+		SpeedX = God->GetAnimValues(0);
+		SpeedY = God->GetAnimValues(1);
 	}	
 }
 
-void UGodAnimInstance::InterruptAttack(bool hurting, bool ejecting) {
+void UGodAnimInstance::InterruptAttack()
+{
 	AttCanStop = true;
 	AttNormal = false;
 	AttSpe = false;
 	AttPush = false;
-
-	if (hurting)
-		Hurt = true;
-	else if (ejecting)
-		Ejected = true;
 
 	// TODO :: Ne marche pas toujours... Des fois le groupe reste dans la scène et jsp pourquoi
 	if (InterruptableAttGroup != nullptr) {
@@ -46,7 +59,8 @@ void UGodAnimInstance::InterruptAttack(bool hurting, bool ejecting) {
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "No group to destroy");
 }
 
-void UGodAnimInstance::StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo) {
+void UGodAnimInstance::StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo)
+{
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Attack Started !");
 
 	FTransform _spawnTransform = God->GetRootComponent()->GetSocketTransform(SocketToAttachTo);
@@ -60,7 +74,8 @@ void UGodAnimInstance::StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassT
 	InterruptableAttGroup->AttachToComponent(God->GetSkeletalMesh(), _attTransformRules, SocketToAttachTo);
 }
 
-void UGodAnimInstance::StartAttackProjectile(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo) {
+void UGodAnimInstance::StartAttackProjectile(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo)
+{
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Projectile Launched !");
 
 	FTransform _spawnTransform = God->GetRootComponent()->GetSocketTransform(SocketToAttachTo);

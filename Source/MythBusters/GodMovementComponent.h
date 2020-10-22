@@ -3,10 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+
+
 #include "Components/ActorComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GodMovementComponent.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EMovementState : uint8 {
+	Flying,
+	Dashing,
+	Sprinting,
+	Ejected,
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MYTHBUSTERS_API UGodMovementComponent : public UActorComponent
@@ -18,6 +29,10 @@ public:
 	UGodMovementComponent();
 
 public:
+
+	UPROPERTY(BlueprintReadOnly)
+		EMovementState MovementState;
+	
 	/** The maximum speed when flying. */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float MaxHorizontalFlySpeed;
@@ -87,8 +102,6 @@ public:
 		SprintHorizontal,
 		SprintHorizontalTurnAround,
 		SprintHorizontalStop,
-		EjectionHorizontal,
-		DashHorizontal
 	};
 
 	enum EVerticalMovementState
@@ -103,8 +116,6 @@ public:
 		SprintVertical,
 		SprintVerticalTurnaround,
 		SprintVerticalStop,
-		EjectionVertical,
-		DashVertical
 	};
 
 	EHorizontalMovementState HorizontalMovementState;
@@ -117,6 +128,7 @@ public:
 
 
 protected:
+	
 	FVector2D _MovementInput;
 
 	float HorizontalSpeed;
@@ -127,8 +139,8 @@ protected:
 	float VerticalSpeed;
 	float VerticalPreviousSpeed;
 
-	int HorizontalDashFrameCounter = 0;
-	int VerticalDashFrameCounter = 0;	
+	int DashFrameCounter = 0;
+	int EjectionFrameCounter = 0;
 	
 	float DELTA_TIME;
 
@@ -147,6 +159,8 @@ protected:
 
 	virtual void ChangeVerticalMovementState(EVerticalMovementState NewState);
 
+	virtual void ChangeMovementState(EMovementState NewState);
+
 
 
 public:	
@@ -157,7 +171,14 @@ public:
 
 	virtual void ComputeNewVelocity();
 
-	UFUNCTION(BlueprintCallable)
+	virtual void ComputeWallMovement(FHitResult HitInfo);
+
+	virtual void ComputeFlyingVelocity();
+
+	virtual void ComputeDashingVelocity();
+	
+	virtual void ComputeEjectedVelocity();
+
 	virtual void Eject(FVector2D _EjectionSpeed);
 		
 	virtual void Dash();

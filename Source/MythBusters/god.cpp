@@ -3,6 +3,9 @@
 
 #include "god.h"
 
+#include <string>
+
+
 // Sets default values
 AGod::AGod()
 {
@@ -30,6 +33,20 @@ void AGod::BeginPlay()
 void AGod::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	switch (GodMovement->MovementState)
+	{
+		case EMovementState::Flying:
+			ChangeGodState(EGodState::Flying);
+			break;
+		case EMovementState::Ejected:
+			ChangeGodState(EGodState::Ejected);
+			break;
+		case EMovementState::Sprinting:
+			ChangeGodState(EGodState::Sprinting);
+			break;
+	}
+	
 
 }
 
@@ -79,9 +96,28 @@ void AGod::StopAttackPush()
 	EStopAttackPush();
 }
 
+void AGod::Eject(FVector2D _EjectionSpeed)
+{
+	ChangeGodState(EGodState::Ejected);
+	GodMovement->Eject(_EjectionSpeed);
+}
+
+
 void AGod::Dash()
 {
-	GodMovement->Dash();
+	switch (State)
+	{
+		case EGodState::Flying:
+			ChangeGodState(EGodState::Dashing);
+			GodMovement->Dash();
+			break;
+	}
+	
+}
+
+void AGod::ChangeGodState(EGodState NewState)
+{
+	State = NewState;
 }
 
 

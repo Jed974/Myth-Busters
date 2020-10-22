@@ -8,6 +8,18 @@
 #include "GameFramework/Actor.h"
 #include "god.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EGodState : uint8 {
+	Flying UMETA(DisplayName = "Flying"),
+	Dashing UMETA(DisplayName = "Dashing"),
+	Sprinting UMETA(DisplayName = "Sprinting"),
+	Ejected UMETA(DisplayName = "Ejected"),
+	Hurt UMETA(DisplayName = "Hurt"),
+	Attacking UMETA(DisplayName = "Attacking"),
+	Shielding UMETA(DisplayName = "Shielding")
+};
+
 UCLASS()
 class MYTHBUSTERS_API AGod : public APawn
 {
@@ -79,8 +91,12 @@ protected:
 		void EStopAttackPush();
 
 
+	UFUNCTION(BlueprintCallable)
+		virtual void Eject(FVector2D _EjectionSpeed);
 
 	virtual void Dash();
+
+	
 	
 
 public:	
@@ -93,4 +109,11 @@ public:
 	virtual float GetAnimValues(int _idValueToGet);
 
 	virtual USkeletalMeshComponent* GetSkeletalMesh();
+
+	virtual void ChangeGodState(EGodState NewState);
+	
+	UPROPERTY(BlueprintReadOnly)
+	EGodState State;
+
+	
 };

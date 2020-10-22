@@ -28,20 +28,15 @@ class MYTHBUSTERS_API UGodAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
+	
 	/** Reference to the pawn owner of type God */
 	UPROPERTY(Category = "References", EditAnywhere, BlueprintReadWrite)
 		AGod* God;
 
-
-	/** Variable to set to true to get in the Hurt State */
-	UPROPERTY(Category = "Transition Booleans", EditAnywhere, BlueprintReadWrite)
-		bool Hurt;
-	/** Variable to set to true to get in the Eject State */
-	UPROPERTY(Category = "Transition Booleans", EditAnywhere, BlueprintReadWrite)
-		bool Ejected;
-	/** Variable to set to true to get in the Shield State */
-	UPROPERTY(Category = "Transition Booleans", EditAnywhere, BlueprintReadWrite)
-		bool Block;
+	/** Copies the State of the owner God */
+	UPROPERTY(Category = "References", EditAnywhere, BlueprintReadWrite)
+		EGodState GodState;
+	
 	/** Variable to set to true to get in the Dash State */
 	UPROPERTY(Category = "Transition Booleans", EditAnywhere, BlueprintReadWrite)
 		bool Dashing;
@@ -147,14 +142,14 @@ public:
 	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
 	//	AHitBoxGroup* PushDownwardGroup;
 	//
-
+	
 public :
 	virtual void NativeBeginPlay() override;
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	UFUNCTION(BlueprintCallable)	
-	virtual void InterruptAttack(bool hurting, bool ejecting);
+	virtual void InterruptAttack();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo);
