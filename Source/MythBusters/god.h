@@ -45,6 +45,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	    void EMoveVertical(float AxisValue);
 
+
 	UFUNCTION(BlueprintCallable)
 		virtual void AttackNormal();
 	UFUNCTION(BlueprintImplementableEvent)
@@ -55,9 +56,31 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 		void EStopAttackNormal();
 
+
+	UFUNCTION(BlueprintCallable)
+		virtual void AttackSpecial();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EAttackSpecial();
+
+	UFUNCTION(BlueprintCallable)
+		virtual void StopAttackSpecial();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EStopAttackSpecial();
+
+
+	UFUNCTION(BlueprintCallable)
+		virtual void AttackPush();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EAttackPush();
+
+	UFUNCTION(BlueprintCallable)
+		virtual void StopAttackPush();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EStopAttackPush();
+
+
+
 	virtual void Dash();
-
-
 	
 
 public:	

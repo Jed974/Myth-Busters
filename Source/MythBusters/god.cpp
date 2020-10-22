@@ -58,10 +58,25 @@ void AGod::AttackNormal()
 {
 	EAttackNormal();
 }
-
 void AGod::StopAttackNormal()
 {
 	EStopAttackNormal();
+}
+void AGod::AttackSpecial()
+{
+	EAttackSpecial();
+}
+void AGod::StopAttackSpecial()
+{
+	EStopAttackSpecial();
+}
+void AGod::AttackPush()
+{
+	EAttackPush();
+}
+void AGod::StopAttackPush()
+{
+	EStopAttackPush();
 }
 
 void AGod::Dash()
@@ -80,6 +95,12 @@ void AGod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveVertical", this, &AGod::MoveVertical);
 	PlayerInputComponent->BindAction("AttackNormal", IE_Pressed, this, &AGod::AttackNormal);
 	PlayerInputComponent->BindAction("AttackNormal", IE_Released, this, &AGod::StopAttackNormal);
+
+	PlayerInputComponent->BindAction("AttackSpecial", IE_Pressed, this, &AGod::AttackSpecial);
+	PlayerInputComponent->BindAction("AttackSpecial", IE_Released, this, &AGod::StopAttackSpecial);
+
+	PlayerInputComponent->BindAction("AttackPush", IE_Pressed, this, &AGod::AttackPush);
+	PlayerInputComponent->BindAction("AttackPush", IE_Released, this, &AGod::StopAttackPush);
 
 	PlayerInputComponent->BindAction("Dash",IE_Pressed,this, &AGod::Dash);
 }
