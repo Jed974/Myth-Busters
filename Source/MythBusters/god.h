@@ -15,6 +15,7 @@ enum class EGodState : uint8 {
 	Dashing UMETA(DisplayName = "Dashing"),
 	Sprinting UMETA(DisplayName = "Sprinting"),
 	Ejected UMETA(DisplayName = "Ejected"),
+	WallHit,
 	Hurt UMETA(DisplayName = "Hurt"),
 	Attacking UMETA(DisplayName = "Attacking"),
 	Shielding UMETA(DisplayName = "Shielding")

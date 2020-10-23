@@ -42,6 +42,9 @@ void AGod::Tick(float DeltaTime)
 		case EMovementState::Ejected:
 			ChangeGodState(EGodState::Ejected);
 			break;
+		case EMovementState::WallHit:
+			ChangeGodState(EGodState::WallHit);
+			break;
 		case EMovementState::Sprinting:
 			ChangeGodState(EGodState::Sprinting);
 			break;
@@ -58,6 +61,11 @@ void AGod::MoveHorizontal(float AxisValue)
 		GodMovement->AddMovementInput(FVector2D(1.0, 0.0), AxisValue);
 		EMoveHorizontal(AxisValue);
 	}
+	else
+	{
+		GodMovement->AddMovementInput(FVector2D(1.0, 0.0), 0.f);
+		EMoveHorizontal(0.f);
+	}
 }
 
 void AGod::MoveVertical(float AxisValue)
@@ -66,6 +74,11 @@ void AGod::MoveVertical(float AxisValue)
 	{
 		GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
 		EMoveVertical(AxisValue);
+	}
+	else
+	{
+		GodMovement->AddMovementInput(FVector2D(0.0, 1.0), 0.f);
+		EMoveVertical(0.f);
 	}
 	
 }

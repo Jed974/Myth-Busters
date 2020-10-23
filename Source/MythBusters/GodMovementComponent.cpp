@@ -56,6 +56,16 @@ void UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState N
 void UGodMovementComponent::ChangeMovementState(EMovementState NewState)
 {
 	MovementState = NewState;
+	switch (MovementState)
+	{
+		case EMovementState::WallHit:
+			WallHitFrameCounter = 0;
+			break;
+		case EMovementState::Dashing:
+			DashFrameCounter = 0;
+			break;
+			
+	}
 }
 
 
@@ -102,8 +112,7 @@ void UGodMovementComponent::Dash()
 }
 
 void UGodMovementComponent::Eject(FVector2D _EjectionSpeed) {
-	EjectionVelocity.X = _EjectionSpeed.X;
-	EjectionVelocity.Y = _EjectionSpeed.Y;
+	EjectionVelocity = _EjectionSpeed;
 	isFacingRight = EjectionVelocity.X < 0;
 	isFacingUp = EjectionVelocity.Y < 0;
 	ChangeMovementState(EMovementState::Ejected);
@@ -120,6 +129,16 @@ void UGodMovementComponent::ComputeNewVelocity() {
 			break;
 		case EMovementState::Ejected:
 			ComputeEjectedVelocity();
+			break;
+		case EMovementState::WallHit:
+			if (WallHitFrameCounter < WallHitFrames)
+			{
+				WallHitFrameCounter++;
+			}
+			else
+			{
+				Eject(EjectionVelocity);
+			}
 			break;
 
 	}
@@ -147,6 +166,8 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 			break;
 		case EMovementState::Ejected:
 			EjectionVelocity = EjectionVelocity - 2 * (FVector2D::DotProduct(EjectionVelocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
+			Velocity = FVector2D::ZeroVector;
+			ChangeMovementState(EMovementState::WallHit);
 			break;
 		case EMovementState::Dashing:
 			Reflect = Velocity - 2 * (FVector2D::DotProduct(Velocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
@@ -167,7 +188,6 @@ void UGodMovementComponent::ComputeDashingVelocity()
 	}
 	else
 	{
-		DashFrameCounter = 0;
 		ChangeHorizontalMovementState(HorizontalNeutral);
 		ChangeVerticalMovementState(VerticalNeutral);
 		/*if (_MovementInput.X != 0)
