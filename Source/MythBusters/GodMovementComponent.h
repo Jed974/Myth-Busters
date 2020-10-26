@@ -15,6 +15,7 @@ enum class EMovementState : uint8 {
 	Dashing,
 	Sprinting,
 	Ejected,
+	WallHit
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -74,6 +75,10 @@ public:
 	/** The time it takes to get control over your character again when being ejected. */
 	UPROPERTY(Category = "God Movement: Ejection", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float EjectionRecoverTime;
+
+	/** Number of frames a God stays on a wall while ejected */
+	UPROPERTY(Category = "God Movement: Ejection", VisibleAnywhere, meta = (ClampMin = "0", UIMin = "0"))
+		int WallHitFrames = 12;
 
 	/** Dashing speed, as a multiplier of maximum flying speed */
 	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
@@ -138,6 +143,7 @@ protected:
 
 	int DashFrameCounter = 0;
 	int EjectionFrameCounter = 0;
+	int WallHitFrameCounter = 0;
 	
 	float DELTA_TIME;
 
