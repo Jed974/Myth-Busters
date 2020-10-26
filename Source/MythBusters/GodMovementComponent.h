@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-
-
+#include "Arena.h"
 #include "Components/ActorComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GodMovementComponent.generated.h"
@@ -23,7 +21,6 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MYTHBUSTERS_API UGodMovementComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
 public:	
 	// Sets default values for this component's properties
 	UGodMovementComponent();
@@ -182,4 +179,6 @@ public:
 	virtual void Eject(FVector2D _EjectionSpeed);
 		
 	virtual void Dash();
+
+	virtual float GetVelocityNorm();
 };

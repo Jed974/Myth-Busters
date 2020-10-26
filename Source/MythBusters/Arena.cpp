@@ -16,10 +16,11 @@ AArena::AArena()
 	for (int i = 0; i < 36; i++) {
 		FString _componentName = "Ground_";
 		_componentName.AppendInt(i);
-		Grounds.Add(CreateDefaultSubobject<UStaticMeshComponent>(FName(_componentName)));
+		Grounds.Add(CreateDefaultSubobject<UArenaElement>(FName(_componentName)));
 		Grounds[i]->SetupAttachment(Root);
-		Grounds[i]->AddLocalRotation(FQuat(FRotator(i * 10, 0, 0)));
+		Grounds[i]->SetId(i);
 	}
+
 
 	FoliageRoot = CreateDefaultSubobject<USceneComponent>("Foliage");
 	FoliageRoot->SetupAttachment(Root);
@@ -28,14 +29,24 @@ AArena::AArena()
 // Called when the game starts or when spawned
 void AArena::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
 }
 
 // Called every frame
 void AArena::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
+bool AArena::IsEjected(float _velocityNorm, FHitResult& _hitResult)
+{
+	if (_velocityNorm >= MinimalSpeedToDie) {
+		UArenaElement* _meshComponent = Cast<UArenaElement>(_hitResult.GetComponent());
+		if (_meshComponent != nullptr)
+			_meshComponent->AddLocalRotation(FQuat(FRotator(0, 45, 0)));
+		EGodEjected();
+		return true;
+	}
+	else
+		return false;
+}

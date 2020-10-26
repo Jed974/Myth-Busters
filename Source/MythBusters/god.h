@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "GodMovementComponent.h"
 #include "GameFramework/Actor.h"
 #include "god.generated.h"

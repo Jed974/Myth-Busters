@@ -131,6 +131,7 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 {
 	FVector Tangent = FVector(0.f, 0.f, 0.f);
 	FVector2D Reflect = FVector2D::ZeroVector;
+	AArena* _arenaHitted;
 	switch (MovementState)
 	{
 		case EMovementState::Flying:
@@ -146,6 +147,12 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 			Velocity.Y = Tangent.Z;
 			break;
 		case EMovementState::Ejected:
+			_arenaHitted = Cast<AArena>(HitInfo.Actor);
+			if (_arenaHitted != nullptr) {
+				bool _godDie = _arenaHitted->IsEjected(GetVelocityNorm(), HitInfo);
+				if (_godDie)
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "DIIIIIIIEEEEEEEEEEDDDDDDDDDD");
+			}
 			EjectionVelocity = EjectionVelocity - 2 * (FVector2D::DotProduct(EjectionVelocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
 			break;
 		case EMovementState::Dashing:
@@ -467,4 +474,8 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		}
 		break;
 	}
+}
+
+float UGodMovementComponent::GetVelocityNorm() {
+	return FMath::Sqrt(FMath::Square(Velocity.X) + FMath::Square(Velocity.Y));
 }
