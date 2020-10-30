@@ -15,7 +15,8 @@ enum class EMovementState : uint8 {
 	Dashing,
 	Sprinting,
 	Ejected,
-	WallHit
+	WallHit,
+	DeathEjected
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )

@@ -24,9 +24,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
 		USceneComponent* FoliageRoot;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Ejection", meta = (AllowPrivateAccess = "true"))
 		float MinimalSpeedToDie = 500.0f;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Ejection", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AActor> explodeActor;
 
 protected:
 	// Called when the game starts or when spawned
@@ -37,6 +39,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual bool IsEjected(float _velocityNorm, FHitResult& _hitResult);
+	
+	// Event triggered when a god is definitely ejected
 	UFUNCTION(BlueprintImplementableEvent)
 		void EGodEjected();
 };

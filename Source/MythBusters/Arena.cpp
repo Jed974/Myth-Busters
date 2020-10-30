@@ -42,8 +42,41 @@ bool AArena::IsEjected(float _velocityNorm, FHitResult& _hitResult)
 {
 	if (_velocityNorm >= MinimalSpeedToDie) {
 		UArenaElement* _meshComponent = Cast<UArenaElement>(_hitResult.GetComponent());
+		int idHit = 0;
 		if (_meshComponent != nullptr)
-			_meshComponent->AddLocalRotation(FQuat(FRotator(0, 45, 0)));
+			idHit = _meshComponent->GetId();
+		else
+		{
+			// Cast Failed
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Error casting component hit into UArenaElement");
+			return false;
+		}
+
+		Grounds[idHit]->Explode();
+		if (idHit == 0)
+			Grounds[35]->Explode();
+		else
+			Grounds[idHit-1]->Explode();
+
+
+		if (idHit == 35)
+			Grounds[0]->Explode();
+		else
+			Grounds[idHit + 1]->Explode();
+
+		
+		/*
+		UStaticMeshComponent* _explodedElement = CreateDefaultSubobject<UStaticMeshComponent>("exploded");
+		_explodedElement->SetStaticMesh(explodeMesh);
+		_explodedElement->AddLocalRotation(FQuat(FRotator(idHit * 10, 0, 0)));
+		_explodedElement->SetupAttachment(Root);
+		*/
+		
+		FActorSpawnParameters _spawnParams;
+
+		GetWorld()->SpawnActor<AActor>(explodeActor, FVector::ZeroVector, Grounds[idHit]->GetRelativeRotation(), _spawnParams);
+
+
 		EGodEjected();
 		return true;
 	}

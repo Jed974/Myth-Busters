@@ -75,28 +75,37 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	FVector Location = GetOwner()->GetActorLocation();
-	ComputeNewVelocity();
-	Location.X += Velocity.X * DELTA_TIME;
-	Location.Z += Velocity.Y * DELTA_TIME;
 	FHitResult HitInfo = FHitResult();
-	GetOwner()->SetActorLocation(Location, true, &HitInfo);
-	if (HitInfo.GetActor() != nullptr)
-	{
-		Location = GetOwner()->GetActorLocation();
-		
-		ComputeWallMovement(HitInfo);
+
+	if (MovementState == EMovementState::DeathEjected) {
 		Location.X += Velocity.X * DELTA_TIME;
 		Location.Z += Velocity.Y * DELTA_TIME;
-		GetOwner()->SetActorLocation(Location, true);
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitInfo.Normal.ToString());
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
+		GetOwner()->SetActorLocation(Location, false, &HitInfo, ETeleportType::TeleportPhysics);
+	}
+	else {
+		ComputeNewVelocity();
+		Location.X += Velocity.X * DELTA_TIME;
+		Location.Z += Velocity.Y * DELTA_TIME;
+		
+		GetOwner()->SetActorLocation(Location, true, &HitInfo);
+		if (HitInfo.GetActor() != nullptr)
+		{
+			Location = GetOwner()->GetActorLocation();
+
+			ComputeWallMovement(HitInfo);
+			Location.X += Velocity.X * DELTA_TIME;
+			Location.Z += Velocity.Y * DELTA_TIME;
+			GetOwner()->SetActorLocation(Location, true);
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitInfo.Normal.ToString());
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
+		}
+
+		if (HorizontalMovementState == SprintHorizontal || HorizontalMovementState == SprintHorizontalStartup || HorizontalMovementState == SprintHorizontalStop || VerticalMovementState == SprintVerticalStartup || VerticalMovementState == SprintVerticalStop)
+		{
+			ChangeMovementState(EMovementState::Sprinting);
+		}
 	}
 
-	if (HorizontalMovementState == SprintHorizontal || HorizontalMovementState == SprintHorizontalStartup || HorizontalMovementState == SprintHorizontalStop || VerticalMovementState == SprintVerticalStartup || VerticalMovementState == SprintVerticalStop)
-	{
-		ChangeMovementState(EMovementState::Sprinting);
-	}
 	
 	_MovementInput = FVector2D(0.f, 0.f);
 }
@@ -140,6 +149,9 @@ void UGodMovementComponent::ComputeNewVelocity() {
 				Eject(EjectionVelocity);
 			}
 			break;
+		//case EMovementState::DeathEjected:
+			
+			//break;
 
 	}
 	
@@ -169,8 +181,16 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 			_arenaHitted = Cast<AArena>(HitInfo.Actor);
 			if (_arenaHitted != nullptr) {
 				bool _godDie = _arenaHitted->IsEjected(GetVelocityNorm(), HitInfo);
-				if (_godDie)
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "DIIIIIIIEEEEEEEEEEDDDDDDDDDD");
+				if (_godDie) {
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "A player died");
+			
+					Velocity = EjectionVelocity;
+					Velocity.Normalize();
+					Velocity * 2000;
+
+					ChangeMovementState(EMovementState::DeathEjected);
+					break;
+				}
 			}
 			EjectionVelocity = EjectionVelocity - 2 * (FVector2D::DotProduct(EjectionVelocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
 			Velocity = FVector2D::ZeroVector;
@@ -180,6 +200,8 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 			Reflect = Velocity - 2 * (FVector2D::DotProduct(Velocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
 			isFacingRight = Reflect.X > 0;
 			isFacingUp = Reflect.Y > 0;
+			break;
+		case EMovementState::DeathEjected:
 			break;
 	}
 	
