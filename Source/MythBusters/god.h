@@ -31,6 +31,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
 		UCapsuleComponent* CapsuleComponent;
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
+		float GodDamage = 127;
 
 protected:
 	
@@ -114,6 +117,16 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	EGodState State;
+
+
+	UFUNCTION(BlueprintCallable)
+	virtual float GetGodDamage() { return GodDamage; }
+
+	UFUNCTION(BlueprintCallable)
+	virtual void SetGodDamage(float value) { this->GodDamage = value; }
+
+	UFUNCTION(BlueprintCallable)
+		virtual void ApplyDamage(float value);
 
 	
 };

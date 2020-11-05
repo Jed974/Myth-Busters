@@ -173,3 +173,7 @@ float AGod::GetAnimValues(int _idValueToGet) {
 USkeletalMeshComponent* AGod::GetSkeletalMesh() {
 	return SkeletalMesh;
 }
+
+void AGod::ApplyDamage(float value) {
+	SetGodDamage(GetGodDamage() + value);
+}
