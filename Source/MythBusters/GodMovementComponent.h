@@ -126,7 +126,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector2D Velocity;
-
+	FVector2D PushVelocity;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsPushable;
 	FVector2D EjectionVelocity;
 
 
@@ -149,11 +151,11 @@ protected:
 	float DELTA_TIME;
 
 	UPROPERTY(BlueprintReadOnly)
-	bool isFacingRight;
+		bool isFacingRight;
 	UPROPERTY(BlueprintReadOnly)
-	bool isFacingUp;
-
-	UCapsuleComponent* CapsuleComponent;
+		bool isFacingUp;
+	UPROPERTY(BlueprintReadWrite)
+		AActor* CollidingActor;
 
 protected:
 	// Called when the game starts
@@ -182,6 +184,8 @@ public:
 	virtual void ComputeDashingVelocity();
 	
 	virtual void ComputeEjectedVelocity();
+
+	virtual void ComputePushVelocity(const AActor* OtherActor);
 
 	virtual void Eject(FVector2D _EjectionSpeed);
 		
