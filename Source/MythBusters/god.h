@@ -131,7 +131,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		virtual float GetGodDamage() { return this->GodDamage; }
 	UFUNCTION(BlueprintCallable)
-		virtual void ApplyDamage(float value);
+		virtual void ApplyGodDamage(float value);
 	
 	
 

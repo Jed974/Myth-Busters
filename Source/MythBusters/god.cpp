@@ -55,7 +55,7 @@ void AGod::Tick(float DeltaTime)
 			ChangeGodState(EGodState::Ejected);
 			break;
 		case EMovementState::DeathEjected:
-			ChangeGodState(EGodState::DeathEjected);
+			ChangeGodState(EGodState::Dead);
 			break;
 		default:;
 	}
@@ -267,6 +267,6 @@ USkeletalMeshComponent* AGod::GetSkeletalMesh() {
 	return SkeletalMesh;
 }
 
-void AGod::ApplyDamage(float value) {
+void AGod::ApplyGodDamage(float value) {
 	this->GodDamage += value;
 }
