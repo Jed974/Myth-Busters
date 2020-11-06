@@ -27,9 +27,10 @@ void AShield::BeginPlay()
 	Super::BeginPlay();
 	SetActorRotation(FRotator(0, 0, 90), ETeleportType::None);
 
-	//create dynamic material anywhere u like, Constructor or anywhere .
-	ShieldMaterialInstance = UMaterialInstanceDynamic::Create(ShieldMaterialOriginal, this);
-	ShieldStaticMesh->SetMaterial(0, ShieldMaterialInstance);
+	if (ShieldMaterialInstance == nullptr) {
+		ShieldMaterialInstance = UMaterialInstanceDynamic::Create(ShieldMaterialOriginal, this);
+		ShieldStaticMesh->SetMaterial(0, ShieldMaterialInstance);
+	}
 
 	DELTA_TIME = 1.0 / GEngine->FixedFrameRate;
 }
@@ -37,6 +38,7 @@ void AShield::BeginPlay()
 // Called every frame
 void AShield::Tick(float DeltaTime)
 {
+	SetAngleFromVector();
 	Super::Tick(DeltaTime);
 	if (lifeTime < decreaseDuration) {
 		lifeTime += DELTA_TIME;
@@ -58,17 +60,35 @@ void AShield::Tick(float DeltaTime)
 }
 
 
+void AShield::InitShield(float _size, FColor _colorFresnel, FColor _colorBase) {
+	SetActorRotation(FRotator(0, 0, 90), ETeleportType::None);
+	SetActorScale3D(FVector(_size, _size, _size));
+
+
+	if (ShieldMaterialInstance == nullptr) {
+		ShieldMaterialInstance = UMaterialInstanceDynamic::Create(ShieldMaterialOriginal, this);
+		ShieldStaticMesh->SetMaterial(0, ShieldMaterialInstance);
+	}
+
+	ShieldMaterialInstance->SetVectorParameterValue("ColorFresnel", FLinearColor::FromSRGBColor(_colorFresnel));
+	ShieldMaterialInstance->SetVectorParameterValue("ColorBase", FLinearColor::FromSRGBColor(_colorBase));
+	ShieldMaterialInstance->SetScalarParameterValue("PushAmount", 10*_size);
+
+}
+
+
+
 void AShield::SetAngle(float _angle) {
 	SetActorRotation(FRotator(_angle, 0, 90), ETeleportType::None);
 }
-void AShield::SetAngleFromVector(FVector2D _inputDirection) {
-	//_inputDirection.X = FMath::Abs(_inputDirection.X);
-	_inputDirection.Normalize();
+void AShield::SetAngleFromVector() {
+	InputDirection.Normalize();
 
-	if (_inputDirection.GetAbsMax() > 0.5f) {
-		float _aimAtAngle = FMath::RadiansToDegrees(acosf(FMath::Abs(_inputDirection.X)));
+	if (InputDirection.GetAbsMax() > 0.5f) {
+		//float _aimAtAngle = FMath::RadiansToDegrees(acosf(FMath::Abs(InputDirection.X)));
+		float _aimAtAngle = FMath::RadiansToDegrees(acosf(InputDirection.X));
 
-		if (_inputDirection.Y <= 0)
+		if (InputDirection.Y <= 0)
 			_aimAtAngle = FMath::Abs(_aimAtAngle);
 		else
 			_aimAtAngle = FMath::Abs(_aimAtAngle) * -1;
@@ -79,4 +99,12 @@ void AShield::SetAngleFromVector(FVector2D _inputDirection) {
 
 void AShield::SetMaterialFillRate(float _fillRate) {
 	ShieldMaterialInstance->SetScalarParameterValue("FillRate", _fillRate);
+}
+
+
+void AShield::SetInputDirectionVectorX(float _inputX) {
+	InputDirection.X = _inputX;
+}
+void AShield::SetInputDirectionVectorY(float _inputY) {
+	InputDirection.Y = _inputY;
 }
