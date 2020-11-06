@@ -212,16 +212,17 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 					Velocity = Velocity * 2000;
 
 					ChangeMovementState(EMovementState::DeathEjected);
-					break;
+					
+				}
+				else
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "A player bounced");
+					EjectionVelocity = EjectionVelocity - 2 * (FVector2D::DotProduct(EjectionVelocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
+					Velocity = FVector2D::ZeroVector;
+					ChangeMovementState(EMovementState::WallHit);
 				}
 			}
-			else
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "A player bounced");
-				EjectionVelocity = EjectionVelocity - 2 * (FVector2D::DotProduct(EjectionVelocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
-				Velocity = FVector2D::ZeroVector;
-				ChangeMovementState(EMovementState::WallHit);
-			}
+			
 			
 			break;
 		case EMovementState::Dashing:
