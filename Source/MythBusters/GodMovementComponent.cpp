@@ -548,9 +548,19 @@ void UGodMovementComponent::ComputePushVelocity(const AActor* OtherActor)
 	const float PushSpeedY = FMath::Sign(DistanceY) * FMath::Clamp(1.0f / FMath::Abs(DistanceY), 0.23f, 1.0f) * 2 * MaxVerticalFlySpeed;
 	FVector PushDirection = GetOwner()->GetActorLocation() - OtherActor->GetActorLocation();
 	PushDirection.Normalize();
+
+	if (_MovementInput.X != 0 || _MovementInput.Y != 0)
+	{
+		PushVelocity.X = FMath::Abs(FMath::Sign(_MovementInput.X)) * PushSpeedX;
+		PushVelocity.Y = FMath::Abs(FMath::Sign(_MovementInput.Y)) * PushSpeedY;
+	}
+	else
+	{
+		PushVelocity.X = PushSpeedX;
+		//PushVelocity.Y = PushSpeedY;
+	}
 	
-	PushVelocity.X = PushSpeedX;
-	PushVelocity.Y = PushSpeedY;
+	
 	
 	
 }
