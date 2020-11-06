@@ -40,6 +40,9 @@ public:
 	/** Variable to set to true to get in the Dash State */
 	UPROPERTY(Category = "Transition Booleans", EditAnywhere, BlueprintReadWrite)
 		bool Dashing;
+	/** Variable to set to true to stop an animation after it is finished */
+	UPROPERTY(Category = "Transition Booleans", EditAnywhere, BlueprintReadWrite)
+		bool AnimCanStop;
 	
 
 	/** Value to blend the fly animation on X axis */
@@ -68,9 +71,6 @@ public:
 	/** Variable to set to true to get in a PushAtt SubState */
 	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
 		EAttackDir AttDirection;
-	/** Variable to set to true to get in a PushAtt SubState */
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		bool AttCanStop;
 	/** Name of the socket where to attach the Normal Forward Attack hitboxes */
 	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
 		FName NormalForwardSocketName;
@@ -142,6 +142,28 @@ public:
 	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
 	//	AHitBoxGroup* PushDownwardGroup;
 	//
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimSequenceBase* NormalForwardAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimSequenceBase* SpecialForwardAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimSequenceBase* PushForwardAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimSequenceBase* HurtAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimSequenceBase* ShieldAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimSequenceBase* TurnAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimSequenceBase* EndTurnAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimSequenceBase* TurnReverseAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UBlendSpaceBase* MoveBlendSpace;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UBlendSpaceBase* DashBlendSpace;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UBlendSpaceBase* EjectBlendSpace;
 	
 public :
 	virtual void NativeBeginPlay() override;

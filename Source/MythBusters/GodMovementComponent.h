@@ -12,6 +12,7 @@
 UENUM(BlueprintType)
 enum class EMovementState : uint8 {
 	Flying,
+	FlyingTurnaroud,
 	Dashing,
 	Sprinting,
 	Ejected,
