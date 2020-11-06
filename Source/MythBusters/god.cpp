@@ -34,47 +34,30 @@ void AGod::BeginPlay()
 void AGod::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	/*
-	if (CurrentShield != nullptr) {					// There is a shield
-		switch (GodMovement->MovementState)			// Shielding interruptions
+	switch (GodMovement->MovementState)			// Normal movement
 		{
+		case EMovementState::Flying:
+			ChangeGodState(EGodState::Flying);
+			break;
+		case EMovementState::FlyingTurnaroud:
+			ChangeGodState(EGodState::FlyingTurnaround);
+			break;
+		case EMovementState::WallHit:
+			ChangeGodState(EGodState::WallHit);
+			break;
+		case EMovementState::Sprinting:
+			ChangeGodState(EGodState::Sprinting);
+			break;
+		case EMovementState::Dashing:
+			ChangeGodState(EGodState::Dashing);
+			break;
 		case EMovementState::Ejected:
 			ChangeGodState(EGodState::Ejected);
-			StopShield();
 			break;
 		case EMovementState::DeathEjected:
 			ChangeGodState(EGodState::DeathEjected);
-			StopShield();
 			break;
-		default:									// No shielding interruption => set (again) state
-			ChangeGodState(EGodState::Shielding);
-		}
-	}*/
-
-	switch (GodMovement->MovementState)			// Normal movement
-	{
-	case EMovementState::Flying:
-		ChangeGodState(EGodState::Flying);
-		break;
-	case EMovementState::FlyingTurnaroud:
-		ChangeGodState(EGodState::FlyingTurnaround);
-		break;
-	case EMovementState::WallHit:
-		ChangeGodState(EGodState::WallHit);
-		break;
-	case EMovementState::Sprinting:
-		ChangeGodState(EGodState::Sprinting);
-		break;
-	case EMovementState::Dashing:
-		ChangeGodState(EGodState::Dashing);
-		break;
-	case EMovementState::Ejected:
-		ChangeGodState(EGodState::Ejected);
-		break;
-	case EMovementState::DeathEjected:
-		ChangeGodState(EGodState::DeathEjected);
-		break;
-	default:;
+		default:;
 	}
 
 	if (CurrentShield != nullptr)
@@ -200,8 +183,46 @@ void AGod::ChangeGodState(EGodState NewState)
 	/*if (State == EGodState::Shielding && NewState != EGodState::Shielding)
 		StopShield();*/
 	State = NewState;
+	switch (State)
+	{
+	case EGodState::Flying:
+
+		break;
+	case EGodState::FlyingTurnaround:
+
+		break;
+	case EGodState::Dashing:
+
+		break;
+	case EGodState::Sprinting: 
+		
+		break;
+	case EGodState::Ejected: 
+		
+		break;
+	case EGodState::WallHit: 
+		
+		break;
+	case EGodState::Hurt: 
+		
+		break;
+	case EGodState::Attacking: 
+		
+		break;
+	case EGodState::Shielding: 
+		
+		break;
+	case EGodState::Dead: 
+		Die();
+		break;
+	default: ;
+	}
 }
 
+void AGod::Die()
+{
+	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
 
 
 
@@ -244,4 +265,8 @@ float AGod::GetAnimValues(int _idValueToGet) {
 
 USkeletalMeshComponent* AGod::GetSkeletalMesh() {
 	return SkeletalMesh;
+}
+
+void AGod::ApplyDamage(float value) {
+	this->GodDamage += value;
 }
