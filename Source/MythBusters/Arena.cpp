@@ -77,7 +77,7 @@ bool AArena::IsEjected(float _velocityNorm, FHitResult& _hitResult)
 		GetWorld()->SpawnActor<AActor>(explodeActor, FVector::ZeroVector, Grounds[idHit]->GetRelativeRotation(), _spawnParams);
 
 
-		EGodEjected();
+		//EGodEjected();
 		return true;
 	}
 	else

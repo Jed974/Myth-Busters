@@ -100,6 +100,8 @@ protected:
 
 	virtual void Dash();
 
+	void Die();
+
 	UFUNCTION(BlueprintCallable)
 		virtual void SetGodDamage(float value) { this->GodDamage = value; }
 	UFUNCTION(BlueprintCallable)

@@ -172,12 +172,16 @@ void AGod::ChangeGodState(EGodState NewState)
 		
 		break;
 	case EGodState::Dead: 
-		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Die();
 		break;
 	default: ;
 	}
 }
 
+void AGod::Die()
+{
+	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
 
 
 
