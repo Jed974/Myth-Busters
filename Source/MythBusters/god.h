@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Shield.h"
 #include "GodMovementComponent.h"
 #include "GameFramework/Actor.h"
 #include "god.generated.h"
@@ -46,7 +47,20 @@ protected:
 
 	float HorizontalDeadZone = 0.15f;
 	float VerticalDeadZone = 0.15f;
+	
 	bool canMove = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AShield> ShieldClassToSpwan;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
+		FColor ShieldFresnelColor = FColor::Blue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
+		FColor ShieldBaseColor = FColor::Red;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
+		float ShieldSize = 1.0f;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+		AShield* CurrentShield = nullptr;
 
 protected:
 	// Called when the game starts or when spawned
@@ -95,10 +109,22 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 		void EStopAttackPush();
 
+	   
+	UFUNCTION(BlueprintCallable)
+		virtual void Shield();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EShield();
+
+	UFUNCTION(BlueprintCallable)
+		virtual void StopShield();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EStopShield();
+
 
 	UFUNCTION(BlueprintCallable)
 		virtual void Eject(FVector2D _EjectionSpeed);
 
+	UFUNCTION(BlueprintCallable)
 	virtual void Dash();
 
 	void Die();
@@ -108,7 +134,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		virtual float GetGodDamage() { return this->GodDamage; }
 	UFUNCTION(BlueprintCallable)
-		virtual void ApplyDamage(float value);
+		virtual void ApplyGodDamage(float value);
 	
 	
 
@@ -125,7 +151,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		virtual void ChangeGodState(EGodState NewState);
-	
+
 	UPROPERTY(BlueprintReadOnly)
 	EGodState State;
 
