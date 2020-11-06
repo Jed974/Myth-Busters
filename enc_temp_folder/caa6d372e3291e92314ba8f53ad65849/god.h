@@ -18,8 +18,7 @@ enum class EGodState : uint8 {
 	WallHit,
 	Hurt UMETA(DisplayName = "Hurt"),
 	Attacking UMETA(DisplayName = "Attacking"),
-	Shielding UMETA(DisplayName = "Shielding"),
-	Dead UMETA(DisplayName = "Dead")
+	Shielding UMETA(DisplayName = "Shielding")
 };
 
 UCLASS()
@@ -34,7 +33,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
 		UCapsuleComponent* CapsuleComponent;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
-		float GodDamage = 0;
+		float GodDamage;
 
 protected:
 	
