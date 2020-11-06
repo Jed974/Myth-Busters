@@ -18,7 +18,8 @@ enum class EGodState : uint8 {
 	WallHit,
 	Hurt UMETA(DisplayName = "Hurt"),
 	Attacking UMETA(DisplayName = "Attacking"),
-	Shielding UMETA(DisplayName = "Shielding")
+	Shielding UMETA(DisplayName = "Shielding"),
+	Dead UMETA(DisplayName = "Dead")
 };
 
 UCLASS()

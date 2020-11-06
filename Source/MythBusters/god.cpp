@@ -56,7 +56,7 @@ void AGod::Tick(float DeltaTime)
 			ChangeGodState(EGodState::Dashing);
 			break;
 		case EMovementState::DeathEjected: 
-			
+			ChangeGodState(EGodState::Dead);
 			break;
 		default: ;
 	}
@@ -142,6 +142,40 @@ void AGod::Dash()
 void AGod::ChangeGodState(EGodState NewState)
 {
 	State = NewState;
+	switch (State)
+	{
+	case EGodState::Flying:
+
+		break;
+	case EGodState::FlyingTurnaround:
+
+		break;
+	case EGodState::Dashing:
+
+		break;
+	case EGodState::Sprinting: 
+		
+		break;
+	case EGodState::Ejected: 
+		
+		break;
+	case EGodState::WallHit: 
+		
+		break;
+	case EGodState::Hurt: 
+		
+		break;
+	case EGodState::Attacking: 
+		
+		break;
+	case EGodState::Shielding: 
+		
+		break;
+	case EGodState::Dead: 
+		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	default: ;
+	}
 }
 
 
