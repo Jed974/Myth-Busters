@@ -34,40 +34,64 @@ void AGod::BeginPlay()
 void AGod::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	switch (GodMovement->MovementState)
-	{
-		case EMovementState::Flying:
-			ChangeGodState(EGodState::Flying);
-			break;
-		case EMovementState::FlyingTurnaroud:
-			ChangeGodState(EGodState::FlyingTurnaround);
-			break;
+	/*
+	if (CurrentShield != nullptr) {					// There is a shield
+		switch (GodMovement->MovementState)			// Shielding interruptions
+		{
 		case EMovementState::Ejected:
 			ChangeGodState(EGodState::Ejected);
+			StopShield();
 			break;
-		case EMovementState::WallHit:
-			ChangeGodState(EGodState::WallHit);
+		case EMovementState::DeathEjected:
+			ChangeGodState(EGodState::DeathEjected);
+			StopShield();
 			break;
-		case EMovementState::Sprinting:
-			ChangeGodState(EGodState::Sprinting);
-			break;
-		case EMovementState::Dashing: 
-			ChangeGodState(EGodState::Dashing);
-			break;
-		case EMovementState::DeathEjected: 
-			
-			break;
-		default: ;
-	}
-	
+		default:									// No shielding interruption => set (again) state
+			ChangeGodState(EGodState::Shielding);
+		}
+	}*/
 
+	switch (GodMovement->MovementState)			// Normal movement
+	{
+	case EMovementState::Flying:
+		ChangeGodState(EGodState::Flying);
+		break;
+	case EMovementState::FlyingTurnaroud:
+		ChangeGodState(EGodState::FlyingTurnaround);
+		break;
+	case EMovementState::WallHit:
+		ChangeGodState(EGodState::WallHit);
+		break;
+	case EMovementState::Sprinting:
+		ChangeGodState(EGodState::Sprinting);
+		break;
+	case EMovementState::Dashing:
+		ChangeGodState(EGodState::Dashing);
+		break;
+	case EMovementState::Ejected:
+		ChangeGodState(EGodState::Ejected);
+		break;
+	case EMovementState::DeathEjected:
+		ChangeGodState(EGodState::DeathEjected);
+		break;
+	default:;
+	}
+
+	if (CurrentShield != nullptr)
+		ChangeGodState(EGodState::Shielding);
+	
 }
 
 
 void AGod::MoveHorizontal(float AxisValue)
 {
-	if (FMath::Abs(AxisValue) > HorizontalDeadZone)
+
+	if (CurrentShield != nullptr) {
+		CurrentShield->SetInputDirectionVectorX(AxisValue);
+		GodMovement->AddMovementInput(FVector2D(1.0, 0.0), 0.f);
+		EMoveHorizontal(AxisValue);
+	}
+	else if (FMath::Abs(AxisValue) > HorizontalDeadZone)
 	{
 		GodMovement->AddMovementInput(FVector2D(1.0, 0.0), AxisValue);
 		EMoveHorizontal(AxisValue);
@@ -81,7 +105,13 @@ void AGod::MoveHorizontal(float AxisValue)
 
 void AGod::MoveVertical(float AxisValue)
 {
-	if (FMath::Abs(AxisValue) > VerticalDeadZone)
+
+	if (CurrentShield != nullptr) {
+		CurrentShield->SetInputDirectionVectorY(AxisValue*-1);
+		GodMovement->AddMovementInput(FVector2D(0.0, 1.0), 0.f);
+		EMoveVertical(AxisValue);
+	}
+	else if (FMath::Abs(AxisValue) > VerticalDeadZone)
 	{
 		GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
 		EMoveVertical(AxisValue);
@@ -90,8 +120,7 @@ void AGod::MoveVertical(float AxisValue)
 	{
 		GodMovement->AddMovementInput(FVector2D(0.0, 1.0), 0.f);
 		EMoveVertical(0.f);
-	}
-	
+	}	
 }
 
 
@@ -120,6 +149,34 @@ void AGod::StopAttackPush()
 	EStopAttackPush();
 }
 
+void AGod::Shield()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Shielding !");
+
+	FTransform _spawnTransform = GetRootComponent()->GetComponentTransform();
+	FActorSpawnParameters _spawnParams;
+	_spawnParams.Instigator = this;
+
+	CurrentShield = GetWorld()->SpawnActor<AShield>(ShieldClassToSpwan, _spawnTransform.GetLocation(), _spawnTransform.GetRotation().Rotator(), _spawnParams);
+
+	FAttachmentTransformRules _attTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
+	CurrentShield->AttachToComponent(CapsuleComponent, _attTransformRules);
+	CurrentShield->InitShield(ShieldSize, ShieldFresnelColor, ShieldBaseColor);
+	
+
+	EShield();
+}
+void AGod::StopShield()
+{
+	if (CurrentShield != nullptr)
+	{
+		CurrentShield->Destroy();
+		CurrentShield = nullptr;
+	}
+	EStopShield();
+}
+
+
 void AGod::Eject(FVector2D _EjectionSpeed)
 {
 	ChangeGodState(EGodState::Ejected);
@@ -135,12 +192,13 @@ void AGod::Dash()
 			ChangeGodState(EGodState::Dashing);
 			GodMovement->Dash();
 			break;
-	}
-	
+	}	
 }
 
 void AGod::ChangeGodState(EGodState NewState)
 {
+	/*if (State == EGodState::Shielding && NewState != EGodState::Shielding)
+		StopShield();*/
 	State = NewState;
 }
 
@@ -161,6 +219,9 @@ void AGod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("AttackPush", IE_Pressed, this, &AGod::AttackPush);
 	PlayerInputComponent->BindAction("AttackPush", IE_Released, this, &AGod::StopAttackPush);
+
+	PlayerInputComponent->BindAction("Shield", IE_Pressed, this, &AGod::Shield);
+	PlayerInputComponent->BindAction("Shield", IE_Released, this, &AGod::StopShield);
 
 	PlayerInputComponent->BindAction("Dash",IE_Pressed,this, &AGod::Dash);
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Shield.h"
 #include "GodMovementComponent.h"
 #include "GameFramework/Actor.h"
 #include "god.generated.h"
@@ -18,7 +19,8 @@ enum class EGodState : uint8 {
 	WallHit,
 	Hurt UMETA(DisplayName = "Hurt"),
 	Attacking UMETA(DisplayName = "Attacking"),
-	Shielding UMETA(DisplayName = "Shielding")
+	Shielding UMETA(DisplayName = "Shielding"),
+	DeathEjected UMETA(DisplayName = "DeathEjected")
 };
 
 UCLASS()
@@ -43,6 +45,17 @@ protected:
 
 	float HorizontalDeadZone = 0.15f;
 	float VerticalDeadZone = 0.15f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AShield> ShieldClassToSpwan;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
+		FColor ShieldFresnelColor = FColor::Blue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
+		FColor ShieldBaseColor = FColor::Red;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
+		float ShieldSize = 1.0f;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+		AShield* CurrentShield = nullptr;
 
 protected:
 	// Called when the game starts or when spawned
@@ -91,10 +104,22 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 		void EStopAttackPush();
 
+	   
+	UFUNCTION(BlueprintCallable)
+		virtual void Shield();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EShield();
+
+	UFUNCTION(BlueprintCallable)
+		virtual void StopShield();
+	UFUNCTION(BlueprintImplementableEvent)
+		void EStopShield();
+
 
 	UFUNCTION(BlueprintCallable)
 		virtual void Eject(FVector2D _EjectionSpeed);
 
+	UFUNCTION(BlueprintCallable)
 	virtual void Dash();
 
 	
@@ -112,7 +137,7 @@ public:
 	virtual USkeletalMeshComponent* GetSkeletalMesh();
 
 	virtual void ChangeGodState(EGodState NewState);
-	
+
 	UPROPERTY(BlueprintReadOnly)
 	EGodState State;
 
