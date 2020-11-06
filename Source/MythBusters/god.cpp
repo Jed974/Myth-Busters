@@ -2,7 +2,6 @@
 
 
 #include "god.h"
-
 #include <string>
 
 
