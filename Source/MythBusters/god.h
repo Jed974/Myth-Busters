@@ -18,7 +18,8 @@ enum class EGodState : uint8 {
 	WallHit,
 	Hurt UMETA(DisplayName = "Hurt"),
 	Attacking UMETA(DisplayName = "Attacking"),
-	Shielding UMETA(DisplayName = "Shielding")
+	Shielding UMETA(DisplayName = "Shielding"),
+	Dead UMETA(DisplayName = "Dead")
 };
 
 UCLASS()
@@ -98,6 +99,8 @@ protected:
 		virtual void Eject(FVector2D _EjectionSpeed);
 
 	virtual void Dash();
+
+	void Die();
 
 	UFUNCTION(BlueprintCallable)
 		virtual void SetGodDamage(float value) { this->GodDamage = value; }

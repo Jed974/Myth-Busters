@@ -95,6 +95,7 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	
 	if (MovementState == EMovementState::DeathEjected)
 	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
 		Location.X += Velocity.X * DELTA_TIME;
 		Location.Z += Velocity.Y * DELTA_TIME;
 		GetOwner()->SetActorLocation(Location, false, &HitInfo, ETeleportType::TeleportPhysics);
@@ -116,7 +117,7 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			Location.Z += Velocity.Y * DELTA_TIME;
 			GetOwner()->SetActorLocation(Location, true);
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitInfo.Normal.ToString());
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
 		}
 
 		if (HorizontalMovementState == SprintHorizontal || HorizontalMovementState == SprintHorizontalStartup || HorizontalMovementState == SprintHorizontalStop || VerticalMovementState == SprintVerticalStartup || VerticalMovementState == SprintVerticalStop)
@@ -208,15 +209,20 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 			
 					Velocity = EjectionVelocity;
 					Velocity.Normalize();
-					Velocity * 2000;
+					Velocity = Velocity * 2000;
 
 					ChangeMovementState(EMovementState::DeathEjected);
 					break;
 				}
 			}
-			EjectionVelocity = EjectionVelocity - 2 * (FVector2D::DotProduct(EjectionVelocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
-			Velocity = FVector2D::ZeroVector;
-			ChangeMovementState(EMovementState::WallHit);
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "A player bounced");
+				EjectionVelocity = EjectionVelocity - 2 * (FVector2D::DotProduct(EjectionVelocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
+				Velocity = FVector2D::ZeroVector;
+				ChangeMovementState(EMovementState::WallHit);
+			}
+			
 			break;
 		case EMovementState::Dashing:
 			Reflect = Velocity - 2 * (FVector2D::DotProduct(Velocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
@@ -548,9 +554,19 @@ void UGodMovementComponent::ComputePushVelocity(const AActor* OtherActor)
 	const float PushSpeedY = FMath::Sign(DistanceY) * FMath::Clamp(1.0f / FMath::Abs(DistanceY), 0.23f, 1.0f) * 2 * MaxVerticalFlySpeed;
 	FVector PushDirection = GetOwner()->GetActorLocation() - OtherActor->GetActorLocation();
 	PushDirection.Normalize();
+
+	if (_MovementInput.X != 0 || _MovementInput.Y != 0)
+	{
+		PushVelocity.X = FMath::Abs(FMath::Sign(_MovementInput.X)) * PushSpeedX;
+		PushVelocity.Y = FMath::Abs(FMath::Sign(_MovementInput.Y)) * PushSpeedY;
+	}
+	else
+	{
+		PushVelocity.X = PushSpeedX;
+		//PushVelocity.Y = PushSpeedY;
+	}
 	
-	PushVelocity.X = PushSpeedX;
-	PushVelocity.Y = PushSpeedY;
+	
 	
 	
 }
