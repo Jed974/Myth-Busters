@@ -73,8 +73,7 @@ void UGodMovementComponent::ChangeMovementState(EMovementState NewState)
 			break;
 		case EMovementState::Dashing:
 			DashFrameCounter = 0;
-			break;
-			
+			break;			
 	}
 }
 
@@ -88,9 +87,7 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	FHitResult HitInfo = FHitResult();
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, isFacingRight ? "Right" : "Left" ); 
 	if (CollidingActor != nullptr && IsPushable && CollidingActor->Tags.Contains(FName("Pusher")))
-	{
-		
-		
+	{		
 		ComputePushVelocity(CollidingActor);
 		Location.X += PushVelocity.X * DELTA_TIME;
 		Location.Z += PushVelocity.Y * DELTA_TIME;
