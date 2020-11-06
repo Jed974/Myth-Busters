@@ -14,8 +14,6 @@ UGodMovementComponent::UGodMovementComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	//OwnerGod = dynamic_cast<AGod*>(GetOwner());
-	isFacingRight = true;
-	isFacingUp = true;
 }
 
 
@@ -24,6 +22,9 @@ void UGodMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	DELTA_TIME = 1.0 / GEngine->FixedFrameRate;
+	isFacingRight = true;
+	isFacingUp = true;
+	IsPushable = true;
 	
 }
 
@@ -77,13 +78,26 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	FVector Location = GetOwner()->GetActorLocation();
 	FHitResult HitInfo = FHitResult();
 
-	if (MovementState == EMovementState::DeathEjected) {
+	if (CollidingActor != nullptr && IsPushable && CollidingActor->Tags.Contains(FName("Pusher")))
+	{
+		
+		
+		ComputePushVelocity(CollidingActor);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, PushVelocity.ToString());
+		Location.X += PushVelocity.X * DELTA_TIME;
+		Location.Z += PushVelocity.Y * DELTA_TIME;
+	}
+	
+	if (MovementState == EMovementState::DeathEjected)
+	{
 		Location.X += Velocity.X * DELTA_TIME;
 		Location.Z += Velocity.Y * DELTA_TIME;
 		GetOwner()->SetActorLocation(Location, false, &HitInfo, ETeleportType::TeleportPhysics);
 	}
-	else {
+	else
+	{
 		ComputeNewVelocity();
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
 		Location.X += Velocity.X * DELTA_TIME;
 		Location.Z += Velocity.Y * DELTA_TIME;
 		
@@ -517,6 +531,22 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		break;
 	}
 }
+
+void UGodMovementComponent::ComputePushVelocity(const AActor* OtherActor)
+{
+	const float DistanceX = GetOwner()->GetActorLocation().X - OtherActor->GetActorLocation().X;
+	const float DistanceY = GetOwner()->GetActorLocation().Z - OtherActor->GetActorLocation().Z;
+	const float PushSpeedX = FMath::Sign(DistanceX) * FMath::Clamp(1.0f / FMath::Abs(DistanceX) , 0.23f, 1.0f) * 2 * MaxHorizontalFlySpeed;
+	const float PushSpeedY = FMath::Sign(DistanceY) * FMath::Clamp(1.0f / FMath::Abs(DistanceY), 0.23f, 1.0f) * 2 * MaxVerticalFlySpeed;
+	FVector PushDirection = GetOwner()->GetActorLocation() - OtherActor->GetActorLocation();
+	PushDirection.Normalize();
+	
+	PushVelocity.X = PushSpeedX;
+	PushVelocity.Y = PushSpeedY;
+	
+	
+}
+
 
 float UGodMovementComponent::GetVelocityNorm() {
 	return FMath::Sqrt(FMath::Square(Velocity.X) + FMath::Square(Velocity.Y));

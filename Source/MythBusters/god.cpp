@@ -17,6 +17,7 @@ AGod::AGod()
 	
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("SkeletalMesh");
 	SkeletalMesh->SetupAttachment(CapsuleComponent);
+	CapsuleComponent->SetCollisionProfileName(FName("God"));
 	
 	GodMovement = CreateDefaultSubobject<UGodMovementComponent>("GodMovementComponent");
 
