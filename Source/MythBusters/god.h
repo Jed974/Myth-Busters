@@ -11,6 +11,7 @@
 UENUM(BlueprintType)
 enum class EGodState : uint8 {
 	Flying UMETA(DisplayName = "Flying"),
+	FlyingTurnaround UMETA(DisplayName = "FlyingTurnaround"),
 	Dashing UMETA(DisplayName = "Dashing"),
 	Sprinting UMETA(DisplayName = "Sprinting"),
 	Ejected UMETA(DisplayName = "Ejected"),

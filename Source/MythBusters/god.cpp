@@ -40,6 +40,9 @@ void AGod::Tick(float DeltaTime)
 		case EMovementState::Flying:
 			ChangeGodState(EGodState::Flying);
 			break;
+		case EMovementState::FlyingTurnaroud:
+			ChangeGodState(EGodState::FlyingTurnaround);
+			break;
 		case EMovementState::Ejected:
 			ChangeGodState(EGodState::Ejected);
 			break;
@@ -49,6 +52,13 @@ void AGod::Tick(float DeltaTime)
 		case EMovementState::Sprinting:
 			ChangeGodState(EGodState::Sprinting);
 			break;
+		case EMovementState::Dashing: 
+			ChangeGodState(EGodState::Dashing);
+			break;
+		case EMovementState::DeathEjected: 
+			
+			break;
+		default: ;
 	}
 	
 

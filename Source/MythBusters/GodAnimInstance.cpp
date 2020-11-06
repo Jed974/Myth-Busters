@@ -42,7 +42,7 @@ void UGodAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UGodAnimInstance::InterruptAttack()
 {
-	AttCanStop = true;
+	AnimCanStop = true;
 	AttNormal = false;
 	AttSpe = false;
 	AttPush = false;
