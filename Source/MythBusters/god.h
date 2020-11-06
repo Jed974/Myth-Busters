@@ -46,6 +46,7 @@ protected:
 
 	float HorizontalDeadZone = 0.15f;
 	float VerticalDeadZone = 0.15f;
+	bool canMove = true;
 
 protected:
 	// Called when the game starts or when spawned
@@ -122,7 +123,8 @@ public:
 
 	virtual USkeletalMeshComponent* GetSkeletalMesh();
 
-	virtual void ChangeGodState(EGodState NewState);
+	UFUNCTION(BlueprintCallable)
+		virtual void ChangeGodState(EGodState NewState);
 	
 	UPROPERTY(BlueprintReadOnly)
 	EGodState State;

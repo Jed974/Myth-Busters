@@ -27,6 +27,7 @@ AGod::AGod()
 void AGod::BeginPlay()
 {
 	Super::BeginPlay();
+	canMove = true;
 	
 }
 
@@ -34,9 +35,10 @@ void AGod::BeginPlay()
 void AGod::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	switch (GodMovement->MovementState)
+	if (canMove)
 	{
+		switch (GodMovement->MovementState)
+		{
 		case EMovementState::Flying:
 			ChangeGodState(EGodState::Flying);
 			break;
@@ -52,13 +54,15 @@ void AGod::Tick(float DeltaTime)
 		case EMovementState::Sprinting:
 			ChangeGodState(EGodState::Sprinting);
 			break;
-		case EMovementState::Dashing: 
+		case EMovementState::Dashing:
 			ChangeGodState(EGodState::Dashing);
 			break;
-		case EMovementState::DeathEjected: 
+		case EMovementState::DeathEjected:
 			ChangeGodState(EGodState::Dead);
 			break;
-		default: ;
+		default:;
+		}
+
 	}
 	
 
@@ -67,37 +71,52 @@ void AGod::Tick(float DeltaTime)
 
 void AGod::MoveHorizontal(float AxisValue)
 {
-	if (FMath::Abs(AxisValue) > HorizontalDeadZone)
+	if (canMove)
 	{
-		GodMovement->AddMovementInput(FVector2D(1.0, 0.0), AxisValue);
-		EMoveHorizontal(AxisValue);
+		if (FMath::Abs(AxisValue) > HorizontalDeadZone)
+		{
+			GodMovement->AddMovementInput(FVector2D(1.0, 0.0), AxisValue);
+			EMoveHorizontal(AxisValue);
+		}
+		else
+		{
+			GodMovement->AddMovementInput(FVector2D(1.0, 0.0), 0.f);
+			EMoveHorizontal(0.f);
+		}
 	}
-	else
-	{
-		GodMovement->AddMovementInput(FVector2D(1.0, 0.0), 0.f);
-		EMoveHorizontal(0.f);
-	}
+	
 }
 
 void AGod::MoveVertical(float AxisValue)
 {
-	if (FMath::Abs(AxisValue) > VerticalDeadZone)
+	if (canMove)
 	{
-		GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
-		EMoveVertical(AxisValue);
+		if (FMath::Abs(AxisValue) > VerticalDeadZone)
+		{
+			GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
+			EMoveVertical(AxisValue);
+		}
+		else
+		{
+			GodMovement->AddMovementInput(FVector2D(0.0, 1.0), 0.f);
+			EMoveVertical(0.f);
+		}
 	}
-	else
-	{
-		GodMovement->AddMovementInput(FVector2D(0.0, 1.0), 0.f);
-		EMoveVertical(0.f);
-	}
+	
+
 	
 }
 
 
 void AGod::AttackNormal()
 {
-	EAttackNormal();
+	switch (State)
+	{
+	case EGodState::Flying:
+		EAttackNormal();
+		break;
+	}
+	
 }
 void AGod::StopAttackNormal()
 {
@@ -105,7 +124,12 @@ void AGod::StopAttackNormal()
 }
 void AGod::AttackSpecial()
 {
-	EAttackSpecial();
+	switch (State)
+	{
+	case EGodState::Flying:
+		EAttackSpecial();
+		break;
+	}
 }
 void AGod::StopAttackSpecial()
 {
@@ -113,7 +137,12 @@ void AGod::StopAttackSpecial()
 }
 void AGod::AttackPush()
 {
-	EAttackPush();
+	switch (State)
+	{
+	case EGodState::Flying:
+		EAttackPush();
+		break;
+	}
 }
 void AGod::StopAttackPush()
 {
@@ -141,40 +170,41 @@ void AGod::Dash()
 
 void AGod::ChangeGodState(EGodState NewState)
 {
+	
 	State = NewState;
+	canMove = true;
 	switch (State)
 	{
-	case EGodState::Flying:
+		case EGodState::Flying:
+			break;
+		case EGodState::FlyingTurnaround:
 
-		break;
-	case EGodState::FlyingTurnaround:
+			break;
+		case EGodState::Dashing:
 
-		break;
-	case EGodState::Dashing:
-
-		break;
-	case EGodState::Sprinting: 
-		
-		break;
-	case EGodState::Ejected: 
-		
-		break;
-	case EGodState::WallHit: 
-		
-		break;
-	case EGodState::Hurt: 
-		
-		break;
-	case EGodState::Attacking: 
-		
-		break;
-	case EGodState::Shielding: 
-		
-		break;
-	case EGodState::Dead: 
-		Die();
-		break;
-	default: ;
+			break;
+		case EGodState::Sprinting: 
+			
+			break;
+		case EGodState::Ejected: 
+			
+			break;
+		case EGodState::WallHit: 
+			
+			break;
+		case EGodState::Hurt: 
+			
+			break;
+		case EGodState::Attacking:
+			canMove = false;
+			break;
+		case EGodState::Shielding: 
+			
+			break;
+		case EGodState::Dead: 
+			Die();
+			break;
+		default: ;
 	}
 }
 
