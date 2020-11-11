@@ -145,15 +145,25 @@ public:
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimSequenceBase* NormalForwardAnimation;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimMontage* NormalForwardMontage;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimSequenceBase* SpecialForwardAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimMontage* SpecialForwardMontage;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimSequenceBase* PushForwardAnimation;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimMontage* PushForwardMontage;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimSequenceBase* HurtAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimMontage* HurtMontage;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimSequenceBase* ShieldAnimation;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimSequenceBase* TurnAnimation;
+	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+		UAnimMontage* TurnMontage;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimSequenceBase* EndTurnAnimation;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)

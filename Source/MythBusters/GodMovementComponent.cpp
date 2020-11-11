@@ -336,15 +336,12 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 	case FlyHorizontalStop:
 		if (CurrentHorizontalStateTimer < HorizontalFlyStopTime)
 		{
-			HorizontalSpeed = FMath::Abs(HorizontalPreviousSpeed) * (1 - static_cast<float>(CurrentHorizontalStateTimer) / HorizontalFlyStopTime);
+			HorizontalSpeed = FMath::Abs(HorizontalPreviousSpeed) * (1.0f - static_cast<float>(CurrentHorizontalStateTimer) / HorizontalFlyStopTime);
 			CurrentHorizontalStateTimer++;
-			if (isFacingRight)
+			Velocity.X = HorizontalSpeed * (isFacingRight ? 1.0f : -1.0f);
+			if (_MovementInput.X != 0.0f && FMath::Sign(_MovementInput.X) != (isFacingRight ? 1.0f : - 1.0f))
 			{
-				Velocity.X = HorizontalSpeed;
-			}
-			else
-			{
-				Velocity.X = HorizontalSpeed * -1;
+				ChangeHorizontalMovementState(FlyHorizontalTurnAround);
 			}
 		}
 		else
