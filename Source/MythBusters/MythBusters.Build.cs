@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
+using System;
+using System.IO;
 
 public class MythBusters : ModuleRules
 {
@@ -12,8 +14,9 @@ public class MythBusters : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
-		PublicIncludePaths.Add("../ThirdParty/GGPO/include");
-		PublicSystemLibraryPaths.Add("../ThirdParty/GGPO/lib/x64/");
+		string GGPODirectory = Environment.GetEnvironmentVariable("GGPO_DIR");
+		PublicIncludePaths.Add(GGPODirectory + "include");
+		PublicAdditionalLibraries.Add(GGPODirectory + "lib\\x64\\GGPO.lib");
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
