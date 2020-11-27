@@ -34,36 +34,7 @@ void AGod::BeginPlay()
 void AGod::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (canMove)
-	{
-		switch (GodMovement->MovementState)
-		{
-		case EMovementState::Flying:
-			ChangeGodState(EGodState::Flying);
-			break;
-		case EMovementState::FlyingTurnaroud:
-			ChangeGodState(EGodState::FlyingTurnaround);
-			break;
-		case EMovementState::WallHit:
-			ChangeGodState(EGodState::WallHit);
-			break;
-		case EMovementState::Sprinting:
-			ChangeGodState(EGodState::Sprinting);
-			break;
-		case EMovementState::Dashing:
-			ChangeGodState(EGodState::Dashing);
-			break;
-		case EMovementState::Ejected:
-			ChangeGodState(EGodState::Ejected);
-			break;
-		case EMovementState::DeathEjected:
-			ChangeGodState(EGodState::Dead);
-			break;
-		default:;
-		}
-
-	}
-
+	UpdateState();
 	if (CurrentShield != nullptr)
 		ChangeGodState(EGodState::Shielding);
 	
@@ -214,7 +185,7 @@ void AGod::ChangeGodState(EGodState NewState)
 		case EGodState::Flying:
 			break;
 		case EGodState::FlyingTurnaround:
-
+			TurnaroundEvent();
 			break;
 		case EGodState::Dashing:
 
@@ -294,4 +265,37 @@ USkeletalMeshComponent* AGod::GetSkeletalMesh() {
 
 void AGod::ApplyGodDamage(float value) {
 	this->GodDamage += value;
+}
+
+void AGod::UpdateState()
+{
+	if (canMove)
+	{
+		switch (GodMovement->MovementState)
+		{
+		case EMovementState::Flying:
+			ChangeGodState(EGodState::Flying);
+			break;
+		case EMovementState::FlyingTurnaroud:
+			if (State != EGodState::FlyingTurnaround) ChangeGodState(EGodState::FlyingTurnaround);
+			break;
+		case EMovementState::WallHit:
+			ChangeGodState(EGodState::WallHit);
+			break;
+		case EMovementState::Sprinting:
+			ChangeGodState(EGodState::Sprinting);
+			break;
+		case EMovementState::Dashing:
+			ChangeGodState(EGodState::Dashing);
+			break;
+		case EMovementState::Ejected:
+			ChangeGodState(EGodState::Ejected);
+			break;
+		case EMovementState::DeathEjected:
+			ChangeGodState(EGodState::Dead);
+			break;
+		default:;
+		}
+
+	}
 }

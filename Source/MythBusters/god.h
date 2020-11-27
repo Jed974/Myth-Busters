@@ -135,6 +135,11 @@ protected:
 		virtual float GetGodDamage() { return this->GodDamage; }
 	UFUNCTION(BlueprintCallable)
 		virtual void ApplyGodDamage(float value);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void TurnaroundEvent();
+
+	void UpdateState();
 	
 	
 
@@ -153,7 +158,7 @@ public:
 		virtual void ChangeGodState(EGodState NewState);
 
 	UPROPERTY(BlueprintReadOnly)
-	EGodState State;
+		EGodState State;
 
 	
 };

@@ -37,7 +37,6 @@ void UGodMovementComponent::ChangeHorizontalMovementState(EHorizontalMovementSta
 	{
 		case FlyHorizontalStartup:
 			ChangeMovementState(EMovementState::Flying);
-			isFacingRight = _MovementInput.X > 0;
 			break;
 		case FlyHorizontalTurnAround:
 			ChangeMovementState(EMovementState::FlyingTurnaroud);
@@ -47,6 +46,7 @@ void UGodMovementComponent::ChangeHorizontalMovementState(EHorizontalMovementSta
 			break;
 		case HorizontalNeutral:
 			ChangeMovementState(EMovementState::Flying);
+			break;
 	}
 }
 
@@ -58,7 +58,6 @@ void UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState N
 	switch (NewState)
 	{
 		case FlyVerticalStartup:
-			isFacingUp = _MovementInput.Y > 0;
 			break;
 	}
 }
@@ -73,7 +72,10 @@ void UGodMovementComponent::ChangeMovementState(EMovementState NewState)
 			break;
 		case EMovementState::Dashing:
 			DashFrameCounter = 0;
-			break;			
+			break;
+		case EMovementState::FlyingTurnaroud:
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Turnaround");
+			break;
 	}
 }
 
@@ -358,6 +360,7 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		else
 		{
 			ChangeHorizontalMovementState(FlyHorizontalStartup);
+			isFacingRight = !isFacingRight;
 		}
 		break;
 	case FlyHorizontalStartup:
@@ -412,6 +415,7 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		{
 			HorizontalSpeed = 0;
 			ChangeHorizontalMovementState(HorizontalNeutral);
+			isFacingRight = !isFacingRight;
 		}
 		break;
 	case SprintHorizontal:
@@ -469,6 +473,7 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		else
 		{
 			ChangeVerticalMovementState(FlyVerticalStartup);
+			isFacingUp = !isFacingUp;
 		}
 		break;
 	case FlyVerticalStartup:
@@ -525,6 +530,7 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		{
 			VerticalSpeed = 0;
 			ChangeVerticalMovementState(VerticalNeutral);
+			isFacingUp = !isFacingUp;
 		}
 		break;
 	case SprintVertical:
