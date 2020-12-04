@@ -9,6 +9,8 @@
 #include "god.generated.h"
 
 
+
+
 UENUM(BlueprintType)
 enum class EGodState : uint8 {
 	Flying UMETA(DisplayName = "Flying"),
@@ -139,7 +141,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 		void TurnaroundEvent();
 
-	void UpdateState();
+	void UpdateState(EMovementState NewMovementState);
+
+	void InstantTurn();
 	
 	
 
@@ -160,5 +164,5 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		EGodState State;
 
-	
+	UGodMovementComponent* GetGodMovementComponent() { return GodMovement; };
 };

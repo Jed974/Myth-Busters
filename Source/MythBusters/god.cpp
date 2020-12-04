@@ -20,6 +20,9 @@ AGod::AGod()
 	
 	GodMovement = CreateDefaultSubobject<UGodMovementComponent>("GodMovementComponent");
 
+	GodMovement->ChangeMovementStateDelegate.BindUObject(this, &AGod::UpdateState);
+	GodMovement->InstantTurnDelegate.BindUObject(this, &AGod::InstantTurn);
+
 }
 
 // Called when the game starts or when spawned
@@ -34,7 +37,6 @@ void AGod::BeginPlay()
 void AGod::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UpdateState();
 	if (CurrentShield != nullptr)
 		ChangeGodState(EGodState::Shielding);
 	
@@ -267,17 +269,17 @@ void AGod::ApplyGodDamage(float value) {
 	this->GodDamage += value;
 }
 
-void AGod::UpdateState()
+void AGod::UpdateState(EMovementState NewMovementState)
 {
 	if (canMove)
 	{
-		switch (GodMovement->MovementState)
+		switch (NewMovementState)
 		{
 		case EMovementState::Flying:
 			ChangeGodState(EGodState::Flying);
 			break;
 		case EMovementState::FlyingTurnaroud:
-			if (State != EGodState::FlyingTurnaround) ChangeGodState(EGodState::FlyingTurnaround);
+			ChangeGodState(EGodState::FlyingTurnaround);
 			break;
 		case EMovementState::WallHit:
 			ChangeGodState(EGodState::WallHit);
@@ -298,4 +300,11 @@ void AGod::UpdateState()
 		}
 
 	}
+}
+
+void AGod::InstantTurn()
+{
+	FRotator NewRotation = SkeletalMesh->GetRelativeRotation();
+	NewRotation.Yaw *= -1;
+	SkeletalMesh->SetRelativeRotation(NewRotation);
 }

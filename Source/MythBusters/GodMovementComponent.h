@@ -9,6 +9,9 @@
 #include "GodMovementComponent.generated.h"
 
 
+DECLARE_DELEGATE_OneParam(FChangeMovementStateDelegate, EMovementState);
+DECLARE_DELEGATE(FInstantTurnDelegate);
+
 UENUM(BlueprintType)
 enum class EMovementState : uint8 {
 	Flying,
@@ -29,6 +32,9 @@ public:
 	UGodMovementComponent();
 
 public:
+
+	FChangeMovementStateDelegate ChangeMovementStateDelegate;
+	FInstantTurnDelegate InstantTurnDelegate;
 
 	UPROPERTY(BlueprintReadOnly)
 		EMovementState MovementState;
@@ -167,6 +173,8 @@ protected:
 	virtual void ChangeVerticalMovementState(EVerticalMovementState NewState);
 
 	virtual void ChangeMovementState(EMovementState NewState);
+
+	
 
 
 

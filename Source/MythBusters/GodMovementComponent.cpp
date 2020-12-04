@@ -64,6 +64,7 @@ void UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState N
 
 void UGodMovementComponent::ChangeMovementState(EMovementState NewState)
 {
+	ChangeMovementStateDelegate.ExecuteIfBound(NewState);
 	MovementState = NewState;
 	switch (MovementState)
 	{
@@ -207,7 +208,7 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 			if (_arenaHitted != nullptr) {
 				bool _godDie = _arenaHitted->IsEjected(GetVelocityNorm(), HitInfo);
 				if (_godDie) {
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "A player died");
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "A player died");
 			
 					Velocity = EjectionVelocity;
 					Velocity.Normalize();
@@ -218,7 +219,7 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 				}
 				else
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "A player bounced");
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "A player bounced");
 					EjectionVelocity = EjectionVelocity - 2 * (FVector2D::DotProduct(EjectionVelocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
 					Velocity = FVector2D::ZeroVector;
 					ChangeMovementState(EMovementState::WallHit);
@@ -229,7 +230,12 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 			break;
 		case EMovementState::Dashing:
 			Reflect = Velocity - 2 * (FVector2D::DotProduct(Velocity, FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z))) * FVector2D(HitInfo.Normal.X, HitInfo.Normal.Z);
-			isFacingRight = Reflect.X > 0;
+			if (isFacingRight != Reflect.X > 0)
+			{
+				isFacingRight = Reflect.X > 0;
+				InstantTurnDelegate.ExecuteIfBound();
+			}
+			
 			isFacingUp = Reflect.Y > 0;
 			break;
 		case EMovementState::DeathEjected:

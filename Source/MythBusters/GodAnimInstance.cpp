@@ -47,7 +47,7 @@ void UGodAnimInstance::InterruptAttack()
 	AttSpe = false;
 	AttPush = false;
 
-	// TODO :: Ne marche pas toujours... Des fois le groupe reste dans la scène et jsp pourquoi
+	
 	if (InterruptableAttGroup != nullptr) {
 		bool destroySuccess = InterruptableAttGroup->Destroy();
 		if (destroySuccess)
