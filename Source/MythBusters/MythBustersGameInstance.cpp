@@ -13,14 +13,8 @@
 #include <math.h>*/
 #include <stdio.h>
 #include "NonGameState.h"
-#include <timeapi.h>
 #include "god.h"
-
-
-#define SYNC_TEST    // test: turn on synctest
-#define MAX_PLAYERS     64
-#define NUM_PLAYERS     2
-
+#include <timeapi.h>
 struct AbstractCharacter
 {
     AGod* ref;
@@ -32,11 +26,11 @@ struct AbstractCharacter
 struct AbstractGameState
 {
     TArray<AbstractCharacter> characters;
-    void Init(int num_players)
+    void Init(int num_players, UGameInstance* Instance)
     {
         for (int i = 0; i < num_players; i++)
         {
-            AGod* god = dynamic_cast<AGod*>(UGameplayStatics::GetPlayerPawn(GEngine->GetWorldContexts()[0].World(), i));
+            AGod* god = dynamic_cast<AGod*>(UGameplayStatics::GetPlayerPawn(Instance->GetWorld(), i));
             AbstractCharacter AbstractGod = AbstractCharacter();
             AbstractGod.ref = god;
             AbstractGod.transform = god->GetActorTransform();
@@ -44,15 +38,16 @@ struct AbstractGameState
             AbstractGod.damage = god->GodDamage;
             characters.Add(AbstractGod);
         }
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "GameState Initiated");
 
     }
     void Apply()
     {
         for (int i = 0; i < characters.Num(); i++)
         {
-            //AGod* god = dynamic_cast<AGod*>(UGameplayStatics::GetPlayerPawn(GEngine->GetWorldContexts()[0].World(), i));
             if (characters[i].ref != nullptr)
             {
+                GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Loading Character " + FString::FromInt(i));
                 characters[i].ref->SetActorTransform(characters[i].transform);
                 characters[i].ref->GetGodMovementComponent()->Velocity = characters[i].velocity;
                 characters[i].ref->GodDamage = characters[i].damage;
@@ -65,9 +60,9 @@ struct AbstractGameState
     {
         for (int i = 0; i < characters.Num(); i++)
         {
-            //AGod* god = dynamic_cast<AGod*>(UGameplayStatics::GetPlayerPawn(GEngine->GetWorldContexts()[0].World(), i));
             if (characters[i].ref != nullptr)
             {
+                GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Saving Character " + FString::FromInt(i));
                 characters[i].transform = characters[i].ref->GetActorTransform();
                 characters[i].velocity = characters[i].ref->GetGodMovementComponent()->Velocity;
                 characters[i].damage = characters[i].ref->GodDamage;
@@ -77,9 +72,16 @@ struct AbstractGameState
     }
 };
 
+#define SYNC_TEST    // test: turn on synctest
+#define MAX_PLAYERS     64
+#define NUM_PLAYERS     2
+#define FRAME_DELAY     2
+
+
 AbstractGameState gs = {  };
 NonGameState ngs = { 0 };
 GGPOSession* ggpo = NULL;
+
 
 /*
  * Simple checksum function stolen from wikipedia:
@@ -188,8 +190,7 @@ bool __cdecl mb_advance_frame_callback(int)
  *
  * Makes our current state match the state passed in by GGPO.
  */
-bool __cdecl
-mb_load_game_state_callback(unsigned char* buffer, int len)
+bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
 {
     memcpy(&gs, buffer, len);
     gs.Apply();
@@ -202,8 +203,7 @@ mb_load_game_state_callback(unsigned char* buffer, int len)
  * Save the current state to a buffer and return it to GGPO via the
  * buffer and len parameters.
  */
-bool __cdecl
-mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
+bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
     gs.Observe();
     *len = sizeof(gs);
@@ -259,12 +259,12 @@ mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int
   *
   * Free a save state buffer previously returned in vw_save_game_state_callback.
   */
-  /*void __cdecl
-  vw_free_buffer(void* buffer)
+  void __cdecl
+  mb_free_buffer_callback(void* buffer)
   {
       free(buffer);
   }
-  */
+  
 
   /*
    * VectorWar_Init --
@@ -275,10 +275,10 @@ mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int
 void
 UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int num_players, GGPOPlayer* players, int num_spectators)
 {
-    //GGPOErrorCode result;
+    GGPOErrorCode result;
 
     // Initialize the game state
-    gs.Init(num_players);
+    gs.Init(num_players, this);
     ngs.num_players = num_players;
 
     // Fill in a ggpo callbacks structure to pass to start_session.
@@ -287,16 +287,16 @@ UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int num_pla
     cb.advance_frame = mb_advance_frame_callback;
     cb.load_game_state = mb_load_game_state_callback;
     cb.save_game_state = mb_save_game_state_callback;
-    //cb.free_buffer = mb_free_buffer;
+    cb.free_buffer = mb_free_buffer_callback;
     cb.on_event = mb_on_event_callback;
-    //cb.log_game_state = mb_log_game_state;
-/*
+    //cb.log_game_state = mb_log_game_state_callback;
+
 #if defined(SYNC_TEST)
-    result = ggpo_start_synctest(&ggpo, &cb, "vectorwar", num_players, sizeof(int), 1);
+    result = ggpo_start_synctest(&ggpo, &cb, "mythbusters", num_players, sizeof(int), 1);
 #else
-    result = ggpo_start_session(&ggpo, &cb, "vectorwar", num_players, sizeof(int), localport);
-#endif*/
-/*
+    result = ggpo_start_session(&ggpo, &cb, "mythbusters", num_players, sizeof(int), localport);
+#endif
+
     // automatically disconnect clients after 3000 ms and start our count-down timer
     // for disconnects after 1000 ms.   To completely disable disconnects, simply use
     // a value of 0 for ggpo_set_disconnect_timeout.
@@ -318,7 +318,7 @@ UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int num_pla
         else {
             ngs.players[i].connect_progress = 0;
         }
-    }*/
+    }
 }
 
 /*
@@ -518,7 +518,26 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(int inputs[], int discon
        renderer = NULL;
    }*/
 
+void UMythBustersGameInstance::LoadState()
+{
+    //Static_MythBusters_LoadState(_buffer, _len);
+    mb_load_game_state_callback(_buffer, _len);
+    //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "State loaded");
+}
 
+void UMythBustersGameInstance::SaveState()
+{
+    //Static_MythBusters_SaveState(&_buffer, &_len, &_checksum, 0);
+    mb_save_game_state_callback(&_buffer, &_len, &_checksum, 0);
+    //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "State Saved");
+}
+
+void UMythBustersGameInstance::InitState()
+{
+    gs = {  };
+    gs.Init(2, this);
+    SaveState();
+}
 
 #pragma region StaticMethod
 
@@ -626,5 +645,4 @@ void UMythBustersGameInstance::Static_MythBusters_Exit()
             GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("GGPOManagerInstance is null ! (on Static_MythBusters_Exit)"));
     }
 }
-
 #pragma endregion

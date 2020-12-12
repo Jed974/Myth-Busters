@@ -37,6 +37,18 @@ public:
 	static void Static_MythBusters_DisconnectPlayer(int player);
 	static void Static_MythBusters_Exit();
 
+	unsigned char* _buffer;
+	int _len;
+	int _checksum;
+
+    UFUNCTION(BlueprintCallable)
+    void LoadState();
+    UFUNCTION(BlueprintCallable)
+    void SaveState();
+
+	UFUNCTION(BlueprintCallable)
+	void InitState();
+
 
 	/*bool __cdecl mb_advance_frame_callback(int);
 	bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len);
