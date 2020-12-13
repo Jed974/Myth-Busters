@@ -80,39 +80,36 @@ class MYTHBUSTERS_API UMythBustersGameInstance : public UGameInstance
 protected:
 	UMythBustersGameInstance();
 
-	void MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators);
-	//void MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port);
-	//void MythBusters_DrawCurrentFrame();
-	void MythBusters_AdvanceFrame(int inputs[], int disconnect_flags);
-	//void MythBusters_RunFrame();
-	//void MythBusters_Idle(int time);
-	//void MythBusters_DisconnectPlayer(int player);
-	//void MythBusters_Exit();
-
-
 public:
-	static void Static_MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators);
+	/*static void Static_MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators);
 	static void Static_MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port);
 	static void Static_MythBusters_DrawCurrentFrame();
 	static void Static_MythBusters_AdvanceFrame(int inputs[], int disconnect_flags);
 	static void Static_MythBusters_RunFrame();
 	static void Static_MythBusters_Idle(int time);
 	static void Static_MythBusters_DisconnectPlayer(int player);
-	static void Static_MythBusters_Exit();
+	static void Static_MythBusters_Exit();*/
 
-    static bool __cdecl mb_begin_game_callback(const char*);
+    /*static bool __cdecl mb_begin_game_callback(const char*);
     static bool __cdecl mb_on_event_callback(GGPOEvent* info);
     static bool __cdecl mb_advance_frame_callback(int);
     static bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len);
     static bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int);
-    static void __cdecl mb_free_buffer_callback(void* buffer);
+    static void __cdecl mb_free_buffer_callback(void* buffer);*/
 
-    static AbstractGameState gs;
-    static NonGameState ngs;
-    static GGPOSession* ggpo;
+    void MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators);
+    //void MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port);
+    //void MythBusters_DrawCurrentFrame();
+    void MythBusters_AdvanceFrame(int inputs[], int disconnect_flags);
+    //void MythBusters_RunFrame();
+    //void MythBusters_Idle(int time);
+    //void MythBusters_DisconnectPlayer(int player);
+    //void MythBusters_Exit();
 
-	UFUNCTION(BlueprintCallable)
-	void SetStaticRefToInstance();
+    AbstractGameState gs;
+    NonGameState ngs;
+    GGPOSession* ggpo;
+    static UMythBustersGameInstance* Instance;
 
 	unsigned char* _buffer;
 	int _len;

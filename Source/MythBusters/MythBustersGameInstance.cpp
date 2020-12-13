@@ -23,11 +23,7 @@
 #define NUM_PLAYERS     2
 #define FRAME_DELAY     2
 
-
-AbstractGameState UMythBustersGameInstance::gs = { };
-NonGameState UMythBustersGameInstance::ngs = { 0 };
-GGPOSession* UMythBustersGameInstance::ggpo = NULL;
-
+UMythBustersGameInstance* UMythBustersGameInstance::Instance = nullptr;
 
 /*
  * Simple checksum function stolen from wikipedia:
@@ -63,7 +59,7 @@ fletcher32_checksum(short* data, size_t len)
  * The begin game callback.  We don't need to do anything special here,
  * so just return true.
  */
-bool __cdecl UMythBustersGameInstance::mb_begin_game_callback(const char*)
+bool __cdecl mb_begin_game_callback(const char*)
 {
     return true;
 }
@@ -74,34 +70,41 @@ bool __cdecl UMythBustersGameInstance::mb_begin_game_callback(const char*)
  * Notification from GGPO that something has happened.  Update the status
  * text at the bottom of the screen to notify the user.
  */
-bool __cdecl UMythBustersGameInstance::mb_on_event_callback(GGPOEvent* info)
+bool __cdecl mb_on_event_callback(GGPOEvent* info)
 {
     int progress;
     switch (info->code) {
     case GGPO_EVENTCODE_CONNECTED_TO_PEER:
-        ngs.SetConnectState(info->u.connected.player, Synchronizing);
+        UMythBustersGameInstance::Instance->ngs.SetConnectState(info->u.connected.player, Synchronizing);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Connected - Now Synchronizing...");
         break;
     case GGPO_EVENTCODE_SYNCHRONIZING_WITH_PEER:
         progress = 100 * info->u.synchronizing.count / info->u.synchronizing.total;
-        ngs.UpdateConnectProgress(info->u.synchronizing.player, progress);
+        UMythBustersGameInstance::Instance->ngs.UpdateConnectProgress(info->u.synchronizing.player, progress);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Synchronizing with peer...");
         break;
     case GGPO_EVENTCODE_SYNCHRONIZED_WITH_PEER:
-        ngs.UpdateConnectProgress(info->u.synchronized.player, 100);
+        UMythBustersGameInstance::Instance->ngs.UpdateConnectProgress(info->u.synchronized.player, 100);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Synchronized !");
         break;
     case GGPO_EVENTCODE_RUNNING:
-        ngs.SetConnectState(Running);
+        UMythBustersGameInstance::Instance->ngs.SetConnectState(Running);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Running");
         //renderer->SetStatusText("");
         break;
     case GGPO_EVENTCODE_CONNECTION_INTERRUPTED:
-        ngs.SetDisconnectTimeout(info->u.connection_interrupted.player,
+        UMythBustersGameInstance::Instance->ngs.SetDisconnectTimeout(info->u.connection_interrupted.player,
             timeGetTime(),
             info->u.connection_interrupted.disconnect_timeout);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Connection lost !");
         break;
     case GGPO_EVENTCODE_CONNECTION_RESUMED:
-        ngs.SetConnectState(info->u.connection_resumed.player, Running);
+        UMythBustersGameInstance::Instance->ngs.SetConnectState(info->u.connection_resumed.player, Running);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Connection retrieved !");
         break;
     case GGPO_EVENTCODE_DISCONNECTED_FROM_PEER:
-        ngs.SetConnectState(info->u.disconnected.player, Disconnected);
+        UMythBustersGameInstance::Instance->ngs.SetConnectState(info->u.disconnected.player, Disconnected);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Disconnected from peer !");
         break;
     case GGPO_EVENTCODE_TIMESYNC:
         Sleep(1000 * info->u.timesync.frames_ahead / 60);
@@ -117,15 +120,15 @@ bool __cdecl UMythBustersGameInstance::mb_on_event_callback(GGPOEvent* info)
  * Notification from GGPO we should step foward exactly 1 frame
  * during a rollback.
  */
-bool __cdecl UMythBustersGameInstance::mb_advance_frame_callback(int)
+bool __cdecl mb_advance_frame_callback(int)
 {
     int inputs[NUM_PLAYERS] = { 0 };
     int disconnect_flags;
 
     // Make sure we fetch new inputs from GGPO and use those to update
     // the game state instead of reading from the keyboard.
-    ggpo_synchronize_input(ggpo, (void*)inputs, sizeof(int) * NUM_PLAYERS, &disconnect_flags);
-    UMythBustersGameInstance::Static_MythBusters_AdvanceFrame(inputs, disconnect_flags);
+    ggpo_synchronize_input(UMythBustersGameInstance::Instance->ggpo, (void*)inputs, sizeof(int) * NUM_PLAYERS, &disconnect_flags);
+    UMythBustersGameInstance::Instance->MythBusters_AdvanceFrame(inputs, disconnect_flags);
     return true;
 }
 
@@ -134,10 +137,10 @@ bool __cdecl UMythBustersGameInstance::mb_advance_frame_callback(int)
  *
  * Makes our current state match the state passed in by GGPO.
  */
-bool __cdecl UMythBustersGameInstance::mb_load_game_state_callback(unsigned char* buffer, int len)
+bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
 {
-    memcpy(&gs, buffer, len);
-    gs.Apply();
+    memcpy(&UMythBustersGameInstance::Instance->gs, buffer, len);
+    UMythBustersGameInstance::Instance->gs.Apply();
     return true;
 }
 
@@ -147,15 +150,15 @@ bool __cdecl UMythBustersGameInstance::mb_load_game_state_callback(unsigned char
  * Save the current state to a buffer and return it to GGPO via the
  * buffer and len parameters.
  */
-bool __cdecl UMythBustersGameInstance::mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
+bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-    gs.Observe();
-    *len = sizeof(gs);
+    UMythBustersGameInstance::Instance->gs.Observe();
+    *len = sizeof(UMythBustersGameInstance::Instance->gs);
     *buffer = (unsigned char*)malloc(*len);
     if (!*buffer) {
         return false;
     }
-    memcpy(*buffer, &gs, *len);
+    memcpy(*buffer, &UMythBustersGameInstance::Instance->gs, *len);
     *checksum = fletcher32_checksum((short*)*buffer, *len / 2);
     return true;
 }
@@ -203,7 +206,7 @@ bool __cdecl UMythBustersGameInstance::mb_save_game_state_callback(unsigned char
   *
   * Free a save state buffer previously returned in vw_save_game_state_callback.
   */
-  void __cdecl UMythBustersGameInstance::mb_free_buffer_callback(void* buffer)
+  void __cdecl mb_free_buffer_callback(void* buffer)
   {
       free(buffer);
   }
@@ -211,7 +214,10 @@ bool __cdecl UMythBustersGameInstance::mb_save_game_state_callback(unsigned char
 
   UMythBustersGameInstance::UMythBustersGameInstance()
   {
-      //UMythBustersGameInstance::GameInstance = this;
+      Instance = this;
+      gs = { };
+      ngs = { 0 };
+      ggpo = NULL;
   }
 
   /*
@@ -239,12 +245,14 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
     cb.on_event = mb_on_event_callback;
     //cb.log_game_state = mb_log_game_state_callback;
 
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Callback binded");
+
 #if defined(SYNC_TEST)
     result = ggpo_start_synctest(&ggpo, &cb, "mythbusters", num_players, sizeof(int), 1);
 #else
     result = ggpo_start_session(&ggpo, &cb, "mythbusters", num_players, sizeof(int), localport);
 #endif
-    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, (result == GGPO_OK || result == GGPO_ERRORCODE_SUCCESS) ? "GGPO session started" : "GPPO session failed");
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, (result == GGPO_OK || result == GGPO_ERRORCODE_SUCCESS) ? "GGPO session started" : "GPPO session failed");
     // automatically disconnect clients after 3000 ms and start our count-down timer
     // for disconnects after 1000 ms.   To completely disable disconnects, simply use
     // a value of 0 for ggpo_set_disconnect_timeout.
@@ -290,14 +298,10 @@ void UMythBustersGameInstance::CreateRemotePlayer(FString IPAdress)
 
 void UMythBustersGameInstance::StartGGPO()
 {
-    Static_MythBusters_Init(8001, NUM_PLAYERS, Players, 0);
+    MythBusters_Init(8001, NUM_PLAYERS, Players, 0);
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Start GGPO");
 }
 
-void UMythBustersGameInstance::SetStaticRefToInstance()
-{
-    //Instance = this;
-    //UMythBustersGameInstance::WorldContextObject = GetWorld();
-}
 /*
  * VectorWar_InitSpectator --
  *
@@ -515,14 +519,14 @@ void UMythBustersGameInstance::InitState()
     gs.Init(2, this);
     SaveState();
 }
-
+/*
 #pragma region StaticMethod
 
 void UMythBustersGameInstance::Static_MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators)
 {
     if (GEngine->GetWorld() != nullptr && GEngine->GetWorld()->GetGameInstance() != nullptr)
     {
-        UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
+        //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
 
         if (Instance != nullptr)
         {
@@ -539,7 +543,7 @@ void UMythBustersGameInstance::Static_MythBusters_Init(unsigned short localport,
 void UMythBustersGameInstance::Static_MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port)
 {
     //UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World())
-    UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
+    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
     if (Instance != nullptr)
     {
         //GGPOManagerInstance->MythBusters_InitSpectator(localport, num_players, host_ip, host_port);
@@ -552,7 +556,7 @@ void UMythBustersGameInstance::Static_MythBusters_InitSpectator(unsigned short l
 }
 void UMythBustersGameInstance::Static_MythBusters_DrawCurrentFrame()
 {
-    UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
+    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
     if (Instance != nullptr)
     {
     //GGPOManagerInstance->MythBusters_DrawCurrentFrame();
@@ -565,7 +569,7 @@ void UMythBustersGameInstance::Static_MythBusters_DrawCurrentFrame()
  }
 void UMythBustersGameInstance::Static_MythBusters_AdvanceFrame(int inputs[], int disconnect_flags)
 {
-    UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
+    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
     if (Instance != nullptr)
     {
         Instance->MythBusters_AdvanceFrame(inputs, disconnect_flags);
@@ -578,7 +582,7 @@ void UMythBustersGameInstance::Static_MythBusters_AdvanceFrame(int inputs[], int
 }
 void UMythBustersGameInstance::Static_MythBusters_RunFrame()
 {
-    UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
+    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
     if (Instance != nullptr)
     {
         //GGPOManagerInstance->MythBusters_RunFrame();
@@ -591,7 +595,7 @@ void UMythBustersGameInstance::Static_MythBusters_RunFrame()
 }
 void UMythBustersGameInstance::Static_MythBusters_Idle(int time)
 {
-    UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
+    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
     if (Instance != nullptr)
     {
         //GGPOManagerInstance->MythBusters_Idle(time);
@@ -604,7 +608,7 @@ void UMythBustersGameInstance::Static_MythBusters_Idle(int time)
 }
 void UMythBustersGameInstance::Static_MythBusters_DisconnectPlayer(int player)
 {
-    UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
+    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
     if (Instance != nullptr)
     {
         //GGPOManagerInstance->MythBusters_DisconnectPlayer(player);
@@ -617,7 +621,7 @@ void UMythBustersGameInstance::Static_MythBusters_DisconnectPlayer(int player)
 }
 void UMythBustersGameInstance::Static_MythBusters_Exit()
 {
-    UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
+    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
     if (Instance != nullptr)
     {
         //GGPOManagerInstance->MythBusters_Exit();
@@ -629,3 +633,4 @@ void UMythBustersGameInstance::Static_MythBusters_Exit()
     }
 }
 #pragma endregion
+*/
