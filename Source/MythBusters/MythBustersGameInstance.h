@@ -125,14 +125,17 @@ public:
 
 	TArray<GGPOPlayer> Players;
 
-	UFUNCTION(BlueprintCallable)
-	void CreateLocalPlayer();
+	/*UFUNCTION(BlueprintCallable)
+	void CreateLocalPlayer();*/
 
 	UFUNCTION(BlueprintCallable)
 	void CreateRemotePlayer(FString IPAdress);
 
 	UFUNCTION(BlueprintCallable)
 	void StartGGPO();
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int GGPOPlayerIndex;
 
 	/*bool __cdecl mb_advance_frame_callback(int);
 	bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len);

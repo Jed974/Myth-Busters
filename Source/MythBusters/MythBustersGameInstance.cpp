@@ -277,28 +277,49 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
     }
 }
 
-void UMythBustersGameInstance::CreateLocalPlayer()
+/*void UMythBustersGameInstance::CreateLocalPlayer()
 {
     GGPOPlayer Player;
     Player.size = sizeof(GGPOPlayer);
     Player.type = GGPO_PLAYERTYPE_LOCAL;
     Players.EmplaceAt(0, Player);
-}
+}*/
 
 void UMythBustersGameInstance::CreateRemotePlayer(FString IPAdress)
 {
-    GGPOPlayer Player;
-    Player.size = sizeof(GGPOPlayer);
-    Player.type = GGPO_PLAYERTYPE_REMOTE;
-    strcpy_s(Player.u.remote.ip_address, TCHAR_TO_ANSI(*IPAdress));
-    Player.u.remote.port = 8001;
+    GGPOPlayer Player1;
+    GGPOPlayer Player2;
 
-    Players.EmplaceAt(1, Player);
+    Player1.size = sizeof(GGPOPlayer);
+    Player2.size = sizeof(GGPOPlayer);
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::FromInt(GGPOPlayerIndex));
+    if (GGPOPlayerIndex == 0)
+    {
+        Player1.type = GGPO_PLAYERTYPE_LOCAL;
+
+        Player2.type = GGPO_PLAYERTYPE_REMOTE;
+        strcpy_s(Player2.u.remote.ip_address, TCHAR_TO_ANSI(*IPAdress));
+        Player2.u.remote.port = 8002;
+
+        Players.EmplaceAt(0, Player1);
+        Players.EmplaceAt(1, Player2);
+    }
+    else
+    {
+        Player2.type = GGPO_PLAYERTYPE_LOCAL;
+
+        Player1.type = GGPO_PLAYERTYPE_REMOTE;
+        strcpy_s(Player1.u.remote.ip_address, TCHAR_TO_ANSI(*IPAdress));
+        Player1.u.remote.port = 8001;
+
+        Players.EmplaceAt(0, Player1);
+        Players.EmplaceAt(1, Player2);
+    }
 }
 
 void UMythBustersGameInstance::StartGGPO()
 {
-    MythBusters_Init(8001, NUM_PLAYERS, Players, 0);
+    MythBusters_Init(8001 + GGPOPlayerIndex, NUM_PLAYERS, Players, 0);
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Start GGPO");
 }
 
