@@ -61,6 +61,7 @@ fletcher32_checksum(short* data, size_t len)
  */
 bool __cdecl mb_begin_game_callback(const char*)
 {
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Purple, "Begin game");
     return true;
 }
 
@@ -72,6 +73,7 @@ bool __cdecl mb_begin_game_callback(const char*)
  */
 bool __cdecl mb_on_event_callback(GGPOEvent* info)
 {
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Purple, "GGPOEvent : ");
     int progress;
     switch (info->code) {
     case GGPO_EVENTCODE_CONNECTED_TO_PEER:
@@ -169,15 +171,12 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
  * Log the gamestate.  Used by the synctest debugging tool.
  */
  /*bool __cdecl
- vw_log_game_state(char* filename, unsigned char* buffer, int)
+ mb_log_game_state(char* filename, unsigned char* buffer, int)
  {
      FILE* fp = nullptr;
      fopen_s(&fp, filename, "w");
      if (fp) {
-         GameState* gamestate = (GameState*)buffer;
-         fprintf(fp, "GameState object.\n");
-         fprintf(fp, "  bounds: %d,%d x %d,%d.\n", gamestate->_bounds.left, gamestate->_bounds.top,
-             gamestate->_bounds.right, gamestate->_bounds.bottom);
+         AbstractGameState* gamestate = (AbstractGameState*)buffer;
          fprintf(fp, "  num_ships: %d.\n", gamestate->_num_ships);
          for (int i = 0; i < gamestate->_num_ships; i++) {
              Ship* ship = gamestate->_ships + i;
@@ -218,6 +217,7 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
       gs = { };
       ngs = { 0 };
       ggpo = NULL;
+      GGPOPlayerIndex = 0;
   }
 
   /*
@@ -252,7 +252,7 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
 #else
     result = ggpo_start_session(&ggpo, &cb, "mythbusters", num_players, sizeof(int), localport);
 #endif
-    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, (result == GGPO_OK || result == GGPO_ERRORCODE_SUCCESS) ? "GGPO session started" : "GPPO session failed");
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, GGPO_SUCCEEDED(result) ? "GGPO session started" : "GPPO session failed");
     // automatically disconnect clients after 3000 ms and start our count-down timer
     // for disconnects after 1000 ms.   To completely disable disconnects, simply use
     // a value of 0 for ggpo_set_disconnect_timeout.
@@ -270,10 +270,13 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
             ngs.local_player_handle = handle;
             ngs.SetConnectState(handle, Connecting);
             ggpo_set_frame_delay(ggpo, handle, FRAME_DELAY);
+            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Player " + FString::FromInt(players[i].player_num) + " : Local - Port = " + FString::FromInt(localport));
         }
         else {
             ngs.players[i].connect_progress = 0;
+            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Player " + FString::FromInt(players[i].player_num) + " : Remote - IPAdress = " + players[i].u.remote.ip_address + " - Port = " + FString::FromInt(players[i].u.remote.port));
         }
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, GGPO_SUCCEEDED(result) ? "added GGPO Player" : "fail to add GGPO Player");
     }
 }
 
@@ -289,9 +292,13 @@ void UMythBustersGameInstance::CreateRemotePlayer(FString IPAdress)
 {
     GGPOPlayer Player1;
     GGPOPlayer Player2;
-
+    
     Player1.size = sizeof(GGPOPlayer);
+    Player1.player_num = 1;
+
     Player2.size = sizeof(GGPOPlayer);
+    Player2.player_num = 2;
+
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::FromInt(GGPOPlayerIndex));
     if (GGPOPlayerIndex == 0)
     {
@@ -299,10 +306,8 @@ void UMythBustersGameInstance::CreateRemotePlayer(FString IPAdress)
 
         Player2.type = GGPO_PLAYERTYPE_REMOTE;
         strcpy_s(Player2.u.remote.ip_address, TCHAR_TO_ANSI(*IPAdress));
-        Player2.u.remote.port = 8002;
+        Player2.u.remote.port = 7001;
 
-        Players.EmplaceAt(0, Player1);
-        Players.EmplaceAt(1, Player2);
     }
     else
     {
@@ -310,16 +315,16 @@ void UMythBustersGameInstance::CreateRemotePlayer(FString IPAdress)
 
         Player1.type = GGPO_PLAYERTYPE_REMOTE;
         strcpy_s(Player1.u.remote.ip_address, TCHAR_TO_ANSI(*IPAdress));
-        Player1.u.remote.port = 8001;
+        Player1.u.remote.port = 7000;
 
-        Players.EmplaceAt(0, Player1);
-        Players.EmplaceAt(1, Player2);
     }
+    Players.Add(Player1);
+    Players.Add(Player2);
 }
 
 void UMythBustersGameInstance::StartGGPO()
 {
-    MythBusters_Init(8001 + GGPOPlayerIndex, NUM_PLAYERS, Players, 0);
+    MythBusters_Init(7000 + GGPOPlayerIndex, NUM_PLAYERS, Players, 0);
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Start GGPO");
 }
 
