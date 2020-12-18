@@ -58,7 +58,7 @@ struct AbstractGameState
         {
             if (characters[i].ref != nullptr)
             {
-                GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Saving Character " + FString::FromInt(i));
+                //GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Saving Character " + FString::FromInt(i));
                 characters[i].transform = characters[i].ref->GetActorTransform();
                 characters[i].velocity = characters[i].ref->GetGodMovementComponent()->Velocity;
                 characters[i].damage = characters[i].ref->GodDamage;
@@ -80,7 +80,9 @@ class MYTHBUSTERS_API UMythBustersGameInstance : public UGameInstance
 protected:
 	UMythBustersGameInstance();
 
+
 public:
+
 	/*static void Static_MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators);
 	static void Static_MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port);
 	static void Static_MythBusters_DrawCurrentFrame();
@@ -136,6 +138,9 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int GGPOPlayerIndex;
+
+    UFUNCTION(BlueprintCallable)
+        void MythBusters_Idle(int timeout);
 
 	/*bool __cdecl mb_advance_frame_callback(int);
 	bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len);

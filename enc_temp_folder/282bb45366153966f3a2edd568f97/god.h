@@ -8,16 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "god.generated.h"
 
-const struct SInputDirection
-{
-	float Vertical;
-	float Horizontal;
-};
 
-const struct SInputButton
-{
-	bool Pressed;
-};
 
 
 UENUM(BlueprintType)

@@ -61,7 +61,7 @@ fletcher32_checksum(short* data, size_t len)
  */
 bool __cdecl mb_begin_game_callback(const char*)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Purple, "Begin game");
+    //GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Purple, "Begin game");
     return true;
 }
 
@@ -73,40 +73,40 @@ bool __cdecl mb_begin_game_callback(const char*)
  */
 bool __cdecl mb_on_event_callback(GGPOEvent* info)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Purple, "GGPOEvent : ");
+    GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Purple, "GGPOEvent : ");
     int progress;
     switch (info->code) {
     case GGPO_EVENTCODE_CONNECTED_TO_PEER:
         UMythBustersGameInstance::Instance->ngs.SetConnectState(info->u.connected.player, Synchronizing);
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Connected - Now Synchronizing...");
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Connected - Now Synchronizing...");
         break;
     case GGPO_EVENTCODE_SYNCHRONIZING_WITH_PEER:
         progress = 100 * info->u.synchronizing.count / info->u.synchronizing.total;
         UMythBustersGameInstance::Instance->ngs.UpdateConnectProgress(info->u.synchronizing.player, progress);
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Synchronizing with peer...");
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Synchronizing with peer...");
         break;
     case GGPO_EVENTCODE_SYNCHRONIZED_WITH_PEER:
         UMythBustersGameInstance::Instance->ngs.UpdateConnectProgress(info->u.synchronized.player, 100);
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Synchronized !");
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, "Synchronized !");
         break;
     case GGPO_EVENTCODE_RUNNING:
         UMythBustersGameInstance::Instance->ngs.SetConnectState(Running);
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Running");
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Running");
         //renderer->SetStatusText("");
         break;
     case GGPO_EVENTCODE_CONNECTION_INTERRUPTED:
         UMythBustersGameInstance::Instance->ngs.SetDisconnectTimeout(info->u.connection_interrupted.player,
             timeGetTime(),
             info->u.connection_interrupted.disconnect_timeout);
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, "Connection lost !");
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Red, "Connection lost !");
         break;
     case GGPO_EVENTCODE_CONNECTION_RESUMED:
         UMythBustersGameInstance::Instance->ngs.SetConnectState(info->u.connection_resumed.player, Running);
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Connection retrieved !");
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Connection retrieved !");
         break;
     case GGPO_EVENTCODE_DISCONNECTED_FROM_PEER:
         UMythBustersGameInstance::Instance->ngs.SetConnectState(info->u.disconnected.player, Disconnected);
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Disconnected from peer !");
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Disconnected from peer !");
         break;
     case GGPO_EVENTCODE_TIMESYNC:
         Sleep(1000 * info->u.timesync.frames_ahead / 60);
@@ -170,10 +170,9 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
  *
  * Log the gamestate.  Used by the synctest debugging tool.
  */
- /*bool __cdecl
- mb_log_game_state(char* filename, unsigned char* buffer, int)
+ bool __cdecl mb_log_game_state_callback(char* filename, unsigned char* buffer, int)
  {
-     FILE* fp = nullptr;
+     /*FILE* fp = nullptr;
      fopen_s(&fp, filename, "w");
      if (fp) {
          AbstractGameState* gamestate = (AbstractGameState*)buffer;
@@ -196,9 +195,9 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
              }
          }
          fclose(fp);
-     }
+     }*/
      return true;
- }*/
+ }
 
  /*
   * vw_free_buffer --
@@ -219,6 +218,9 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
       ggpo = NULL;
       GGPOPlayerIndex = 0;
   }
+
+
+
 
   /*
    * VectorWar_Init --
@@ -243,7 +245,7 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
     cb.save_game_state = mb_save_game_state_callback;
     cb.free_buffer = mb_free_buffer_callback;
     cb.on_event = mb_on_event_callback;
-    //cb.log_game_state = mb_log_game_state_callback;
+    cb.log_game_state = mb_log_game_state_callback;
 
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Callback binded");
 
@@ -252,7 +254,7 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
 #else
     result = ggpo_start_session(&ggpo, &cb, "mythbusters", num_players, sizeof(int), localport);
 #endif
-    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, GGPO_SUCCEEDED(result) ? "GGPO session started" : "GPPO session failed");
+    GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, GGPO_SUCCEEDED(result) ? "GGPO session started" : "GPPO session failed");
     // automatically disconnect clients after 3000 ms and start our count-down timer
     // for disconnects after 1000 ms.   To completely disable disconnects, simply use
     // a value of 0 for ggpo_set_disconnect_timeout.
@@ -270,13 +272,13 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
             ngs.local_player_handle = handle;
             ngs.SetConnectState(handle, Connecting);
             ggpo_set_frame_delay(ggpo, handle, FRAME_DELAY);
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Player " + FString::FromInt(players[i].player_num) + " : Local - Port = " + FString::FromInt(localport));
+            GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, "Player " + FString::FromInt(players[i].player_num) + " : Local - Port = " + FString::FromInt(localport));
         }
         else {
             ngs.players[i].connect_progress = 0;
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Player " + FString::FromInt(players[i].player_num) + " : Remote - IPAdress = " + players[i].u.remote.ip_address + " - Port = " + FString::FromInt(players[i].u.remote.port));
+            GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, "Player " + FString::FromInt(players[i].player_num) + " : Remote - IPAdress = " + players[i].u.remote.ip_address + " - Port = " + FString::FromInt(players[i].u.remote.port));
         }
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, GGPO_SUCCEEDED(result) ? "added GGPO Player" : "fail to add GGPO Player");
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, GGPO_SUCCEEDED(result) ? "added GGPO Player" : "fail to add GGPO Player");
     }
 }
 
@@ -545,6 +547,14 @@ void UMythBustersGameInstance::InitState()
     gs.Init(2, this);
     SaveState();
 }
+
+void UMythBustersGameInstance::MythBusters_Idle(int timeout)
+{
+    ggpo_advance_frame(ggpo);
+    ggpo_idle(ggpo, timeout);
+}
+
+
 /*
 #pragma region StaticMethod
 
