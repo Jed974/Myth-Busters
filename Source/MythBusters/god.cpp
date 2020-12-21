@@ -23,6 +23,15 @@ AGod::AGod()
 	GodMovement->ChangeMovementStateDelegate.BindUObject(this, &AGod::UpdateState);
 	GodMovement->InstantTurnDelegate.BindUObject(this, &AGod::InstantTurn);
 
+	/*for (int i = 0; i < 5; i++)
+	{
+		Inputs.InputActions.Add(SInputAction());
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		GGPOInputs.InputActions.Add(SInputAction());
+	}*/
+	
 }
 
 // Called when the game starts or when spawned
@@ -37,8 +46,9 @@ void AGod::BeginPlay()
 void AGod::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (CurrentShield != nullptr)
-		ChangeGodState(EGodState::Shielding);
+
+	ReadInputs(&GGPOInputs);
+		
 	
 }
 
@@ -143,7 +153,7 @@ void AGod::Shield()
 	FAttachmentTransformRules _attTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 	CurrentShield->AttachToComponent(CapsuleComponent, _attTransformRules);
 	CurrentShield->InitShield(ShieldSize, ShieldFresnelColor, ShieldBaseColor);
-	
+	ChangeGodState(EGodState::Shielding);
 
 	EShield();
 }
@@ -174,6 +184,15 @@ void AGod::Dash()
 			GodMovement->Dash();
 			break;
 	}	
+}
+void AGod::StopDash()
+{
+	switch (State)
+	{
+	case EGodState::Dashing:
+		ChangeGodState(EGodState::Flying);
+		break;
+	}
 }
 
 void AGod::ChangeGodState(EGodState NewState)
@@ -228,7 +247,7 @@ void AGod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveHorizontal", this, &AGod::MoveHorizontal);
+	/*PlayerInputComponent->BindAxis("MoveHorizontal", this, &AGod::MoveHorizontal);
 	PlayerInputComponent->BindAxis("MoveVertical", this, &AGod::MoveVertical);
 	PlayerInputComponent->BindAction("AttackNormal", IE_Pressed, this, &AGod::AttackNormal);
 	PlayerInputComponent->BindAction("AttackNormal", IE_Released, this, &AGod::StopAttackNormal);
@@ -242,9 +261,175 @@ void AGod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 	PlayerInputComponent->BindAction("Shield", IE_Pressed, this, &AGod::Shield);
 	PlayerInputComponent->BindAction("Shield", IE_Released, this, &AGod::StopShield);
 
-	PlayerInputComponent->BindAction("Dash",IE_Pressed,this, &AGod::Dash);
+	PlayerInputComponent->BindAction("Dash",IE_Pressed,this, &AGod::Dash);*/
+
+	PlayerInputComponent->BindAxis("MoveHorizontal", this, &AGod::WriteHorizontalAxis);
+	PlayerInputComponent->BindAxis("MoveVertical", this, &AGod::WriteVerticalAxis);
+	PlayerInputComponent->BindAction("AttackNormal", IE_Pressed, this, &AGod::PressAttackNormal);
+	PlayerInputComponent->BindAction("AttackNormal", IE_Released, this, &AGod::ReleaseAttackNormal);
+
+	PlayerInputComponent->BindAction("AttackSpecial", IE_Pressed, this, &AGod::PressAttackSpecial);
+	PlayerInputComponent->BindAction("AttackSpecial", IE_Released, this, &AGod::ReleaseAttackSpecial);
+
+	PlayerInputComponent->BindAction("AttackPush", IE_Pressed, this, &AGod::PressAttackPush);
+	PlayerInputComponent->BindAction("AttackPush", IE_Released, this, &AGod::ReleaseAttackPush);
+
+	PlayerInputComponent->BindAction("Shield", IE_Pressed, this, &AGod::PressShield);
+	PlayerInputComponent->BindAction("Shield", IE_Released, this, &AGod::ReleaseShield);
+
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AGod::PressDash);
+	PlayerInputComponent->BindAction("Dash", IE_Released, this, &AGod::ReleaseDash);
 }
 
+void AGod::WriteInputs(EInputSpecifier Specifier, float Value)
+{
+	Inputs.Update(Specifier, Value);
+
+}
+
+void AGod::WriteInputs(EInputSpecifier Specifier, EInputActionState ActionState)
+{
+	Inputs.Update(Specifier, ActionState);
+
+}
+
+void AGod::WriteVerticalAxis(float Value)
+{
+	WriteInputs(VERTICAL, Value);
+}
+
+void AGod::WriteHorizontalAxis(float Value)
+{
+	WriteInputs(HORIZONTAL, Value);
+}
+
+void AGod::PressAttackNormal()
+{
+	WriteInputs(NORMAL, Pressed);
+}
+void AGod::ReleaseAttackNormal()
+{
+	WriteInputs(NORMAL, Released);
+}
+void AGod::PressAttackSpecial()
+{
+	WriteInputs(SPECIAL, Pressed);
+}
+void AGod::ReleaseAttackSpecial()
+{
+	WriteInputs(SPECIAL, Released);
+}
+void AGod::PressAttackPush()
+{
+	WriteInputs(PUSH, Pressed);
+}
+void AGod::ReleaseAttackPush()
+{
+	WriteInputs(PUSH, Released);
+}
+void AGod::PressShield()
+{
+	WriteInputs(SHIELD, Pressed);
+}
+void AGod::ReleaseShield()
+{
+	WriteInputs(SHIELD, Released);
+}
+void AGod::PressDash()
+{
+	WriteInputs(DASH, Pressed);
+}
+void AGod::ReleaseDash()
+{
+	WriteInputs(DASH, Released);
+}
+
+void AGod::ReadInputs(SInputs* _Inputs)
+{
+	MoveHorizontal(_Inputs->HorizontalAxis.Value);
+	MoveVertical(_Inputs->VerticalAxis.Value);
+	/*if (!_Inputs->InputActions[NORMAL].Consumed)
+	{
+		if (_Inputs->InputActions[NORMAL].State == Pressed)
+		{
+			AttackNormal();
+			_Inputs->InputActions[NORMAL].Consumed = true;
+		}
+	}
+	else
+	{
+		if (_Inputs->InputActions[NORMAL].State == Released)
+		{
+			StopAttackNormal();
+			_Inputs->InputActions[NORMAL].Consumed = false;
+		}
+	}
+	if (!_Inputs->InputActions[SPECIAL].Consumed)
+	{
+		if (_Inputs->InputActions[SPECIAL].State == Pressed)
+		{
+			AttackSpecial();
+			_Inputs->InputActions[SPECIAL].Consumed = true;
+		}
+	}
+	else
+	{
+		if (_Inputs->InputActions[SPECIAL].State == Released)
+		{
+			StopAttackSpecial();
+			_Inputs->InputActions[SPECIAL].Consumed = false;
+		}
+	}
+	if (!_Inputs->InputActions[PUSH].Consumed)
+	{
+		if (_Inputs->InputActions[PUSH].State == Pressed)
+		{
+			AttackPush();
+			_Inputs->InputActions[PUSH].Consumed = true;
+		}
+	}
+	else
+	{
+		if (_Inputs->InputActions[PUSH].State == Released)
+		{
+			StopAttackPush();
+			_Inputs->InputActions[PUSH].Consumed = false;
+		}
+	}
+	if (!_Inputs->InputActions[SHIELD].Consumed)
+	{
+		if (_Inputs->InputActions[SHIELD].State == Pressed)
+		{
+			Shield();
+			_Inputs->InputActions[SHIELD].Consumed = true;
+		}
+	}
+	else
+	{
+		if (_Inputs->InputActions[SHIELD].State == Released)
+		{
+			StopShield();
+			_Inputs->InputActions[SHIELD].Consumed = false;
+		}
+	}
+	if (!_Inputs->InputActions[DASH].Consumed)
+	{
+		if (_Inputs->InputActions[DASH].State == Pressed)
+		{
+			Dash();
+			_Inputs->InputActions[DASH].Consumed = true;
+		}
+	}
+	else
+	{
+		if (_Inputs->InputActions[DASH].State == Released)
+		{
+			StopDash();
+			_Inputs->InputActions[DASH].Consumed = false;
+		}
+	}*/
+	
+}
 
 float AGod::GetAnimValues(int _idValueToGet) {
 	switch (_idValueToGet) {

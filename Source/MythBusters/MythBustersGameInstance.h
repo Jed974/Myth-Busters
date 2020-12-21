@@ -11,6 +11,11 @@
 #include "MythBustersGameInstance.generated.h"
 
 
+//#define SYNC_TEST    // test: turn on synctest
+#define MAX_PLAYERS     2
+#define NUM_PLAYERS     2
+#define FRAME_DELAY     2
+
 struct AbstractCharacter
 {
     AGod* ref;
@@ -22,6 +27,7 @@ struct AbstractCharacter
 struct AbstractGameState
 {
     TArray<AbstractCharacter> characters;
+    int _framenumber = 0;
     void Init(int num_players, UGameInstance* Instance)
     {
         for (int i = 0; i < num_players; i++)
@@ -79,7 +85,7 @@ class MYTHBUSTERS_API UMythBustersGameInstance : public UGameInstance
 
 protected:
 	UMythBustersGameInstance();
-
+    ~UMythBustersGameInstance();
 
 public:
 
@@ -102,16 +108,18 @@ public:
     void MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators);
     //void MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port);
     //void MythBusters_DrawCurrentFrame();
-    void MythBusters_AdvanceFrame(int inputs[], int disconnect_flags);
-    //void MythBusters_RunFrame();
+    void MythBusters_AdvanceFrame(SInputs inputs[], int disconnect_flags);
+    void MythBusters_RunFrame();
     //void MythBusters_Idle(int time);
-    //void MythBusters_DisconnectPlayer(int player);
-    //void MythBusters_Exit();
+    void MythBusters_DisconnectPlayer(int player);
+    void MythBusters_Exit();
 
     AbstractGameState gs;
     NonGameState ngs;
     GGPOSession* ggpo;
     static UMythBustersGameInstance* Instance;
+    SInputs Inputs[MAX_PLAYERS];
+    int PacketSize;
 
 	unsigned char* _buffer;
 	int _len;
@@ -140,7 +148,7 @@ public:
     int GGPOPlayerIndex;
 
     UFUNCTION(BlueprintCallable)
-        void MythBusters_Idle(int timeout);
+    void MythBusters_Idle(int timeout);
 
 	/*bool __cdecl mb_advance_frame_callback(int);
 	bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len);

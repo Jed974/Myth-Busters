@@ -18,10 +18,7 @@
 
 
 
-//#define SYNC_TEST    // test: turn on synctest
-#define MAX_PLAYERS     64
-#define NUM_PLAYERS     2
-#define FRAME_DELAY     2
+
 
 UMythBustersGameInstance* UMythBustersGameInstance::Instance = nullptr;
 
@@ -109,6 +106,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Disconnected from peer !");
         break;
     case GGPO_EVENTCODE_TIMESYNC:
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Time Synching...");
         Sleep(1000 * info->u.timesync.frames_ahead / 60);
         break;
     }
@@ -124,12 +122,12 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
  */
 bool __cdecl mb_advance_frame_callback(int)
 {
-    int inputs[NUM_PLAYERS] = { 0 };
+    SInputs inputs[NUM_PLAYERS] = { 0 };
     int disconnect_flags;
 
     // Make sure we fetch new inputs from GGPO and use those to update
     // the game state instead of reading from the keyboard.
-    ggpo_synchronize_input(UMythBustersGameInstance::Instance->ggpo, (void*)inputs, sizeof(int) * NUM_PLAYERS, &disconnect_flags);
+    ggpo_synchronize_input(UMythBustersGameInstance::Instance->ggpo, (void*)inputs, UMythBustersGameInstance::Instance->PacketSize * NUM_PLAYERS, &disconnect_flags);
     UMythBustersGameInstance::Instance->MythBusters_AdvanceFrame(inputs, disconnect_flags);
     return true;
 }
@@ -219,6 +217,11 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
       GGPOPlayerIndex = 0;
   }
 
+  UMythBustersGameInstance::~UMythBustersGameInstance()
+  {
+      MythBusters_DisconnectPlayer(GGPOPlayerIndex);
+      MythBusters_Exit();
+  }
 
 
 
@@ -231,7 +234,10 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
 void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators)
 {
     GGPOErrorCode result;
-
+    AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
+    //LocalGod->Inputs.MakeSendable();
+    PacketSize = sizeof(LocalGod->Inputs);
+    GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, "Packet Size : " + FString::FromInt(PacketSize));
     // Initialize the game state
     gs.Init(num_players, this);
     ngs.num_players = num_players;
@@ -252,7 +258,7 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
 #if defined(SYNC_TEST)
     result = ggpo_start_synctest(&ggpo, &cb, "mythbusters", num_players, sizeof(int), 1);
 #else
-    result = ggpo_start_session(&ggpo, &cb, "mythbusters", num_players, sizeof(int), localport);
+    result = ggpo_start_session(&ggpo, &cb, "mythbusters", num_players, PacketSize, localport);
 #endif
     GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, GGPO_SUCCEEDED(result) ? "GGPO session started" : "GPPO session failed");
     // automatically disconnect clients after 3000 ms and start our count-down timer
@@ -369,8 +375,7 @@ void UMythBustersGameInstance::StartGGPO()
   * Disconnects a player from this session.
   */
 
-  /*void
-  VectorWar_DisconnectPlayer(int player)
+  void UMythBustersGameInstance::MythBusters_DisconnectPlayer(int player)
   {
       if (player < ngs.num_players) {
           char logbuf[128];
@@ -381,9 +386,8 @@ void UMythBustersGameInstance::StartGGPO()
           else {
               sprintf_s(logbuf, ARRAYSIZE(logbuf), "Error while disconnecting player (err:%d).\n", result);
           }
-          renderer->SetStatusText(logbuf);
       }
-  }*/
+  }
 
 
   /*
@@ -405,17 +409,20 @@ void UMythBustersGameInstance::StartGGPO()
     * Advances the game state by exactly 1 frame using the inputs specified
     * for player 1 and player 2.
     */
-void UMythBustersGameInstance::MythBusters_AdvanceFrame(int inputs[], int disconnect_flags)
+void UMythBustersGameInstance::MythBusters_AdvanceFrame(SInputs inputs[], int disconnect_flags)
 {
     //gs.Update(inputs, disconnect_flags);
-
+    AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
+    AGod* RemoteGod = (AGod*)GetLocalPlayers()[1]->PlayerController->GetPawn();
+    LocalGod->GGPOInputs = inputs[GGPOPlayerIndex];
+    RemoteGod->GGPOInputs = inputs[!GGPOPlayerIndex];
     // update the checksums to display in the top of the window.  this
     // helps to detect desyncs.
-    /*ngs.now.framenumber = gs._framenumber;
+    ngs.now.framenumber = gs._framenumber;
     ngs.now.checksum = fletcher32_checksum((short*)&gs, sizeof(gs) / 2);
     if ((gs._framenumber % 90) == 0) {
         ngs.periodic = ngs.now;
-    }*/
+    }
 
     // Notify ggpo that we've moved forward exactly 1 frame.
     ggpo_advance_frame(ggpo);
@@ -440,9 +447,8 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(int inputs[], int discon
  * worry about player 2.  GGPO will handle remapping his inputs
  * transparently.
  */
- /*int
- ReadInputs(HWND hwnd)
- {
+ /*int ReadInputs(HWND hwnd)
+ {MythBusters_RunFrame
      static const struct {
          int      key;
          int      input;
@@ -472,34 +478,37 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(int inputs[], int discon
   *
   * Run a single frame of the game.
   */
-  /*void
-  VectorWar_RunFrame(HWND hwnd)
+  void UMythBustersGameInstance::MythBusters_RunFrame()
   {
       GGPOErrorCode result = GGPO_OK;
       int disconnect_flags;
-      int inputs[MAX_SHIPS] = { 0 };
-
+      AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
+      SInputs LocalInputs = LocalGod->Inputs;
+      //LocalInputs.MakeSendable();
       if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
-          int input = ReadInputs(hwnd);
+          //int input = ReadInputs(hwnd);
+          
+          //GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::SanitizeFloat(LocalInputs.HorizontalAxis.Value));
+
   #if defined(SYNC_TEST)
           input = rand(); // test: use random inputs to demonstrate sync testing
   #endif
-          result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &input, sizeof(input));
+          result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs, PacketSize);
       }
 
       // synchronize these inputs with ggpo.  If we have enough input to proceed
       // ggpo will modify the input list with the correct inputs to use and
       // return 1.
       if (GGPO_SUCCEEDED(result)) {
-          result = ggpo_synchronize_input(ggpo, (void*)inputs, sizeof(int) * MAX_SHIPS, &disconnect_flags);
+          result = ggpo_synchronize_input(ggpo, (void*)Inputs, PacketSize * MAX_PLAYERS, &disconnect_flags);
           if (GGPO_SUCCEEDED(result)) {
               // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
               // the game by 1 frame using those inputs.
-              VectorWar_AdvanceFrame(inputs, disconnect_flags);
+              MythBusters_AdvanceFrame(Inputs, disconnect_flags);
           }
       }
-      VectorWar_DrawCurrentFrame();
-  }*/
+      
+  }
 
   /*
    * VectorWar_Idle --
@@ -513,8 +522,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(int inputs[], int discon
        ggpo_idle(ggpo, time);
    }*/
 
-   /*void
-   VectorWar_Exit()
+   void UMythBustersGameInstance::MythBusters_Exit()
    {
        memset(&gs, 0, sizeof(gs));
        memset(&ngs, 0, sizeof(ngs));
@@ -523,9 +531,8 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(int inputs[], int discon
            ggpo_close_session(ggpo);
            ggpo = NULL;
        }
-       delete renderer;
-       renderer = NULL;
-   }*/
+
+   }
 
 void UMythBustersGameInstance::LoadState()
 {
@@ -550,7 +557,7 @@ void UMythBustersGameInstance::InitState()
 
 void UMythBustersGameInstance::MythBusters_Idle(int timeout)
 {
-    ggpo_advance_frame(ggpo);
+    MythBusters_RunFrame();
     ggpo_idle(ggpo, timeout);
 }
 

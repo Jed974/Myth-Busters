@@ -8,17 +8,100 @@
 #include "GameFramework/Actor.h"
 #include "god.generated.h"
 
-const struct SInputDirection
+
+enum EInputActionState
 {
-	float Vertical;
-	float Horizontal;
+	Released,
+	Pressed
 };
 
-const struct SInputButton
+enum EInputSpecifier
 {
-	bool Pressed;
+	NORMAL,
+	SPECIAL,
+	PUSH,
+	SHIELD,
+	DASH,
+	HORIZONTAL,
+	VERTICAL
 };
 
+struct SInputAxis
+{
+	float Value;
+};
+
+struct SInputAction
+{
+	SInputAction() : State(EInputActionState::Released), PreviousState(EInputActionState::Released) {};
+	EInputActionState State;
+	EInputActionState PreviousState;
+	bool Consumed = false;
+};
+
+struct SInputs
+{
+
+	SInputAxis VerticalAxis;
+	SInputAxis HorizontalAxis;
+
+	//TArray<SInputAction> InputActions;
+	//int SendableInputs[2];
+	void Update(EInputSpecifier Specifier, SInputAxis NewInputAxis)
+	{
+		switch (Specifier)
+		{
+			case HORIZONTAL:
+				HorizontalAxis = NewInputAxis;
+				break;
+			case VERTICAL:
+				VerticalAxis = NewInputAxis;
+				break;
+		}
+	};
+	void Update(EInputSpecifier Specifier, float Value)
+	{
+		SInputAxis NewInputAxis;
+		NewInputAxis.Value = Value;
+		Update(Specifier, NewInputAxis);
+	};
+	void Update(EInputSpecifier Specifier, SInputAction NewInputAction)
+	{
+		//InputActions[Specifier] = NewInputAction;
+	};
+	void Update(EInputSpecifier Specifier, EInputActionState State)
+	{
+		/*SInputAction NewInputAction;
+		NewInputAction.State = State;
+		NewInputAction.PreviousState = InputActions[Specifier].State;
+		Update(Specifier, NewInputAction);*/
+	};
+	void MakeSendable()
+	{
+		//SendableInputs[0] = HorizontalAxis.Value;
+		//SendableInputs[1] = VerticalAxis.Value;
+		/*SendableInputs[2] = InputActions[NORMAL].State;
+		SendableInputs[3] = InputActions[SPECIAL].State;
+		SendableInputs[4] = InputActions[PUSH].State;
+		SendableInputs[5] = InputActions[SHIELD].State;
+		SendableInputs[6] = InputActions[DASH].State;*/
+	};
+	void Readable(int Inputs[])
+	{
+		if (Inputs != nullptr)
+		{
+			HorizontalAxis.Value = Inputs[0];
+			VerticalAxis.Value = Inputs[1];
+			/*InputActions[NORMAL].State = Inputs[2] ? Pressed : Released;
+			InputActions[SPECIAL].State = Inputs[3] ? Pressed : Released;
+			InputActions[PUSH].State = Inputs[4] ? Pressed : Released;
+			InputActions[SHIELD].State = Inputs[5] ? Pressed : Released;
+			InputActions[DASH].State = Inputs[6] ? Pressed : Released;*/
+		}
+		
+		
+	};
+};
 
 UENUM(BlueprintType)
 enum class EGodState : uint8 {
@@ -47,6 +130,24 @@ public:
 		UCapsuleComponent* CapsuleComponent;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
 		float GodDamage = 0.0f;
+
+	SInputs Inputs;
+	SInputs GGPOInputs;
+	void ReadInputs(SInputs* Inputs);
+	void WriteInputs(EInputSpecifier Specifier, float Value);
+	void WriteInputs(EInputSpecifier Specifier, EInputActionState State);
+	void WriteHorizontalAxis(float Value);
+	void WriteVerticalAxis(float Value);
+	void PressAttackNormal();
+	void ReleaseAttackNormal();
+	void PressAttackSpecial();
+	void ReleaseAttackSpecial();
+	void PressAttackPush();
+	void ReleaseAttackPush();
+	void PressShield();
+	void ReleaseShield();
+	void PressDash();
+	void ReleaseDash();
 
 protected:
 	
@@ -137,6 +238,8 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Dash();
+	UFUNCTION(BlueprintCallable)
+		virtual void StopDash();
 
 	void Die();
 
