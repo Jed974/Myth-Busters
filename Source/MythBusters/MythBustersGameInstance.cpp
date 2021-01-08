@@ -261,7 +261,7 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Callback binded");
 
 #if defined(SYNC_TEST)
-    result = ggpo_start_synctest(&ggpo, &cb, "mythbusters", num_players, sizeof(int), 1);
+    result = ggpo_start_synctest(&ggpo, &cb, "mythbusters", num_players, PacketSize, 1);
 #else
     result = ggpo_start_session(&ggpo, &cb, "mythbusters", num_players, PacketSize, localport);
 #endif
@@ -490,7 +490,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
       AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
       
       SInputs LocalInputs = LocalGod->Inputs;
-      LocalInputs.MakeSendable();
+      
       
       if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
           //int input = ReadInputs(hwnd);
@@ -498,8 +498,9 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
           //GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::SanitizeFloat(LocalInputs.HorizontalAxis.Value));
 
   #if defined(SYNC_TEST)
-          input = rand(); // test: use random inputs to demonstrate sync testing
+          LocalInputs.HorizontalAxis.Value = float((rand() % 100) - 50.0f)/50.0f; // test: use random inputs to demonstrate sync testing
   #endif
+          LocalInputs.MakeSendable();
           result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
       }
 

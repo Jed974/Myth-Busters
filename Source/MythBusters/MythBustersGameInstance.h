@@ -15,6 +15,7 @@
 #define MAX_PLAYERS     2
 #define NUM_PLAYERS     2
 #define FRAME_DELAY     2
+//#define SYNC_TEST
 
 struct AbstractCharacter
 {
