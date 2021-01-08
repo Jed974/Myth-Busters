@@ -92,23 +92,23 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	if (CollidingActor != nullptr && IsPushable && CollidingActor->Tags.Contains(FName("Pusher")))
 	{		
 		ComputePushVelocity(CollidingActor);
-		Location.X += PushVelocity.X * DELTA_TIME;
-		Location.Z += PushVelocity.Y * DELTA_TIME;
+		Location.X += PushVelocity.X * DeltaTime;
+		Location.Z += PushVelocity.Y * DeltaTime;
 	}
 	
 	if (MovementState == EMovementState::DeathEjected)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
-		Location.X += Velocity.X * DELTA_TIME;
-		Location.Z += Velocity.Y * DELTA_TIME;
+		Location.X += Velocity.X * DeltaTime;
+		Location.Z += Velocity.Y * DeltaTime;
 		GetOwner()->SetActorLocation(Location, false, &HitInfo, ETeleportType::TeleportPhysics);
 	}
 	else
 	{
 		ComputeNewVelocity();
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
-		Location.X += Velocity.X * DELTA_TIME;
-		Location.Z += Velocity.Y * DELTA_TIME;
+		Location.X += Velocity.X * DeltaTime;
+		Location.Z += Velocity.Y * DeltaTime;
 		
 		GetOwner()->SetActorLocation(Location, true, &HitInfo);
 		if (HitInfo.GetActor() != nullptr)
@@ -116,8 +116,8 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			Location = GetOwner()->GetActorLocation();
 
 			ComputeWallMovement(HitInfo);
-			Location.X += Velocity.X * DELTA_TIME;
-			Location.Z += Velocity.Y * DELTA_TIME;
+			Location.X += Velocity.X * DeltaTime;
+			Location.Z += Velocity.Y * DeltaTime;
 			GetOwner()->SetActorLocation(Location, true);
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitInfo.Normal.ToString());
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
