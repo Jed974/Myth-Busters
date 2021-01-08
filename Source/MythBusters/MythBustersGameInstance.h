@@ -45,11 +45,12 @@ struct AbstractGameState
     }
     void Apply()
     {
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Rollback !");
         for (int i = 0; i < characters.Num(); i++)
         {
             if (characters[i].ref != nullptr)
             {
-                GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Loading Character " + FString::FromInt(i));
+                
                 characters[i].ref->SetActorTransform(characters[i].transform);
                 characters[i].ref->GetGodMovementComponent()->Velocity = characters[i].velocity;
                 characters[i].ref->GodDamage = characters[i].damage;
@@ -108,7 +109,7 @@ public:
     void MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators);
     //void MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port);
     //void MythBusters_DrawCurrentFrame();
-    void MythBusters_AdvanceFrame(SInputs inputs[], int disconnect_flags);
+    void MythBusters_AdvanceFrame(SSendableInputs inputs[], int disconnect_flags);
     void MythBusters_RunFrame();
     //void MythBusters_Idle(int time);
     void MythBusters_DisconnectPlayer(int player);
@@ -118,7 +119,7 @@ public:
     NonGameState ngs;
     GGPOSession* ggpo;
     static UMythBustersGameInstance* Instance;
-    SInputs Inputs[MAX_PLAYERS];
+    SSendableInputs Inputs[MAX_PLAYERS];
     int PacketSize;
 
 	unsigned char* _buffer;

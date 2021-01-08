@@ -23,14 +23,6 @@ AGod::AGod()
 	GodMovement->ChangeMovementStateDelegate.BindUObject(this, &AGod::UpdateState);
 	GodMovement->InstantTurnDelegate.BindUObject(this, &AGod::InstantTurn);
 
-	/*for (int i = 0; i < 5; i++)
-	{
-		Inputs.InputActions.Add(SInputAction());
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		GGPOInputs.InputActions.Add(SInputAction());
-	}*/
 	
 }
 
@@ -348,7 +340,7 @@ void AGod::ReadInputs(SInputs* _Inputs)
 {
 	MoveHorizontal(_Inputs->HorizontalAxis.Value);
 	MoveVertical(_Inputs->VerticalAxis.Value);
-	/*if (!_Inputs->InputActions[NORMAL].Consumed)
+	if (!_Inputs->InputActions[NORMAL].Consumed)
 	{
 		if (_Inputs->InputActions[NORMAL].State == Pressed)
 		{
@@ -427,7 +419,7 @@ void AGod::ReadInputs(SInputs* _Inputs)
 			StopDash();
 			_Inputs->InputActions[DASH].Consumed = false;
 		}
-	}*/
+	}
 	
 }
 

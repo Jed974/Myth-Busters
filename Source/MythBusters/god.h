@@ -39,14 +39,21 @@ struct SInputAction
 	bool Consumed = false;
 };
 
+struct SSendableInputs
+{
+	float VerticalAxis;
+	float HorizontalAxis;
+	char Actions;
+};
+
 struct SInputs
 {
 
 	SInputAxis VerticalAxis;
 	SInputAxis HorizontalAxis;
 
-	//TArray<SInputAction> InputActions;
-	//int SendableInputs[2];
+	SSendableInputs SendableInputs;
+	SInputAction InputActions[5];
 	void Update(EInputSpecifier Specifier, SInputAxis NewInputAxis)
 	{
 		switch (Specifier)
@@ -67,39 +74,49 @@ struct SInputs
 	};
 	void Update(EInputSpecifier Specifier, SInputAction NewInputAction)
 	{
-		//InputActions[Specifier] = NewInputAction;
+		InputActions[Specifier] = NewInputAction;
 	};
 	void Update(EInputSpecifier Specifier, EInputActionState State)
 	{
-		/*SInputAction NewInputAction;
+		SInputAction NewInputAction;
 		NewInputAction.State = State;
 		NewInputAction.PreviousState = InputActions[Specifier].State;
-		Update(Specifier, NewInputAction);*/
+		Update(Specifier, NewInputAction);
 	};
 	void MakeSendable()
 	{
-		//SendableInputs[0] = HorizontalAxis.Value;
-		//SendableInputs[1] = VerticalAxis.Value;
-		/*SendableInputs[2] = InputActions[NORMAL].State;
-		SendableInputs[3] = InputActions[SPECIAL].State;
-		SendableInputs[4] = InputActions[PUSH].State;
-		SendableInputs[5] = InputActions[SHIELD].State;
-		SendableInputs[6] = InputActions[DASH].State;*/
+		SendableInputs.HorizontalAxis = HorizontalAxis.Value;
+		SendableInputs.VerticalAxis = VerticalAxis.Value;
+		char act = 0;
+		if (InputActions[NORMAL].State == Pressed){
+			act += 0b00000001;
+		}
+		if (InputActions[SPECIAL].State == Pressed){
+			act += 0b00000010;
+		}
+		if (InputActions[PUSH].State == Pressed){
+			act += 0b00000100;
+		}
+		if (InputActions[DASH].State == Pressed){
+			act += 0b00001000;
+		}
+		if (InputActions[SHIELD].State == Pressed){
+			act += 0b00010000;
+		}
+		SendableInputs.Actions = act;
 	};
-	void Readable(int Inputs[])
+	void Readable(SSendableInputs const * const Inputs)
 	{
 		if (Inputs != nullptr)
 		{
-			HorizontalAxis.Value = Inputs[0];
-			VerticalAxis.Value = Inputs[1];
-			/*InputActions[NORMAL].State = Inputs[2] ? Pressed : Released;
-			InputActions[SPECIAL].State = Inputs[3] ? Pressed : Released;
-			InputActions[PUSH].State = Inputs[4] ? Pressed : Released;
-			InputActions[SHIELD].State = Inputs[5] ? Pressed : Released;
-			InputActions[DASH].State = Inputs[6] ? Pressed : Released;*/
-		}
-		
-		
+			HorizontalAxis.Value = Inputs->HorizontalAxis;
+			VerticalAxis.Value = Inputs->VerticalAxis;
+			InputActions[NORMAL].State = ((Inputs->Actions & 0b00000001) != 0) ? Pressed : Released;
+			InputActions[SPECIAL].State = ((Inputs->Actions & 0b00000010) != 0) ? Pressed : Released;
+			InputActions[PUSH].State = ((Inputs->Actions & 0b00000100) != 0) ? Pressed : Released;
+			InputActions[DASH].State = ((Inputs->Actions & 0b00001000) != 0) ? Pressed : Released;
+			InputActions[SHIELD].State = ((Inputs->Actions & 0b00010000) != 0) ? Pressed : Released;
+		}		
 	};
 };
 

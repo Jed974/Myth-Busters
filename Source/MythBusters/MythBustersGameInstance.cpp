@@ -122,7 +122,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
  */
 bool __cdecl mb_advance_frame_callback(int)
 {
-    SInputs inputs[NUM_PLAYERS] = { 0 };
+    SSendableInputs inputs[NUM_PLAYERS] = { 0 };
     int disconnect_flags;
 
     // Make sure we fetch new inputs from GGPO and use those to update
@@ -140,6 +140,7 @@ bool __cdecl mb_advance_frame_callback(int)
 bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
 {
     memcpy(&UMythBustersGameInstance::Instance->gs, buffer, len);
+    GEngine->GameViewport->bDisableWorldRendering = true;
     UMythBustersGameInstance::Instance->gs.Apply();
     return true;
 }
@@ -152,6 +153,10 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
  */
 bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
+    if (GEngine->GameViewport->bDisableWorldRendering)
+    {
+        GEngine->GameViewport->bDisableWorldRendering = false;
+    }
     UMythBustersGameInstance::Instance->gs.Observe();
     *len = sizeof(UMythBustersGameInstance::Instance->gs);
     *buffer = (unsigned char*)malloc(*len);
@@ -235,8 +240,8 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
 {
     GGPOErrorCode result;
     AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
-    //LocalGod->Inputs.MakeSendable();
-    PacketSize = sizeof(LocalGod->Inputs);
+    LocalGod->Inputs.MakeSendable();
+    PacketSize = sizeof(LocalGod->Inputs.SendableInputs);
     GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Green, "Packet Size : " + FString::FromInt(PacketSize));
     // Initialize the game state
     gs.Init(num_players, this);
@@ -409,13 +414,13 @@ void UMythBustersGameInstance::StartGGPO()
     * Advances the game state by exactly 1 frame using the inputs specified
     * for player 1 and player 2.
     */
-void UMythBustersGameInstance::MythBusters_AdvanceFrame(SInputs inputs[], int disconnect_flags)
+void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[], int disconnect_flags)
 {
     //gs.Update(inputs, disconnect_flags);
     AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
     AGod* RemoteGod = (AGod*)GetLocalPlayers()[1]->PlayerController->GetPawn();
-    LocalGod->GGPOInputs = inputs[GGPOPlayerIndex];
-    RemoteGod->GGPOInputs = inputs[!GGPOPlayerIndex];
+    LocalGod->GGPOInputs.Readable(&inputs[GGPOPlayerIndex]);
+    RemoteGod->GGPOInputs.Readable(&inputs[!GGPOPlayerIndex]);
     // update the checksums to display in the top of the window.  this
     // helps to detect desyncs.
     ngs.now.framenumber = gs._framenumber;
@@ -483,8 +488,10 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SInputs inputs[], int di
       GGPOErrorCode result = GGPO_OK;
       int disconnect_flags;
       AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
+      
       SInputs LocalInputs = LocalGod->Inputs;
-      //LocalInputs.MakeSendable();
+      LocalInputs.MakeSendable();
+      
       if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
           //int input = ReadInputs(hwnd);
           
@@ -493,7 +500,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SInputs inputs[], int di
   #if defined(SYNC_TEST)
           input = rand(); // test: use random inputs to demonstrate sync testing
   #endif
-          result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs, PacketSize);
+          result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
       }
 
       // synchronize these inputs with ggpo.  If we have enough input to proceed
