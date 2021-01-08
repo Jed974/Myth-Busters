@@ -32,7 +32,7 @@ struct AbstractGameState
     {
         for (int i = 0; i < num_players; i++)
         {
-            AGod* god = dynamic_cast<AGod*>(UGameplayStatics::GetPlayerPawn(Instance->GetWorld(), i));
+            AGod* god = (AGod*)Instance->GetLocalPlayers()[i]->PlayerController->GetPawn();
             AbstractCharacter AbstractGod = AbstractCharacter();
             AbstractGod.ref = god;
             AbstractGod.transform = god->GetActorTransform();
