@@ -164,7 +164,7 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
         APlayerController* PController = UGameplayStatics::GetPlayerController(UMythBustersGameInstance::Instance->GetWorld(), 0);
         if (PController)
         {
-            PController->ConsoleCommand(TEXT("t.maxfps = 60"), true);
+            PController->ConsoleCommand(TEXT("t.maxfps = 30"), true);
         }
     }
     UMythBustersGameInstance::Instance->gs.Observe();
