@@ -170,12 +170,14 @@ public :
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	UFUNCTION(BlueprintCallable)	
-	virtual void InterruptAttack();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo);
+	void HandleAttackNotify(ENotifyType notifyType);
 
+	UFUNCTION(BlueprintCallable)	
+	virtual void InterruptAttack();
+	UFUNCTION(BlueprintCallable)
+	virtual void StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo);
 	UFUNCTION(BlueprintCallable)
 	virtual void StartAttackProjectile(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo);
 };

@@ -40,6 +40,12 @@ void UGodAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}	
 }
 
+
+void UGodAnimInstance::HandleAttackNotify(ENotifyType notifyType) {
+	God->HandleAttackNotify(notifyType);
+}
+
+
 void UGodAnimInstance::InterruptAttack()
 {
 	AnimCanStop = true;

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Shield.h"
 #include "GodMovementComponent.h"
+#include "GodAttackComponent.h"
 #include "GameFramework/Actor.h"
 #include "god.generated.h"
 
@@ -174,6 +175,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Movement", meta = (AllowPrivateAccess = "true"))
 		UGodMovementComponent* GodMovement;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
+		UGodAttackComponent* GodAttack;
+
 	float HorizontalDeadZone = 0.15f;
 	float VerticalDeadZone = 0.15f;
 	
@@ -294,4 +298,6 @@ public:
 		EGodState State;
 
 	UGodMovementComponent* GetGodMovementComponent() { return GodMovement; };
+
+	void HandleAttackNotify(ENotifyType notifyType);
 };

@@ -23,7 +23,7 @@ AGod::AGod()
 	GodMovement->ChangeMovementStateDelegate.BindUObject(this, &AGod::UpdateState);
 	GodMovement->InstantTurnDelegate.BindUObject(this, &AGod::InstantTurn);
 
-	
+	GodAttack = CreateDefaultSubobject<UGodAttackComponent>("GodAttackComponent");
 }
 
 // Called when the game starts or when spawned
@@ -484,4 +484,8 @@ void AGod::InstantTurn()
 	FRotator NewRotation = SkeletalMesh->GetRelativeRotation();
 	NewRotation.Yaw *= -1;
 	SkeletalMesh->SetRelativeRotation(NewRotation);
+}
+
+void AGod::HandleAttackNotify(ENotifyType notifyType) {
+	GodAttack->TransmitNotify(notifyType);
 }
