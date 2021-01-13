@@ -39,7 +39,15 @@ void AGod::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	ReadInputs(&GGPOInputs);
+	if (netplay)
+	{
+		ReadInputs(&GGPOInputs);
+	}
+	else
+	{
+		ReadInputs(&Inputs);
+	}
+	
 		
 	
 }
