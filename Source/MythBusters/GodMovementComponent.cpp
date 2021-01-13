@@ -344,8 +344,20 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 	case FlyHorizontalStop:
 		if (CurrentHorizontalStateTimer < HorizontalFlyStopTime)
 		{
+			if (_MovementInput.X != 0.0f)
+			{
+				HorizontalSpeed = 0;
+				ChangeHorizontalMovementState(HorizontalNeutral);
+			}
 			HorizontalSpeed = FMath::Abs(HorizontalPreviousSpeed) * (1.0f - static_cast<float>(CurrentHorizontalStateTimer) / HorizontalFlyStopTime);
-			CurrentHorizontalStateTimer++;
+			if (HorizontalSpeed == 0.0f)
+			{
+				CurrentHorizontalStateTimer = HorizontalFlyStopTime;
+			}
+			else
+			{
+				CurrentHorizontalStateTimer++;
+			}
 			Velocity.X = HorizontalSpeed * (isFacingRight ? 1.0f : -1.0f);
 			if (_MovementInput.X != 0.0f && FMath::Sign(_MovementInput.X) != (isFacingRight ? 1.0f : - 1.0f))
 			{
@@ -374,7 +386,8 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		{
 			if (CurrentHorizontalStateTimer  < HorizontalFlyStartupTime)
 			{
-				HorizontalSpeed += MaxHorizontalFlySpeed / HorizontalFlyStartupTime;
+				const float Alpha = FMath::Pow(float(CurrentHorizontalStateTimer) / (HorizontalFlyStartupTime-1), 2);
+				HorizontalSpeed = FMath::Lerp(StartupHorizontalFlySpeed, MaxHorizontalFlySpeed, Alpha);
 				CurrentHorizontalStateTimer++;
 				Velocity.X = _MovementInput.X * HorizontalSpeed;
 			}
@@ -406,8 +419,15 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 	case FlyHorizontalTurnAround:
 		if (CurrentHorizontalStateTimer < HorizontalFlyTurnaroundTime)
 		{
-			HorizontalSpeed -= MaxHorizontalFlySpeed / HorizontalFlyTurnaroundTime;
-			CurrentHorizontalStateTimer++;
+			HorizontalSpeed -= FMath::Abs(HorizontalPreviousSpeed) / HorizontalFlyTurnaroundTime;
+			if (HorizontalSpeed == 0.0f)
+			{
+				CurrentHorizontalStateTimer = HorizontalFlyTurnaroundTime;
+			}
+			else
+			{
+				CurrentHorizontalStateTimer++;
+			}
 			if (isFacingRight)
 			{
 				Velocity.X = HorizontalSpeed;
@@ -454,8 +474,15 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 	case FlyVerticalStop:
 		if (CurrentVerticalStateTimer < VerticalFlyStopTime)
 		{
-			VerticalSpeed = FMath::Abs(VerticalPreviousSpeed) * (1 - static_cast<float>(CurrentVerticalStateTimer) / VerticalFlyStopTime);
+			if (_MovementInput.Y != 0.0f)
+			{
+				VerticalSpeed = 0;
+				ChangeVerticalMovementState(VerticalNeutral);
+			}
+			VerticalSpeed = FMath::Abs(VerticalPreviousSpeed) * (1.0f - static_cast<float>(CurrentVerticalStateTimer) / VerticalFlyStopTime);
+
 			CurrentVerticalStateTimer++;
+			
 			if (isFacingUp)
 			{
 				Velocity.Y = VerticalSpeed;
@@ -487,7 +514,8 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		{
 			if (CurrentVerticalStateTimer * DELTA_TIME < VerticalFlyStartupTime * DELTA_TIME)
 			{
-				VerticalSpeed += MaxVerticalFlySpeed / VerticalFlyStartupTime;
+				const float Alpha = FMath::Pow(float(CurrentVerticalStateTimer) / (VerticalFlyStartupTime - 1), 2);
+				VerticalSpeed = FMath::Lerp(StartupVerticalFlySpeed, MaxVerticalFlySpeed, Alpha);
 				CurrentVerticalStateTimer++;
 				Velocity.Y = _MovementInput.Y * VerticalSpeed;
 			}
@@ -520,8 +548,16 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 	case FlyVerticalTurnAround:
 		if (CurrentVerticalStateTimer < VerticalFlyTurnaroundTime)
 		{
-			VerticalSpeed -= MaxVerticalFlySpeed / VerticalFlyTurnaroundTime;
-			CurrentVerticalStateTimer++;
+			VerticalSpeed -= FMath::Abs(VerticalPreviousSpeed) / VerticalFlyTurnaroundTime;
+			if (VerticalSpeed == 0.0f)
+			{
+				CurrentVerticalStateTimer = VerticalFlyTurnaroundTime;
+			}
+			else
+			{
+				CurrentVerticalStateTimer++;
+			}
+			
 			if (isFacingUp)
 			{
 				Velocity.Y = VerticalSpeed;
