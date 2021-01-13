@@ -191,6 +191,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		AShield* CurrentShield = nullptr;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		bool netplay = false;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
