@@ -88,7 +88,6 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
         break;
     case GGPO_EVENTCODE_RUNNING:
         UMythBustersGameInstance::Instance->ngs.SetConnectState(Running);
-        UMythBustersGameInstance::Instance->gs._framenumber = 0;
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Running");
         //renderer->SetStatusText("");
         break;

@@ -59,6 +59,7 @@ struct AbstractGameState
 
         }
 
+
     }
     void Observe()
     {
@@ -73,6 +74,7 @@ struct AbstractGameState
             }
 
         }
+
     }
 };
 
