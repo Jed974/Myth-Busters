@@ -88,6 +88,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
         break;
     case GGPO_EVENTCODE_RUNNING:
         UMythBustersGameInstance::Instance->ngs.SetConnectState(Running);
+        UMythBustersGameInstance::Instance->gs._framenumber = 0;
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Running");
         //renderer->SetStatusText("");
         break;
@@ -158,6 +159,15 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
  */
 bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
+    FILE* fp = nullptr;
+    AbstractGameState gs = UMythBustersGameInstance::Instance->gs;
+    fopen_s(&fp, "LogInput.txt", "a");
+    if (fp)
+    {
+        fprintf(fp, "  Frame %i - Player1 : %f\n", gs._framenumber, gs.characters[0].ref->GGPOInputs.HorizontalAxis.Value);
+        fprintf(fp, "  Frame %i - Player2 : %f\n", gs._framenumber, gs.characters[1].ref->GGPOInputs.HorizontalAxis.Value);
+        fclose(fp);
+    }
     if (GEngine->GameViewport->bDisableWorldRendering)
     {
         GEngine->GameViewport->bDisableWorldRendering = false;
@@ -185,6 +195,16 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
  */
  bool __cdecl mb_log_game_state_callback(char* filename, unsigned char* buffer, int)
  {
+
+     /*FILE* fp = nullptr;
+     AbstractGameState gs = UMythBustersGameInstance::Instance->gs;
+     fopen_s(&fp, filename, "w");
+     if (fp)
+     {
+         fprintf(fp, "  Frame %i - Player1 : %f\n", gs._framenumber, gs.characters[0].ref->GGPOInputs.HorizontalAxis.Value);
+         fprintf(fp, "  Frame %i - Player2 : %f\n", gs._framenumber, gs.characters[1].ref->GGPOInputs.HorizontalAxis.Value);
+         fclose(fp);
+     }*/
      /*FILE* fp = nullptr;
      fopen_s(&fp, filename, "w");
      if (fp) {
@@ -427,10 +447,13 @@ void UMythBustersGameInstance::StartGGPO()
 void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[], int disconnect_flags)
 {
     //gs.Update(inputs, disconnect_flags);
+    gs._framenumber += 1;
     AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
     AGod* RemoteGod = (AGod*)GetLocalPlayers()[1]->PlayerController->GetPawn();
     LocalGod->GGPOInputs.Readable(&inputs[GGPOPlayerIndex]);
     RemoteGod->GGPOInputs.Readable(&inputs[!GGPOPlayerIndex]);
+
+    
     // update the checksums to display in the top of the window.  this
     // helps to detect desyncs.
     ngs.now.framenumber = gs._framenumber;
@@ -501,6 +524,8 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
       
       SInputs LocalInputs = LocalGod->Inputs;
       
+      GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::FromInt(gs._framenumber));
+
       
       if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
           //int input = ReadInputs(hwnd);

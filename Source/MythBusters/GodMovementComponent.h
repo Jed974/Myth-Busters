@@ -43,6 +43,10 @@ public:
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float MaxHorizontalFlySpeed;
 
+	/** The startup speed when initiating a flying movement. */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		float StartupHorizontalFlySpeed;
+
 	/** The time (in frames) it takes to reach inputted horizontal fly speed */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int HorizontalFlyStartupTime;
@@ -62,6 +66,10 @@ public:
 	/** The maximum speed when flying. 1: Lateral speed; 2: Upward speed; 3: Downward speed; */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float MaxVerticalFlySpeed;
+
+	/** The startup speed when initiating a flying movement. */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		float StartupVerticalFlySpeed;
 
 	/** The time (in frames) it takes to reach inputted vertical fly speed */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))

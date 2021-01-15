@@ -157,8 +157,6 @@ public:
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimMontage* TurnMontage;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
-		UAnimMontage* TurnReverseMontage;
-	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UBlendSpaceBase* MoveBlendSpace;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UBlendSpaceBase* DashBlendSpace;
