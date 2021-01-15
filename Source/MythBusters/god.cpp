@@ -349,15 +349,16 @@ void AGod::ReleaseDash()
 void AGod::ReadInputs(SInputs* _Inputs)
 {
 	AbstractGameState gs = UMythBustersGameInstance::Instance->gs;
+	NonGameState ngs = UMythBustersGameInstance::Instance->ngs;
 	
 	FILE* fp = nullptr;
 	fopen_s(&fp, "ReadInputsLog.txt", "a");
 	if (fp)
 	{
 		fprintf(fp, "  Frame %i - Player %i : %f\n", gs._framenumber, GetController()->GetUniqueID() , GGPOInputs.HorizontalAxis.Value);
-		if (gs.paused)
+		if (ngs.paused)
 		{
-			fprintf(fp, "  Paused");
+			fprintf(fp, "  Paused\n");
 
 		}
 		fclose(fp);
