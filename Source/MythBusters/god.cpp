@@ -102,8 +102,10 @@ void AGod::AttackNormal()
 	switch (State)
 	{
 	case EGodState::Flying:
-		GodAttack->StartNormalAttack(attackState);
-		EAttackNormal();
+		if (GodAttack->StartNormalAttack(attackState)) {
+			EAttackNormal();
+			ChangeGodState(EGodState::Attacking);
+		}
 		break;
 	}
 	
