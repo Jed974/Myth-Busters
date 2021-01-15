@@ -111,6 +111,13 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
         //UMythBustersGameInstance::Instance->ngs.paused = true;
         AGod* LocalGod = (AGod*)UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController->GetPawn();
         LocalGod->GGPOInputs = SInputs();
+        FILE* fp = nullptr;
+        fopen_s(&fp, "ReadInputsLog.txt", "a");
+        if (fp)
+        {
+            fprintf(fp, "  Paused\n");
+            fclose(fp);
+        }
         FPlatformProcess::Sleep(float(info->u.timesync.frames_ahead) / 60);
         //UMythBustersGameInstance::Instance->ngs.paused = false;
         //UMythBustersGameInstance::Instance->MainThreadSleep(float(info->u.timesync.frames_ahead) / 60);
