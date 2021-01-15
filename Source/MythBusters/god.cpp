@@ -24,7 +24,7 @@ AGod::AGod()
 	GodMovement->ChangeMovementStateDelegate.BindUObject(this, &AGod::UpdateState);
 	GodMovement->InstantTurnDelegate.BindUObject(this, &AGod::InstantTurn);
 
-	
+	GodAttack = CreateDefaultSubobject<UGodAttackComponent>("GodAttackComponent");
 }
 
 // Called when the game starts or when spawned
@@ -48,9 +48,8 @@ void AGod::Tick(float DeltaTime)
 	{
 		ReadInputs(&Inputs);
 	}
-	
-		
-	
+			
+	UpdateAttackState();
 }
 
 
@@ -76,7 +75,6 @@ void AGod::MoveHorizontal(float AxisValue)
 	}
 	
 }
-
 void AGod::MoveVertical(float AxisValue)
 {
 	if (CurrentShield != nullptr) {
@@ -105,6 +103,7 @@ void AGod::AttackNormal()
 	switch (State)
 	{
 	case EGodState::Flying:
+		GodAttack->StartNormalAttack(attackState);
 		EAttackNormal();
 		break;
 	}
@@ -119,6 +118,7 @@ void AGod::AttackSpecial()
 	switch (State)
 	{
 	case EGodState::Flying:
+		GodAttack->StartSpecialAttack(attackState);
 		EAttackSpecial();
 		break;
 	}
@@ -132,6 +132,7 @@ void AGod::AttackPush()
 	switch (State)
 	{
 	case EGodState::Flying:
+		GodAttack->StartPushAttack(attackState);
 		EAttackPush();
 		break;
 	}
@@ -282,23 +283,21 @@ void AGod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 	PlayerInputComponent->BindAction("Dash", IE_Released, this, &AGod::ReleaseDash);
 }
 
+
 void AGod::WriteInputs(EInputSpecifier Specifier, float Value)
 {
 	Inputs.Update(Specifier, Value);
 
 }
-
 void AGod::WriteInputs(EInputSpecifier Specifier, EInputActionState ActionState)
 {
 	Inputs.Update(Specifier, ActionState);
 
 }
-
 void AGod::WriteVerticalAxis(float Value)
 {
 	WriteInputs(VERTICAL, Value);
 }
-
 void AGod::WriteHorizontalAxis(float Value)
 {
 	WriteInputs(HORIZONTAL, Value);
@@ -493,7 +492,48 @@ void AGod::UpdateState(EMovementState NewMovementState)
 			break;
 		default:;
 		}
+	}
+}
 
+
+void AGod::UpdateAttackState() {
+
+	float horizAxis = 0;
+	float vertAxis = 0;
+	if (netplay) {
+		horizAxis = GGPOInputs.HorizontalAxis.Value;
+		vertAxis = GGPOInputs.VerticalAxis.Value;
+	}
+	else {
+		horizAxis = Inputs.HorizontalAxis.Value;
+		vertAxis = Inputs.VerticalAxis.Value;
+	}
+
+	if (FMath::Abs(vertAxis) > FMath::Abs(horizAxis)) {		// l'axe vertical gagne
+		if (FMath::Abs(vertAxis) > VerticalDeadZone*2) {
+			if (vertAxis > 0) {
+				attackState = EAttackDirection::UP;
+			}
+			else {
+				attackState = EAttackDirection::DOWN;
+			}
+		}
+		else {
+			attackState = EAttackDirection::NEUTRAL;
+		}
+	}
+	else {
+		if (FMath::Abs(horizAxis) > HorizontalDeadZone*2) {
+			if ((horizAxis > 0 && GodMovement->GetIsFacingRight()) || (horizAxis < 0 && !GodMovement->GetIsFacingRight())) {
+				attackState = EAttackDirection::FORWARD;
+			}
+			else {
+				attackState = EAttackDirection::BACKWARD;
+			}
+		}
+		else {
+			attackState = EAttackDirection::NEUTRAL;
+		}
 	}
 }
 
@@ -502,4 +542,8 @@ void AGod::InstantTurn()
 	FRotator NewRotation = SkeletalMesh->GetRelativeRotation();
 	NewRotation.Yaw *= -1;
 	SkeletalMesh->SetRelativeRotation(NewRotation);
+}
+
+void AGod::HandleAttackNotify(ENotifyType notifyType) {
+	GodAttack->TransmitNotify(notifyType);
 }
