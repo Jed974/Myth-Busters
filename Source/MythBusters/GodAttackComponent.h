@@ -82,11 +82,11 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	UFUNCTION(BlueprintCallable)
-	void StartNormalAttack(EAttackDirection _attackDirection);
+	bool StartNormalAttack(EAttackDirection _attackDirection);
 	UFUNCTION(BlueprintCallable)
-	void StartSpecialAttack(EAttackDirection _attackDirection);
+	bool StartSpecialAttack(EAttackDirection _attackDirection);
 	UFUNCTION(BlueprintCallable)
-	void StartPushAttack(EAttackDirection _attackDirection);
+	bool StartPushAttack(EAttackDirection _attackDirection);
 	
 	void TransmitNotify(ENotifyType _notifyType);
 };

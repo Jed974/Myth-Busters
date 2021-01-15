@@ -52,12 +52,13 @@ void UGodAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	//Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (currentAttack >= 0 && Attacks[currentAttack]->getState() == EAttackState::OFF) {
 		currentAttack = -1;
+		Cast<AGod>(GetOwner())->ChangeGodState(EGodState::Flying);
 	}
 }
 
 
 
-void UGodAttackComponent::StartNormalAttack(EAttackDirection _attackDirection) {
+bool UGodAttackComponent::StartNormalAttack(EAttackDirection _attackDirection) {
 	if (currentAttack == -1) {
 		switch (_attackDirection)
 		{
@@ -94,9 +95,12 @@ void UGodAttackComponent::StartNormalAttack(EAttackDirection _attackDirection) {
 		default:
 			break;
 		}
+		return true;
 	}
+	else
+		return false;
 }
-void UGodAttackComponent::StartSpecialAttack(EAttackDirection _attackDirection) {
+bool UGodAttackComponent::StartSpecialAttack(EAttackDirection _attackDirection) {
 	if (currentAttack == -1) {
 		switch (_attackDirection)
 		{
@@ -133,9 +137,12 @@ void UGodAttackComponent::StartSpecialAttack(EAttackDirection _attackDirection) 
 		default:
 			break;
 		}
+		return true;
 	}
+	else
+		return false;
 }
-void UGodAttackComponent::StartPushAttack(EAttackDirection _attackDirection) {
+bool UGodAttackComponent::StartPushAttack(EAttackDirection _attackDirection) {
 	if (currentAttack == -1) {
 		switch (_attackDirection)
 		{
@@ -172,7 +179,10 @@ void UGodAttackComponent::StartPushAttack(EAttackDirection _attackDirection) {
 		default:
 			break;
 		}
+		return true;
 	}
+	else
+		return false;
 }
 
 void UGodAttackComponent::TransmitNotify(ENotifyType _notifyType) {
