@@ -585,3 +585,6 @@ void UGodMovementComponent::ComputePushVelocity(const AActor* OtherActor)
 float UGodMovementComponent::GetVelocityNorm() {
 	return FMath::Sqrt(FMath::Square(Velocity.X) + FMath::Square(Velocity.Y));
 }
+bool UGodMovementComponent::GetIsFacingRight() {
+	return isFacingRight;
+}

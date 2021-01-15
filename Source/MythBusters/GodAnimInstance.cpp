@@ -8,9 +8,7 @@
 void UGodAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
-	God = Cast<AGod>(GetOwningActor());
-
-	
+	God = Cast<AGod>(GetOwningActor());	
 }
 
 void UGodAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -42,6 +40,7 @@ void UGodAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 
 void UGodAnimInstance::HandleAttackNotify(ENotifyType notifyType) {
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Notify reçue");
 	God->HandleAttackNotify(notifyType);
 }
 

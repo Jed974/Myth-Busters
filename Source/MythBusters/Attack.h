@@ -11,8 +11,8 @@ class UGodAnimInstance;
 #include "Attack.generated.h"
 
 
-
-enum EAttackState	// A completer selon les types d'attaques
+UENUM(BlueprintType)
+enum class EAttackState : uint8 	// A completer selon les types d'attaques
 {
 	OFF,
 	START,
@@ -38,25 +38,30 @@ class MYTHBUSTERS_API UAttack : public UObject
 	GENERATED_BODY()
 
 protected:
+	UPROPERTY(Category = "State", VisibleAnywhere, BlueprintReadWrite)
 	EAttackState attackState;
 	UPROPERTY(Category = "Animation", EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* attackMontage;
+	//UPROPERTY(Category = "God Pointers", VisibleAnywhere)
 	AGod* god;
+	//UPROPERTY(Category = "God Pointers", EditAnywhere)
 	UGodAnimInstance* godAnimInstance;
 
 	virtual void PlayMontageFromCurrentState(int _animationFrameToLoad);
 	UFUNCTION(BlueprintCallable)
-	virtual void EndOfRecoverAttack();
+	/** Method called to call when the attack is over (triggered by OverNotify) */
+	virtual void OverAttack();
 
 
 public:	
 	UAttack();
 	virtual ~UAttack();
 	
+	/** Method called to start the attack*/
 	virtual void StartAttack();
+	/** Method called to stop the attack at any moment*/
 	virtual void StopAttack();
 	void LoadAttackSaveState(EAttackState* _stateToLoad, int _animationFrameToLoad = -1);
-	const bool GetAttackOrientation();	// TODO / enlever / mettre l'orientation dans les hit box
 
 	virtual void OnOverNotify();		// Déclenchée par une anim notify indiquant la fin de l'attaque
 	virtual void OnActiveNotify();		// Déclenchée par une anim notify indiquant l'apparition de la hitbox ou de l'effet

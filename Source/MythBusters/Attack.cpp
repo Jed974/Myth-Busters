@@ -12,14 +12,15 @@ UAttack::~UAttack() {}
 
 void UAttack::PlayMontageFromCurrentState(int _animationFrameToLoad) {
 	if (attackState != EAttackState::OFF) {
-		godAnimInstance->Montage_Play(attackMontage, 1.0f, EMontagePlayReturnType::MontageLength, _animationFrameToLoad / 60, true);	// TODO : Modifier l'encroit où on commence le montage !!!!!!!!!!!!!!!!!!!!!!!!!!!
+		godAnimInstance->Montage_Play(attackMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0, true); // 0 -> _animationFrameToLoad / 60
+		// TODO : Modifier l'encroit où on commence le montage !!!!!!!!!!!!!!!!!!!!!!!!!!!
 	}
 }
 
 // Doit être implémentée pour chaque classe enfant (serait virtuelle pure si Unreal était pas relou)
 void UAttack::StartAttack() {}
 void UAttack::StopAttack() {}
-void UAttack::EndOfRecoverAttack(){
+void UAttack::OverAttack(){
 	attackState = EAttackState::OFF;
 }
 
@@ -30,13 +31,10 @@ void UAttack::LoadAttackSaveState(EAttackState* _stateToLoad, int _animationFram
 		PlayMontageFromCurrentState(_animationFrameToLoad);
 }
 
-const bool UAttack::GetAttackOrientation() {
-	return true;
-}
 
 
 void UAttack::OnOverNotify() {
-	EndOfRecoverAttack();
+	OverAttack();
 }
 void UAttack::OnActiveNotify(){}
 void UAttack::OnChangeNotify(){}

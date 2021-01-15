@@ -31,7 +31,8 @@ class MYTHBUSTERS_API UGodAttackComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-private:
+protected:
+	UPROPERTY(Category = "Attack", VisibleAnywhere, BlueprintReadWrite)
 	int currentAttack = -1;
 
 public:	
@@ -80,8 +81,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UFUNCTION(BlueprintCallable)
 	void StartNormalAttack(EAttackDirection _attackDirection);
+	UFUNCTION(BlueprintCallable)
 	void StartSpecialAttack(EAttackDirection _attackDirection);
+	UFUNCTION(BlueprintCallable)
 	void StartPushAttack(EAttackDirection _attackDirection);
 	
 	void TransmitNotify(ENotifyType _notifyType);
