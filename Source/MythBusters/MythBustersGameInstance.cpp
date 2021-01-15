@@ -108,9 +108,6 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
         break;
     case GGPO_EVENTCODE_TIMESYNC:
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Time Synching...");
-        //UMythBustersGameInstance::Instance->ngs.paused = true;
-        AGod* LocalGod = (AGod*)UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController->GetPawn();
-        LocalGod->GGPOInputs = SInputs();
         FILE* fp = nullptr;
         fopen_s(&fp, "ReadInputsLog.txt", "a");
         if (fp)
@@ -118,8 +115,12 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
             fprintf(fp, "  Paused at frame %i\n", UMythBustersGameInstance::Instance->gs._framenumber);
             fclose(fp);
         }
-        FPlatformProcess::Sleep(float(info->u.timesync.frames_ahead) / 60);
-        //UMythBustersGameInstance::Instance->ngs.paused = false;
+        
+        AsyncTask(ENamedThreads::GameThread, [&]()
+        {
+            // Code placed here will run in the game thread
+            Sleep(1000 * float(info->u.timesync.frames_ahead) / GEngine->FixedFrameRate);
+        });
         //UMythBustersGameInstance::Instance->MainThreadSleep(float(info->u.timesync.frames_ahead) / 60);
         break;
     }
@@ -270,6 +271,7 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
       MythBusters_DisconnectPlayer(GGPOPlayerIndex);
       FILE* fp = nullptr;
       fopen_s(&fp, "LogInput.txt", "w");
+      fclose(fp);
       MythBusters_Exit();
   }
 
