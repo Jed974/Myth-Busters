@@ -108,7 +108,9 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
         break;
     case GGPO_EVENTCODE_TIMESYNC:
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Time Synching...");
-        Sleep(1000 * info->u.timesync.frames_ahead / 60);
+        UMythBustersGameInstance::Instance->gs.paused = true;
+        FPlatformProcess::Sleep(float(info->u.timesync.frames_ahead) / 60);
+        UMythBustersGameInstance::Instance->gs.paused = false;
         break;
     }
     return true;

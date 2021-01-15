@@ -29,6 +29,7 @@ struct AbstractGameState
 {
     TArray<AbstractCharacter> characters;
     int _framenumber = 0;
+    bool paused = false;
     void Init(int num_players, UGameInstance* Instance)
     {
         for (int i = 0; i < num_players; i++)

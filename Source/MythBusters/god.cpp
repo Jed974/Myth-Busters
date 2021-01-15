@@ -355,6 +355,11 @@ void AGod::ReadInputs(SInputs* _Inputs)
 	if (fp)
 	{
 		fprintf(fp, "  Frame %i - Player %i : %f\n", gs._framenumber, GetController()->GetUniqueID() , GGPOInputs.HorizontalAxis.Value);
+		if (gs.paused)
+		{
+			fprintf(fp, "  Paused");
+
+		}
 		fclose(fp);
 	}
 	MoveHorizontal(_Inputs->HorizontalAxis.Value);
