@@ -354,7 +354,7 @@ void AGod::ReadInputs(SInputs* _Inputs)
 	fopen_s(&fp, "ReadInputsLog.txt", "a");
 	if (fp)
 	{
-		fprintf(fp, "  Frame %i - Player %i : %f\n", gs._framenumber, GetController()->GetUniqueID() , GGPOInputs.HorizontalAxis.Value);
+		fprintf(fp, "  Frame %i - Player%i : %f\n", gs._framenumber, GetController()->GetUniqueID() ,GGPOInputs.HorizontalAxis.Value);
 		fclose(fp);
 	}
 	MoveHorizontal(_Inputs->HorizontalAxis.Value);
