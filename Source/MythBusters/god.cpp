@@ -539,3 +539,6 @@ void AGod::InstantTurn()
 void AGod::HandleAttackNotify(ENotifyType notifyType) {
 	GodAttack->TransmitNotify(notifyType);
 }
+void AGod::RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack) {
+	GodAttack->RegisterProjectile(_projectile, _idAttack);
+}

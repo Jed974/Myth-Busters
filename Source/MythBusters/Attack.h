@@ -38,6 +38,7 @@ class MYTHBUSTERS_API UAttack : public UObject
 	GENERATED_BODY()
 
 protected:
+	int idAttackOnGodAttackComponent = -1;
 	UPROPERTY(Category = "State", VisibleAnywhere, BlueprintReadWrite)
 	EAttackState attackState;
 	UPROPERTY(Category = "Animation", EditAnywhere, BlueprintReadWrite)
@@ -68,6 +69,6 @@ public:
 	virtual void OnChangeNotify();		// Déclenchée par une anim notify indiquant un changement de hitbox ou de l'effet
 	virtual void OnInactiveNotify();	// Déclenchée par une anim notify indiquant la disparition de la hitbox ou de l'effet
 
-	void SetGod(AGod* _god);
+	void SetUpAttack(AGod* _god, int _idAttack);
 	const EAttackState getState();
 };

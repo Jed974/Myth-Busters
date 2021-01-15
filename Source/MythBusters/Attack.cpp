@@ -41,9 +41,10 @@ void UAttack::OnChangeNotify(){}
 void UAttack::OnInactiveNotify(){}
 
 
-void UAttack::SetGod(AGod* _god) {
+void UAttack::SetUpAttack(AGod* _god, int _idAttack) {
 	god = _god;
 	godAnimInstance = Cast<UGodAnimInstance>(god->GetSkeletalMesh()->GetAnimInstance());
+	idAttackOnGodAttackComponent = _idAttack;
 }
 const EAttackState UAttack::getState() {
 	return attackState;

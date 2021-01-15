@@ -307,4 +307,5 @@ public:
 	UGodMovementComponent* GetGodMovementComponent() { return GodMovement; };
 
 	void HandleAttackNotify(ENotifyType notifyType);
+	void RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack);
 };

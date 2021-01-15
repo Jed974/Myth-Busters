@@ -2,7 +2,7 @@
 
 #pragma once
 
-
+class AHitBoxGroupProjectile;
 #include "CoreMinimal.h"
 #include "Attack.h"
 #include "Components/ActorComponent.h"
@@ -24,9 +24,28 @@ enum class EAttackDirection : uint8 {
 	UP,
 	DOWN
 };
+USTRUCT(BlueprintType)
+struct MYTHBUSTERS_API FAttacksSaveState {
+	GENERATED_BODY()
+
+	int idCurrentAttack;
+	UAttackSaveState* attackState;
+	//TMap<int, TArray<AHitBoxGroupProjectile>> AllProjectiles;
+
+	FAttacksSaveState() : idCurrentAttack(-1) {
+		attackState = nullptr;
+	}
+};
+USTRUCT()
+struct FProjectileArray {
+	GENERATED_BODY()
+
+	UPROPERTY(Category = "Attack", VisibleAnywhere)
+	TArray<AHitBoxGroupProjectile*> Projectiles;
+};
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MYTHBUSTERS_API UGodAttackComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -34,6 +53,8 @@ class MYTHBUSTERS_API UGodAttackComponent : public UActorComponent
 protected:
 	UPROPERTY(Category = "Attack", VisibleAnywhere, BlueprintReadWrite)
 	int currentAttack = -1;
+	UPROPERTY(Category = "Attack", VisibleAnywhere)
+	TMap<int, FProjectileArray> AllProjectiles;
 
 public:	
 	// Sets default values for this component's properties
@@ -89,4 +110,12 @@ public:
 	bool StartPushAttack(EAttackDirection _attackDirection);
 	
 	void TransmitNotify(ENotifyType _notifyType);
+
+	void RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack);
+	void CleanUpProjectile();
+
+	UFUNCTION(BlueprintCallable)
+		FAttacksSaveState SaveAttacksState();
+	UFUNCTION(BlueprintCallable)
+		void LoadAttacksState(FAttacksSaveState saveState);
 };
