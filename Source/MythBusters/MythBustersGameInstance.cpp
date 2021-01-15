@@ -109,11 +109,11 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
     case GGPO_EVENTCODE_TIMESYNC:
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Time Synching...");
         //UMythBustersGameInstance::Instance->ngs.paused = true;
-        //AGod* LocalGod = (AGod*)UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController->GetPawn();
-        //LocalGod->GGPOInputs = SInputs();
-        //FPlatformProcess::Sleep(float(info->u.timesync.frames_ahead) / 60);
+        AGod* LocalGod = (AGod*)UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController->GetPawn();
+        LocalGod->GGPOInputs = SInputs();
+        FPlatformProcess::Sleep(float(info->u.timesync.frames_ahead) / 60);
         //UMythBustersGameInstance::Instance->ngs.paused = false;
-        UMythBustersGameInstance::Instance->MainThreadSleep(float(info->u.timesync.frames_ahead) / 60);
+        //UMythBustersGameInstance::Instance->MainThreadSleep(float(info->u.timesync.frames_ahead) / 60);
         break;
     }
     return true;
