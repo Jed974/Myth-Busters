@@ -115,11 +115,11 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
             fprintf(fp, "  Paused at frame %i\n", UMythBustersGameInstance::Instance->gs._framenumber);
             fclose(fp);
         }
-        
-        AsyncTask(ENamedThreads::GameThread, [&]()
+        int frames_ahead = info->u.timesync.frames_ahead;
+        AsyncTask(ENamedThreads::GameThread, [frames_ahead]()
         {
             // Code placed here will run in the game thread
-            Sleep(1000 * float(info->u.timesync.frames_ahead) / GEngine->FixedFrameRate);
+            Sleep(1000 * float(frames_ahead) / GEngine->FixedFrameRate);
         });
         //UMythBustersGameInstance::Instance->MainThreadSleep(float(info->u.timesync.frames_ahead) / 60);
         break;
