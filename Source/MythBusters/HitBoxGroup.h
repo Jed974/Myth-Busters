@@ -19,6 +19,8 @@ protected:
 public:	
 	// Sets default values for this actor's properties
 	AHitBoxGroup();
+	UPROPERTY(Category = "Orientation", BlueprintReadWrite)
+	bool facingRight;
 
 
 protected:

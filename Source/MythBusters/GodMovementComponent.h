@@ -209,4 +209,6 @@ public:
 	virtual void Dash();
 
 	virtual float GetVelocityNorm();
+
+	bool GetIsFacingRight();
 };
