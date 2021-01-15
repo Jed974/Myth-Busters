@@ -29,7 +29,6 @@ struct AbstractGameState
 {
     TArray<AbstractCharacter> characters;
     int _framenumber = 0;
-    bool paused = false;
     void Init(int num_players, UGameInstance* Instance)
     {
         for (int i = 0; i < num_players; i++)
@@ -154,6 +153,8 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void MythBusters_Idle(int timeout);
+
+    void MainThreadSleep(float time);
 
 	/*bool __cdecl mb_advance_frame_callback(int);
 	bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len);
