@@ -115,7 +115,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
         fopen_s(&fp, "ReadInputsLog.txt", "a");
         if (fp)
         {
-            fprintf(fp, "  Paused\n");
+            fprintf(fp, "  Paused at frame %i\n", UMythBustersGameInstance::Instance->gs._framenumber);
             fclose(fp);
         }
         FPlatformProcess::Sleep(float(info->u.timesync.frames_ahead) / 60);
