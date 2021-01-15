@@ -154,6 +154,8 @@ public:
     UFUNCTION(BlueprintCallable)
     void MythBusters_Idle(int timeout);
 
+    void MainThreadSleep(float time);
+
 	/*bool __cdecl mb_advance_frame_callback(int);
 	bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len);
 	bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int);*/

@@ -108,7 +108,20 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
         break;
     case GGPO_EVENTCODE_TIMESYNC:
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Time Synching...");
-        Sleep(1000 * info->u.timesync.frames_ahead / 60);
+        FILE* fp = nullptr;
+        fopen_s(&fp, "ReadInputsLog.txt", "a");
+        if (fp)
+        {
+            fprintf(fp, "  Paused at frame %i\n", UMythBustersGameInstance::Instance->gs._framenumber);
+            fclose(fp);
+        }
+        int frames_ahead = info->u.timesync.frames_ahead;
+        AsyncTask(ENamedThreads::GameThread, [frames_ahead]()
+        {
+            // Code placed here will run in the game thread
+            Sleep(1000 * float(frames_ahead) / GEngine->FixedFrameRate);
+        });
+        //UMythBustersGameInstance::Instance->MainThreadSleep(float(info->u.timesync.frames_ahead) / 60);
         break;
     }
     return true;
@@ -140,6 +153,7 @@ bool __cdecl mb_advance_frame_callback(int)
  */
 bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
 {
+    GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Rollback !");
     memcpy(&UMythBustersGameInstance::Instance->gs, buffer, len);
     GEngine->GameViewport->bDisableWorldRendering = true;
     APlayerController* PController = UGameplayStatics::GetPlayerController(UMythBustersGameInstance::Instance->GetWorld(), 0);
@@ -159,15 +173,15 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
  */
 bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-    FILE* fp = nullptr;
     AbstractGameState gs = UMythBustersGameInstance::Instance->gs;
+    /*FILE* fp = nullptr;
     fopen_s(&fp, "LogInput.txt", "a");
     if (fp)
     {
         fprintf(fp, "  Frame %i - Player1 : %f\n", gs._framenumber, gs.characters[0].ref->GGPOInputs.HorizontalAxis.Value);
         fprintf(fp, "  Frame %i - Player2 : %f\n", gs._framenumber, gs.characters[1].ref->GGPOInputs.HorizontalAxis.Value);
         fclose(fp);
-    }
+    }*/
     if (GEngine->GameViewport->bDisableWorldRendering)
     {
         GEngine->GameViewport->bDisableWorldRendering = false;
@@ -255,6 +269,9 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
   UMythBustersGameInstance::~UMythBustersGameInstance()
   {
       MythBusters_DisconnectPlayer(GGPOPlayerIndex);
+      FILE* fp = nullptr;
+      fopen_s(&fp, "LogInput.txt", "w");
+      fclose(fp);
       MythBusters_Exit();
   }
 
@@ -604,6 +621,11 @@ void UMythBustersGameInstance::MythBusters_Idle(int timeout)
     ggpo_idle(ggpo, timeout);
 }
 
+
+void UMythBustersGameInstance::MainThreadSleep(float time)
+{
+    FPlatformProcess::Sleep(time);
+}
 
 /*
 #pragma region StaticMethod

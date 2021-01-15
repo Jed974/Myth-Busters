@@ -3,6 +3,7 @@
 
 #include "god.h"
 #include <string>
+#include <MythBusters\MythBustersGameInstance.h>
 
 
 // Sets default values
@@ -347,6 +348,16 @@ void AGod::ReleaseDash()
 
 void AGod::ReadInputs(SInputs* _Inputs)
 {
+	AbstractGameState gs = UMythBustersGameInstance::Instance->gs;
+	NonGameState ngs = UMythBustersGameInstance::Instance->ngs;
+	
+	FILE* fp = nullptr;
+	fopen_s(&fp, "ReadInputsLog.txt", "a");
+	if (fp)
+	{
+		fprintf(fp, "  Frame %i - Player %i : %f\n", gs._framenumber, GetController()->GetUniqueID() , GGPOInputs.HorizontalAxis.Value);
+		fclose(fp);
+	}
 	MoveHorizontal(_Inputs->HorizontalAxis.Value);
 	MoveVertical(_Inputs->VerticalAxis.Value);
 	if (!_Inputs->InputActions[NORMAL].Consumed)
