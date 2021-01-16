@@ -6,6 +6,21 @@
 #include "HitBoxGroup.h"
 #include "HitBoxGroupProjectile.generated.h"
 
+
+USTRUCT()
+struct FSimplifiedProjectile {
+	GENERATED_BODY()
+
+	//UPROPERTY(Category = "Attack", VisibleAnywhere)
+	bool facingRight;
+	float lifeTime;
+	FTransform transform;
+
+	FSimplifiedProjectile();
+	FSimplifiedProjectile(AHitBoxGroupProjectile* model);
+};
+
+
 /**
  * 
  */
@@ -31,4 +46,6 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	FSimplifiedProjectile getSimplifiedVersion();
+	void applySimplifiedVersion(const FSimplifiedProjectile& simple);
 };

@@ -11,7 +11,7 @@ extern class AHitBoxGroupProjectile;
  * 
  */
 UCLASS()
-class MYTHBUSTERS_API UAttackProjectile : public UAttack, public FTickableGameObject
+class MYTHBUSTERS_API UAttackProjectile : public UAttack//, public FTickableGameObject
 {
 	GENERATED_BODY()
 	
@@ -21,8 +21,8 @@ public:
 	UPROPERTY(Category = "HitCreation", EditAnywhere, BlueprintReadWrite)
 		FName SocketToAttachTo;
 
-	UPROPERTY(Category = "Track", VisibleAnywhere, BlueprintReadWrite)
-		TArray<AHitBoxGroupProjectile*> Projectiles;
+	//UPROPERTY(Category = "Track", VisibleAnywhere, BlueprintReadWrite)
+	//	TArray<AHitBoxGroupProjectile*> Projectiles;
 
 
 
@@ -33,17 +33,17 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SpwanHitBoxGroup();
-	UFUNCTION(BlueprintCallable)
-		void DestroyAllProjectiles();
-	UFUNCTION(BlueprintCallable)
-		void CleanUpProjectiles();
+	//UFUNCTION(BlueprintCallable)
+		//void DestroyAllProjectiles();
 
 	virtual void OnActiveNotify() override;
 
+	/*
 	void Tick(float DeltaTime) override;
 	bool IsTickable() const override;
 	bool IsTickableInEditor() const override;
 	bool IsTickableWhenPaused() const override;
 	TStatId GetStatId() const override;
 	UWorld* GetWorld() const override;
+	*/
 };

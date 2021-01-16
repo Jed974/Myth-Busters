@@ -2,6 +2,7 @@
 
 
 #include "GodAttackComponent.h"
+#include "HitBoxGroupProjectile.h"
 #include "god.h"
 
 // Sets default values for this component's properties
@@ -37,10 +38,10 @@ void UGodAttackComponent::BeginPlay()
 	AGod* _godOwner = Cast<AGod>(GetOwner());
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, _godOwner);
 
-	for (auto &att : Attacks)
+	for (int i = 0; i< 14; i++)
 	{
-		if (att != nullptr) {
-			att->SetGod(_godOwner);
+		if (Attacks[i] != nullptr) {
+			Attacks[i]->SetUpAttack(_godOwner, i);
 		}
 	}
 }
@@ -54,9 +55,8 @@ void UGodAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		currentAttack = -1;
 		Cast<AGod>(GetOwner())->ChangeGodState(EGodState::Flying);
 	}
+	CleanUpProjectile();
 }
-
-
 
 bool UGodAttackComponent::StartNormalAttack(EAttackDirection _attackDirection) {
 	if (currentAttack == -1) {
@@ -211,4 +211,49 @@ void UGodAttackComponent::TransmitNotify(ENotifyType _notifyType) {
 			break;	
 		}
 	}
+}
+
+void UGodAttackComponent::RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack) {
+	if (_projectile != nullptr && _idAttack > -1) {
+		if (AllProjectiles.Contains(_idAttack)) {
+			// The array for this attack already exists (projectiles already in scene)
+			AllProjectiles[_idAttack].Projectiles.Add(_projectile);
+		}
+		else {
+			// Array for this attack doesn't exist yet
+			AllProjectiles.Add(_idAttack, FProjectileArray());
+			AllProjectiles[_idAttack].Projectiles.Add(_projectile);
+		}
+	}
+}
+void UGodAttackComponent::CleanUpProjectile() {
+	TArray<int> idArrayToRemove;
+	for (auto &pair : AllProjectiles) {
+		while (pair.Value.Projectiles.Num() > 0 && !IsValid(pair.Value.Projectiles[0])) {
+			pair.Value.Projectiles.RemoveAt(0);
+			GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Green, "Projectile cleaned");
+		}
+		if (pair.Value.Projectiles.Num() == 0) {
+			// l'index 0 est invalide -> le tableau est vide, on supprime la paire
+			idArrayToRemove.Add(pair.Key);
+		}
+	}
+	if (idArrayToRemove.Num() > 0) {
+		for (int &id : idArrayToRemove) {
+			AllProjectiles.Remove(id);
+		}
+		AllProjectiles.Compact();
+		AllProjectiles.Shrink();
+	}
+}
+
+
+FAttacksSaveState UGodAttackComponent::SaveAttacksState() {
+	FAttacksSaveState _saveState;
+	if (currentAttack != -1) {
+		_saveState.idCurrentAttack = currentAttack;
+	}
+	return _saveState;
+}
+void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 }
