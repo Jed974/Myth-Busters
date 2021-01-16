@@ -25,9 +25,13 @@ UP2CameraController::UP2CameraController()
 void UP2CameraController::BeginPlay()
 {
 	Super::BeginPlay();
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGod::StaticClass(), Gods);
+	
 }
 
+void UP2CameraController::FindGods()
+{
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGod::StaticClass(), Gods);
+}
 
 // Called every frame
 void UP2CameraController::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

@@ -159,6 +159,13 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
         PController->ConsoleCommand(TEXT("t.maxfps = 0"), true);
     }
     UMythBustersGameInstance::Instance->gs.Apply();
+    FILE* fp = nullptr;
+    fopen_s(&fp, "ReadInputsLog.txt", "a");
+    if (fp)
+    {
+        fprintf(fp, "  Rollback at frame %i\n", UMythBustersGameInstance::Instance->gs._framenumber);
+        fclose(fp);
+    }
     return true;
 }
 

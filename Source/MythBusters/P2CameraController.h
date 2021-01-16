@@ -31,4 +31,6 @@ public:
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", UIMin = "0"))
 	float initialCameraDistance = 600;
 
+	UFUNCTION(BlueprintCallable)
+	void FindGods();
 };
