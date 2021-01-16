@@ -118,6 +118,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
             fprintf(fp, "  Paused at frame %i for %i frames \n", frame, frames_ahead);
             fclose(fp);
         }
+        // Code placed here will run in the game thread
         Sleep(1000 * float(frames_ahead) / GEngine->FixedFrameRate);
         break;
     }
