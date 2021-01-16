@@ -88,7 +88,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
         break;
     case GGPO_EVENTCODE_RUNNING:
         UMythBustersGameInstance::Instance->ngs.SetConnectState(Running);
-        UMythBustersGameInstance::Instance->gs._framenumber = 0;
+        //UMythBustersGameInstance::Instance->gs._framenumber = 0;
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Running");
         //renderer->SetStatusText("");
         break;
@@ -152,6 +152,7 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
 {
     GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Rollback !");
     memcpy(&UMythBustersGameInstance::Instance->gs, buffer, len);
+    UMythBustersGameInstance::Instance->rollbacking = true;
     GEngine->GameViewport->bDisableWorldRendering = true;
     APlayerController* PController = UGameplayStatics::GetPlayerController(UMythBustersGameInstance::Instance->GetWorld(), 0);
     if (PController)
@@ -186,8 +187,9 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
         fprintf(fp, "  Frame %i - Player2 : %f\n", gs._framenumber, gs.characters[1].ref->GGPOInputs.HorizontalAxis.Value);
         fclose(fp);
     }*/
-    if (GEngine->GameViewport->bDisableWorldRendering)
+    if (UMythBustersGameInstance::Instance->rollbacking)
     {
+        UMythBustersGameInstance::Instance->rollbacking = false;
         GEngine->GameViewport->bDisableWorldRendering = false;
         APlayerController* PController = UGameplayStatics::GetPlayerController(UMythBustersGameInstance::Instance->GetWorld(), 0);
         if (PController)
@@ -539,7 +541,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
   */
   void UMythBustersGameInstance::MythBusters_RunFrame()
   {
-      GGPOErrorCode result = GGPO_OK;
+      GGPOErrorCode result = GGPO_ERRORCODE_GENERAL_FAILURE;
       int disconnect_flags;
       AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
       
@@ -557,7 +559,15 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
           LocalInputs.HorizontalAxis.Value = float((rand() % 100) - 50.0f)/50.0f; // test: use random inputs to demonstrate sync testing
   #endif
           LocalInputs.MakeSendable();
-          result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
+          while (!GGPO_SUCCEEDED(result))
+          {
+              result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
+              if (!GGPO_SUCCEEDED(result))
+              {
+                  ggpo_idle(ggpo, 1000 * 1.0f / 60);
+              }
+          }
+          
       }
 
       // synchronize these inputs with ggpo.  If we have enough input to proceed
@@ -570,7 +580,17 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
               // the game by 1 frame using those inputs.
               MythBusters_AdvanceFrame(Inputs, disconnect_flags);
           }
+
       }
+      /*else
+      {
+
+          GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Waiting for other instance");
+          AGod* RemoteGod = (AGod*)GetLocalPlayers()[1]->PlayerController->GetPawn();
+          LocalGod->GGPOInputs = SInputs();
+          RemoteGod->GGPOInputs = SInputs();
+          Sleep(1000 * 1.0f / 60);
+      }*/
       
   }
 
@@ -621,8 +641,17 @@ void UMythBustersGameInstance::InitState()
 
 void UMythBustersGameInstance::MythBusters_Idle(int timeout)
 {
-    MythBusters_RunFrame();
+    if (ngs.players[GGPOPlayerIndex].state == Running)
+    {
+        if (!rollbacking)
+        {
+            MythBusters_RunFrame();
+        }
+    }
+    
     ggpo_idle(ggpo, timeout);
+    
+    
 }
 
 
