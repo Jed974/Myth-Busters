@@ -2,7 +2,11 @@
 
 #pragma once
 
-class AHitBoxGroupProjectile;
+
+//struct FSimplifiedProjectile;
+//class USimplifiedProjectileArray;
+class AHitBoxGroupProjectile; 
+#include "SimplifiedProjectile.h"
 #include "CoreMinimal.h"
 #include "Attack.h"
 #include "Components/ActorComponent.h"
@@ -24,19 +28,21 @@ enum class EAttackDirection : uint8 {
 	UP,
 	DOWN
 };
+
 USTRUCT(BlueprintType)
 struct MYTHBUSTERS_API FAttacksSaveState {
 	GENERATED_BODY()
 
 	int idCurrentAttack;
-	UAttackSaveState* attackState;
-	//TMap<int, TArray<AHitBoxGroupProjectile>> AllProjectiles;
+	UAttackSaveState attackState;
+	float montageFrame;
+	//TMap<int, USimplifiedProjectileArray> projectiles;
+	TMap<int, FSimplifiedProjectileArray> projectiles;
 
-	FAttacksSaveState() : idCurrentAttack(-1) {
-		attackState = nullptr;
-	}
+	FAttacksSaveState() : idCurrentAttack(-1) {}
 };
-USTRUCT()
+
+USTRUCT(BlueprintType)
 struct FProjectileArray {
 	GENERATED_BODY()
 
@@ -115,7 +121,7 @@ public:
 	void CleanUpProjectile();
 
 	UFUNCTION(BlueprintCallable)
-		FAttacksSaveState SaveAttacksState();
+	FAttacksSaveState SaveAttacksState();
 	UFUNCTION(BlueprintCallable)
-		void LoadAttacksState(FAttacksSaveState saveState);
+	void LoadAttacksState(FAttacksSaveState saveState);
 };

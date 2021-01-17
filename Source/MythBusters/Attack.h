@@ -25,14 +25,16 @@ enum class EAttackState : uint8 	// A completer selon les types d'attaques
 
 struct UAttackSaveState {
 	EAttackState attackState_Saved;
-	int animationFrame_Saved;
+	float animationFrame_Saved;
 	// Other, car be derived for attacks that need more information as projectile position
+
+	UAttackSaveState() : attackState_Saved(EAttackState::OFF), animationFrame_Saved(-1) {};
 };
 
 /**
  * 
  */
-UCLASS(Abstract, Blueprintable)
+UCLASS(Blueprintable)
 class MYTHBUSTERS_API UAttack : public UObject
 {
 	GENERATED_BODY()
@@ -48,7 +50,7 @@ protected:
 	//UPROPERTY(Category = "God Pointers", EditAnywhere)
 	UGodAnimInstance* godAnimInstance;
 
-	virtual void PlayMontageFromCurrentState(int _animationFrameToLoad);
+	virtual void PlayMontageFromCurrentState(float _animationFrameToLoad);
 	UFUNCTION(BlueprintCallable)
 	/** Method called to call when the attack is over (triggered by OverNotify) */
 	virtual void OverAttack();
@@ -62,7 +64,12 @@ public:
 	virtual void StartAttack();
 	/** Method called to stop the attack at any moment*/
 	virtual void StopAttack();
-	void LoadAttackSaveState(EAttackState* _stateToLoad, int _animationFrameToLoad = -1);
+
+	virtual void ApplySaveState(UAttackSaveState _saveState);
+	virtual UAttackSaveState GetSaveState();
+	virtual void LoadAttackSaveState(EAttackState _stateToLoad, float _animationFrameToLoad = -1);
+	virtual float GetAttackFrame();
+	virtual EAttackState GetAttackState();
 
 	virtual void OnOverNotify();		// Déclenchée par une anim notify indiquant la fin de l'attaque
 	virtual void OnActiveNotify();		// Déclenchée par une anim notify indiquant l'apparition de la hitbox ou de l'effet

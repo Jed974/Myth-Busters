@@ -7,9 +7,8 @@ extern class AHitBoxGroup;
 #include "Attack.h"
 #include "AttackSingleHit.generated.h"
 
-/**
- * 
- */
+
+
 UCLASS()
 class MYTHBUSTERS_API UAttackSingleHit : public UAttack
 {
@@ -35,6 +34,8 @@ public:
 	void SpwanHitBoxGroup();
 	UFUNCTION(BlueprintCallable)
 	void DestroyHitBoxGroup();
+
+	virtual void ApplySaveState(UAttackSaveState _saveState) override;
 
 	virtual void OnActiveNotify() override;
 	virtual void OnInactiveNotify() override;

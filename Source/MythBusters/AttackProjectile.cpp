@@ -20,7 +20,7 @@ void UAttackProjectile::StopAttack() {
 }
 
 
-void UAttackProjectile::SpwanHitBoxGroup() {
+AHitBoxGroupProjectile* UAttackProjectile::SpwanHitBoxGroup() {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Projectile Launched !");
 	FTransform _spawnTransform = god->GetRootComponent()->GetSocketTransform(SocketToAttachTo);
 
@@ -29,13 +29,10 @@ void UAttackProjectile::SpwanHitBoxGroup() {
 
 	AHitBoxGroupProjectile* proj = GetWorld()->SpawnActor<AHitBoxGroupProjectile>(projectileToSpawn, _spawnTransform.GetLocation(), god->GetSkeletalMesh()->GetRelativeRotation(), _spawnParams);
 	proj->facingRight = god->GetGodMovementComponent()->GetIsFacingRight();
-
-	//Projectiles.Add(proj);
-	//GEngine->AddOnScreenDebugMessage(0, 0, FColor::Green, FString::SanitizeFloat(Projectiles.Num()));
-	god->RegisterProjectile(proj, idAttackOnGodAttackComponent);
-
-	attackState = EAttackState::RECOVER;
+	
+	return proj;
 }
+
 
 /*void UAttackProjectile::DestroyAllProjectiles() {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Destoy all " + FString::SanitizeFloat(Projectiles.Num()));
@@ -51,10 +48,9 @@ void UAttackProjectile::SpwanHitBoxGroup() {
 }*/
 
 
-
-
 void UAttackProjectile::OnActiveNotify() {
-	SpwanHitBoxGroup();
+	god->RegisterProjectile(SpwanHitBoxGroup(), idAttackOnGodAttackComponent);
+	attackState = EAttackState::RECOVER;
 }
 
 /*

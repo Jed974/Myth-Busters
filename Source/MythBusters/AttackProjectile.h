@@ -32,7 +32,7 @@ public:
 	virtual void StopAttack() override;
 
 	UFUNCTION(BlueprintCallable)
-		void SpwanHitBoxGroup();
+	AHitBoxGroupProjectile* SpwanHitBoxGroup();
 	//UFUNCTION(BlueprintCallable)
 		//void DestroyAllProjectiles();
 
