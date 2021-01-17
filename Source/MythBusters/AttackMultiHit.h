@@ -39,6 +39,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DestroyHitBoxGroup();
 
+	virtual void ApplySaveState(UAttackSaveState _saveState) override;
+
 	virtual void OnActiveNotify() override;
 	virtual void OnChangeNotify() override;
 	virtual void OnInactiveNotify() override;

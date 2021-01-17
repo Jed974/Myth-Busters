@@ -43,16 +43,24 @@ void UAttackSingleHit::SpwanHitBoxGroup() {
 }
 
 void UAttackSingleHit::DestroyHitBoxGroup() {
-	bool destroySuccess = hitBoxGroup->Destroy();
-	if (destroySuccess)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Destroy successful");
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroy failed");
-	hitBoxGroup = nullptr;
+	if (hitBoxGroup != nullptr) {
+		bool destroySuccess = hitBoxGroup->Destroy();
+		if (destroySuccess)
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Destroy successful");
+		else
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroy failed");
+		hitBoxGroup = nullptr;
 
-	attackState = EAttackState::RECOVER;
+		attackState = EAttackState::RECOVER;
+	}
 }
 
+void UAttackSingleHit::ApplySaveState(UAttackSaveState _saveState) {
+	Super::ApplySaveState(_saveState);
+	if (attackState == EAttackState::HITACTIVE1) {
+		SpwanHitBoxGroup();
+	}
+}
 
 void UAttackSingleHit::OnActiveNotify() {
 	SpwanHitBoxGroup();

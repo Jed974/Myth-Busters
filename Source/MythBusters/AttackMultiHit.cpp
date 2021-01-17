@@ -49,7 +49,6 @@ void UAttackMultiHit::SpwanHitBoxGroup(int id) {
 		default:
 			attackState = EAttackState::HITACTIVE3;
 			break;
-
 	}
 }
 
@@ -64,6 +63,22 @@ void UAttackMultiHit::DestroyHitBoxGroup() {
 	attackState = EAttackState::RECOVER;
 }
 
+void UAttackMultiHit::ApplySaveState(UAttackSaveState _saveState) {
+	Super::ApplySaveState(_saveState);
+	switch (attackState) {
+	case EAttackState::HITACTIVE1:
+		SpwanHitBoxGroup(0);
+		break;
+	case EAttackState::HITACTIVE2:
+		SpwanHitBoxGroup(1);
+		break;
+	case EAttackState::HITACTIVE3:
+		SpwanHitBoxGroup(2);
+		break;
+	default:
+		break;
+	}
+}
 
 void UAttackMultiHit::OnActiveNotify() {
 	SpwanHitBoxGroup(0);

@@ -4,7 +4,31 @@
 
 #include "CoreMinimal.h"
 #include "HitBoxGroup.h"
+#include "SimplifiedProjectile.h"
 #include "HitBoxGroupProjectile.generated.h"
+
+
+/*UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class MYTHBUSTERS_API USimplifiedProjectileArray : public UObject{
+	GENERATED_BODY()
+
+public:
+	TArray<FSimplifiedProjectile> Projectiles;
+};*/
+
+/*USTRUCT(BlueprintType)
+struct FSimplifiedProjectile {
+	GENERATED_BODY()
+
+	//UPROPERTY(Category = "Attack", VisibleAnywhere)
+	bool facingRight;
+	int lifeTime;
+	FTransform transform;
+
+	FSimplifiedProjectile();
+	FSimplifiedProjectile(AHitBoxGroupProjectile* model);
+};*/
+
 
 /**
  * 
@@ -17,7 +41,7 @@ class MYTHBUSTERS_API AHitBoxGroupProjectile : public AHitBoxGroup
 public:
 	/** Delay before the group is deleted */
 	UPROPERTY(Category = "Projectile Parameters", EditAnywhere, BlueprintReadWrite)
-		float LifeTime;
+		int LifeTime;
 
 	/** Movement Speed */
 	UPROPERTY(Category = "Projectile Parameters", EditAnywhere, BlueprintReadWrite)
@@ -31,4 +55,14 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintCallable)
+	FSimplifiedProjectile getSimplifiedVersion();
+	UFUNCTION(BlueprintCallable)
+	void applySimplifiedVersion(const FSimplifiedProjectile& simple);
+
+
+	/*UFUNCTION(BlueprintCallable)
+		FSimplifiedProjectile getSimplifiedVersion();
+	UFUNCTION(BlueprintCallable)
+		void applySimplifiedVersion(const FSimplifiedProjectile& simple);*/
 };

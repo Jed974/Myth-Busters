@@ -2,6 +2,8 @@
 
 
 #include "GodAttackComponent.h"
+#include "HitBoxGroupProjectile.h"
+#include "AttackProjectile.h"
 #include "god.h"
 
 // Sets default values for this component's properties
@@ -37,10 +39,10 @@ void UGodAttackComponent::BeginPlay()
 	AGod* _godOwner = Cast<AGod>(GetOwner());
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, _godOwner);
 
-	for (auto &att : Attacks)
+	for (int i = 0; i< 14; i++)
 	{
-		if (att != nullptr) {
-			att->SetGod(_godOwner);
+		if (Attacks[i] != nullptr) {
+			Attacks[i]->SetUpAttack(_godOwner, i);
 		}
 	}
 }
@@ -54,9 +56,8 @@ void UGodAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		currentAttack = -1;
 		Cast<AGod>(GetOwner())->ChangeGodState(EGodState::Flying);
 	}
+	CleanUpProjectile();
 }
-
-
 
 bool UGodAttackComponent::StartNormalAttack(EAttackDirection _attackDirection) {
 	if (currentAttack == -1) {
@@ -211,4 +212,139 @@ void UGodAttackComponent::TransmitNotify(ENotifyType _notifyType) {
 			break;	
 		}
 	}
+}
+
+void UGodAttackComponent::RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack) {
+	if (_projectile != nullptr && _idAttack > -1) {
+		if (AllProjectiles.Contains(_idAttack)) {
+			// The array for this attack already exists (projectiles already in scene)
+			AllProjectiles[_idAttack].Projectiles.Add(_projectile);
+		}
+		else {
+			// Array for this attack doesn't exist yet
+			AllProjectiles.Add(_idAttack, FProjectileArray());
+			AllProjectiles[_idAttack].Projectiles.Add(_projectile);
+		}
+	}
+}
+void UGodAttackComponent::CleanUpProjectile() {
+	TArray<int> idArrayToRemove;
+	for (auto &pair : AllProjectiles) {
+		while (pair.Value.Projectiles.Num() > 0 && !IsValid(pair.Value.Projectiles[0])) {
+			pair.Value.Projectiles.RemoveAt(0);
+			GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Green, "Projectile cleaned");
+		}
+		if (pair.Value.Projectiles.Num() == 0) {
+			// l'index 0 est invalide -> le tableau est vide, on supprime la paire
+			idArrayToRemove.Add(pair.Key);
+		}
+	}
+	if (idArrayToRemove.Num() > 0) {
+		for (int &id : idArrayToRemove) {
+			AllProjectiles.Remove(id);
+		}
+		AllProjectiles.Compact();
+		AllProjectiles.Shrink();
+	}
+}
+
+
+FAttacksSaveState UGodAttackComponent::SaveAttacksState() {
+	FAttacksSaveState _saveState;
+
+	// Attaque courrante
+	if (currentAttack != -1) {
+		// id
+		_saveState.idCurrentAttack = currentAttack;
+
+		// Récupérer le saveState
+		_saveState.montageFrame = Attacks[currentAttack]->GetAttackFrame();
+		_saveState.attackState = Attacks[currentAttack]->GetSaveState();
+	}
+
+	
+
+	// Projectiles
+	for (auto &pair : AllProjectiles) {
+		GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Green, "Array de Simplified créé pour l'attaque " + FString::SanitizeFloat(pair.Key) + " contenant " + FString::SanitizeFloat(pair.Value.Projectiles.Num()) + " projectiles.");
+		//_saveState.projectiles.Add(pair.Key, USimplifiedProjectileArray());
+		_saveState.projectiles.Add(pair.Key, FSimplifiedProjectileArray());
+
+		for (auto &proj : pair.Value.Projectiles) {
+			_saveState.projectiles[pair.Key].Projectiles.Add(proj->getSimplifiedVersion());
+		}		
+	}
+	return _saveState;
+}
+void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
+	// Cancel all attacks
+	for (int i = 0; i < 14; i++) {
+		if (Attacks[i] != nullptr) {
+			Attacks[i]->StopAttack();
+		}
+	}
+
+	// Go back to past attack
+	currentAttack = saveState.idCurrentAttack;
+	if (currentAttack != -1)
+		Attacks[currentAttack]->ApplySaveState(saveState.attackState);
+
+	// Projectiles
+	for (int i = 0; i < 14; i++) {
+		if (AllProjectiles.Contains(i) && saveState.projectiles.Contains(i)) {
+			// Currently we have some projectiles but they were not present when state was saved => destroy them
+			for (auto &proj : AllProjectiles[i].Projectiles) {
+				proj->Destroy();
+			}
+		}
+		else if (!AllProjectiles.Contains(i) && saveState.projectiles.Contains(i)) {
+			// There were some projectiles in the past but not they are gone => recreate them + a slot for the attack
+			UAttackProjectile* attackProjectile = Cast<UAttackProjectile>(Attacks[i]);
+			if (attackProjectile == nullptr) {
+				GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Red, "Cast de l'attaque a échoué : impossible de recréer les projectiles.");
+				return;
+			}
+			else {
+				AllProjectiles.Add(i, FProjectileArray());
+				for (auto &simplified : saveState.projectiles[i].Projectiles) {
+					AHitBoxGroupProjectile* projectile = attackProjectile->SpwanHitBoxGroup();
+					projectile->applySimplifiedVersion(simplified);
+					AllProjectiles[i].Projectiles.Add(projectile);
+				}
+			}
+		}
+		else if (AllProjectiles.Contains(i) && saveState.projectiles.Contains(i)) {
+			// There are projectiles in game and in save state for the same attack
+			if (AllProjectiles[i].Projectiles.Num() > saveState.projectiles[i].Projectiles.Num()) {
+				// Il y a plus de projectiles in game que dans le save state : détruire le surplus
+				int surplus = FMath::Abs(AllProjectiles[i].Projectiles.Num() - saveState.projectiles[i].Projectiles.Num());
+				for (int j = 0; j < surplus; j++) {
+					AllProjectiles[i].Projectiles[0]->Destroy();
+					AllProjectiles[i].Projectiles.RemoveAt(0);
+				}
+			}
+			else if (AllProjectiles[i].Projectiles.Num() > saveState.projectiles[i].Projectiles.Num()) {
+				// Il y a moins de projectiles in game que dans le save state : ajouter le manque
+				UAttackProjectile* attackProjectile = Cast<UAttackProjectile>(Attacks[i]);
+				if (attackProjectile == nullptr) {
+					GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Red, "Cast de l'attaque a échoué : impossible d'ajouter les projectiles manquants.");
+					return;
+				}
+				else {
+					int manque = FMath::Abs(saveState.projectiles[i].Projectiles.Num() - AllProjectiles[i].Projectiles.Num());
+					for (int j = 0; j < manque; j++) {
+						AHitBoxGroupProjectile* projectile = attackProjectile->SpwanHitBoxGroup();
+						AllProjectiles[i].Projectiles.Add(projectile);
+					}
+				}				
+			}
+
+			// Ensuite : appliquer les simplified
+			for (int j = 0; j < saveState.projectiles[i].Projectiles.Num(); j++) {
+				AllProjectiles[i].Projectiles[j]->applySimplifiedVersion(saveState.projectiles[i].Projectiles[j]);
+			}
+		}
+	}
+
+	CleanUpProjectile(); // in case we have destroy some projectiles during rollback
 }

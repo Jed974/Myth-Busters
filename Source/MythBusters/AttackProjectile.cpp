@@ -20,7 +20,7 @@ void UAttackProjectile::StopAttack() {
 }
 
 
-void UAttackProjectile::SpwanHitBoxGroup() {
+AHitBoxGroupProjectile* UAttackProjectile::SpwanHitBoxGroup() {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Projectile Launched !");
 	FTransform _spawnTransform = god->GetRootComponent()->GetSocketTransform(SocketToAttachTo);
 
@@ -29,14 +29,12 @@ void UAttackProjectile::SpwanHitBoxGroup() {
 
 	AHitBoxGroupProjectile* proj = GetWorld()->SpawnActor<AHitBoxGroupProjectile>(projectileToSpawn, _spawnTransform.GetLocation(), god->GetSkeletalMesh()->GetRelativeRotation(), _spawnParams);
 	proj->facingRight = god->GetGodMovementComponent()->GetIsFacingRight();
-
-	Projectiles.Add(proj);
-	GEngine->AddOnScreenDebugMessage(0, 0, FColor::Green, FString::SanitizeFloat(Projectiles.Num()));
-
-	attackState = EAttackState::RECOVER;
+	
+	return proj;
 }
 
-void UAttackProjectile::DestroyAllProjectiles() {
+
+/*void UAttackProjectile::DestroyAllProjectiles() {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Destoy all " + FString::SanitizeFloat(Projectiles.Num()));
 	for (auto &proj : Projectiles) {
 		bool destroySuccess = proj->Destroy();
@@ -47,23 +45,15 @@ void UAttackProjectile::DestroyAllProjectiles() {
 		proj = nullptr;
 	}
 	Projectiles.Empty();
-}
-
-void UAttackProjectile::CleanUpProjectiles() {
-	/*if (Projectiles.Num() > 0) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "CleanUp " + FString::SanitizeFloat(Projectiles.Num()));
-	}*/
-	while (Projectiles.Num() > 0 && !IsValid(Projectiles[0])) {
-		Projectiles.RemoveAt(0);
-		//GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Green, "Projectile cleaned");
-	}
-}
+}*/
 
 
 void UAttackProjectile::OnActiveNotify() {
-	SpwanHitBoxGroup();
+	god->RegisterProjectile(SpwanHitBoxGroup(), idAttackOnGodAttackComponent);
+	attackState = EAttackState::RECOVER;
 }
 
+/*
 // ===================== TICK Methods =======================
 
 void UAttackProjectile::Tick(float DeltaTime)
@@ -75,3 +65,4 @@ bool UAttackProjectile::IsTickableInEditor() const { return false; }
 bool UAttackProjectile::IsTickableWhenPaused() const { return false; }
 TStatId UAttackProjectile::GetStatId() const { return TStatId(); }
 UWorld* UAttackProjectile::GetWorld() const { return GetOuter()->GetWorld(); }
+*/
