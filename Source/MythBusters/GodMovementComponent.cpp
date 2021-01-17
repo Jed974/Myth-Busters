@@ -66,6 +66,8 @@ void UGodMovementComponent::ChangeMovementState(EMovementState NewState)
 {
 	ChangeMovementStateDelegate.ExecuteIfBound(NewState);
 	MovementState = NewState;
+	HorizontalPreviousSpeed = Velocity.X;
+	VerticalPreviousSpeed = Velocity.Y;
 	switch (MovementState)
 	{
 		case EMovementState::WallHit:
@@ -73,6 +75,8 @@ void UGodMovementComponent::ChangeMovementState(EMovementState NewState)
 			break;
 		case EMovementState::Dashing:
 			DashFrameCounter = 0;
+			DashStartupCounter = 0;
+			DashLagCounter = 0;
 			break;
 		case EMovementState::FlyingTurnaroud:
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Turnaround");
@@ -237,6 +241,10 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 			}
 			
 			isFacingUp = Reflect.Y > 0;
+			Reflect.Normalize();
+			DashDir = Reflect;
+			DashFrameCounter -= DashFrameCounter*0.75f;
+
 			break;
 		case EMovementState::DeathEjected:
 			break;
@@ -246,16 +254,52 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 
 void UGodMovementComponent::ComputeDashingVelocity()
 {
-	if (DashFrameCounter <= DashFrames)
+
+	if (DashStartupCounter < DashStartupFrames)
 	{
-		Velocity.X = (isFacingRight ?  1 : -1) * HorizontalSpeed * DashingSpeedScale;
-		Velocity.Y = (isFacingUp ? 1 : -1) * VerticalSpeed * DashingSpeedScale;
+		if (FMath::Abs(_MovementInput.X) > 0.1)
+		{
+			DashDir.X = _MovementInput.X;
+		}
+		else
+		{
+			DashDir.X = isFacingRight ? 1 : -1;
+		}
+		
+		if (FMath::Abs(_MovementInput.Y) > 0.1)
+		{
+			DashDir.Y = _MovementInput.Y;
+			if (FMath::Abs(_MovementInput.X) < 0.1)
+			{
+				DashDir.X = 0;
+			}
+		}
+		else
+		{
+			DashDir.Y = 0;
+		}
+		DashDir.Normalize();
+		DashStartupCounter++;
+	}
+	else if (DashFrameCounter < DashFrames)
+	{
+		const float Alpha = FMath::Pow(float(DashFrameCounter) / DashFrames, 2);
+		Velocity.X = FMath::Lerp(DashingSpeed * DashDir.X, 0.0f, Alpha);
+		Velocity.Y = FMath::Lerp(DashingSpeed * DashDir.Y, 0.0f, Alpha);
 		DashFrameCounter++;
 	}
 	else
 	{
-		ChangeHorizontalMovementState(HorizontalNeutral);
-		ChangeVerticalMovementState(VerticalNeutral);
+		if (DashLagCounter < DashLagFrames)
+		{
+			DashLagCounter++;
+		}
+		else
+		{
+			ChangeHorizontalMovementState(HorizontalNeutral);
+			ChangeVerticalMovementState(VerticalNeutral);
+		}
+		
 		/*if (_MovementInput.X != 0)
 		{
 			ChangeHorizontalMovementState(SprintHorizontal);
@@ -272,7 +316,7 @@ void UGodMovementComponent::ComputeDashingVelocity()
 		{
 			ChangeVerticalMovementState(VerticalNeutral);
 		}*/
-		ChangeMovementState(EMovementState::Flying);
+		
 		
 	}
 }
