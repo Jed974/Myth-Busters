@@ -543,7 +543,7 @@ void AGod::UpdateAttackState() {
 void AGod::InstantTurn()
 {
 	FRotator NewRotation = SkeletalMesh->GetRelativeRotation();
-	NewRotation.Yaw = GodMovement->GetIsFacingRight() ? -90.0f : 90.0f;
+	NewRotation.Yaw *= -1;
 	SkeletalMesh->SetRelativeRotation(NewRotation);
 }
 
