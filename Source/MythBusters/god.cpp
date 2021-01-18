@@ -103,6 +103,14 @@ void AGod::AttackNormal()
 	switch (State)
 	{
 	case EGodState::Flying:
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Flying");
+		if (GodAttack->StartNormalAttack(attackState)) {
+			EAttackNormal();
+			ChangeGodState(EGodState::Attacking);
+		}
+		break;
+	case EGodState::FlyingTurnaround:
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Backward attack");
 		if (GodAttack->StartNormalAttack(attackState)) {
 			EAttackNormal();
 			ChangeGodState(EGodState::Attacking);
