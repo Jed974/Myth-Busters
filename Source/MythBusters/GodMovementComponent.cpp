@@ -198,11 +198,18 @@ void UGodMovementComponent::ComputeWallMovement(FHitResult HitInfo)
 		case EMovementState::Flying:
 			if (_MovementInput.Y != 0.f)
 			{
-				Tangent = HitInfo.Normal.RotateAngleAxis((HitInfo.Normal.X > 0.f && HitInfo.Normal.Z < 0.f || HitInfo.Normal.X < 0.f && HitInfo.Normal.Z > 0.f ? -89.f : 89.f), FVector(0.f, 1.f, 0.f)) * MaxVerticalFlySpeed;
+				if (HitInfo.Normal.Z != 1.f)
+				{
+					Tangent += HitInfo.Normal.RotateAngleAxis((HitInfo.Normal.X > 0.f && HitInfo.Normal.Z < 0.f || HitInfo.Normal.X < 0.f && HitInfo.Normal.Z > 0.f ? -89.f : 89.f), FVector(0.f, 1.f, 0.f)) * MaxVerticalFlySpeed;
+				}
 			}
-			else if (_MovementInput.X != 0.f)
+			if (_MovementInput.X != 0.f)
 			{
-				Tangent = HitInfo.Normal.RotateAngleAxis((HitInfo.Normal.X < 0.f && HitInfo.Normal.Z < 0.f || HitInfo.Normal.X > 0.f && HitInfo.Normal.Z > 0.f ? -89.f : 89.f), FVector(0.f, 1.f, 0.f)) * MaxHorizontalFlySpeed;
+				if (HitInfo.Normal.X != 1.f)
+				{
+					Tangent += HitInfo.Normal.RotateAngleAxis((HitInfo.Normal.X < 0.f && HitInfo.Normal.Z < 0.f || HitInfo.Normal.X > 0.f && HitInfo.Normal.Z > 0.f ? -89.f : 89.f), FVector(0.f, 1.f, 0.f)) * MaxHorizontalFlySpeed;
+
+				}
 			}
 			Velocity.X = Tangent.X;
 			Velocity.Y = Tangent.Z;
