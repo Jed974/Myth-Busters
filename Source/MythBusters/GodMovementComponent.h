@@ -55,6 +55,10 @@ public:
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int HorizontalFlyStopTime;
 
+	/** The time (in frames) it takes before being able to cancel the fly stop movement into an other horizontal movement */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		int HorizontalFlyStopCancelFrames;
+
 	/** The extra time (in frames) it takes to start flying horizontally behind the character  */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int HorizontalTurnaroundTime;
@@ -79,6 +83,10 @@ public:
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int VerticalFlyStopTime;
 
+	/** The time (in frames) it takes before being able to cancel the fly stop movement into an other vertical movement */
+	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
+		int VerticalFlyStopCancelFrames;
+
 	/** The extra time (in frames) it takes to start flying vertically in the opposite direction of current movement  */
 	UPROPERTY(Category = "God Movement: Flying", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		int VerticalTurnaroundTime;
@@ -96,13 +104,26 @@ public:
 	UPROPERTY(Category = "God Movement: Ejection", VisibleAnywhere, meta = (ClampMin = "0", UIMin = "0"))
 		int WallHitFrames = 12;
 
-	/** Dashing speed, as a multiplier of maximum flying speed */
+	/** Dashing speed */
 	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
-		float DashingSpeedScale;
+		float DashingSpeed;
+
+	/** Number of frames before starting a dash */
+	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere, meta = (ClampMin = "0", UIMin = "0"))
+		int DashStartupFrames;
 
 	/** Number of frames in a dash */
 	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere, meta = (ClampMin = "0", UIMin = "0"))
 		int DashFrames;
+
+	/** Number of frames where character can't move after a dash */
+	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere, meta = (ClampMin = "0", UIMin = "0"))
+		int DashLagFrames;
+
+	/** The evolution of the speed during a dash */
+	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere)
+		FRuntimeFloatCurve DashSpeedProfile;
+	
 
 	/** Dashing speed, as a multiplier of maximum flying speed */
 	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
@@ -141,6 +162,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector2D Velocity;
+	FVector2D DashDir;
 	FVector2D PushVelocity;
 	UPROPERTY(BlueprintReadOnly)
 	bool IsPushable;
@@ -160,6 +182,8 @@ protected:
 	float VerticalPreviousSpeed;
 
 	int DashFrameCounter = 0;
+	int DashStartupCounter = 0;
+	int DashLagCounter = 0;
 	int EjectionFrameCounter = 0;
 	int WallHitFrameCounter = 0;
 	
