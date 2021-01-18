@@ -103,14 +103,6 @@ void AGod::AttackNormal()
 	switch (State)
 	{
 	case EGodState::Flying:
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Flying");
-		if (GodAttack->StartNormalAttack(attackState)) {
-			EAttackNormal();
-			ChangeGodState(EGodState::Attacking);
-		}
-		break;
-	case EGodState::FlyingTurnaround:
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Flying");
 		if (GodAttack->StartNormalAttack(attackState)) {
 			EAttackNormal();
 			ChangeGodState(EGodState::Attacking);
@@ -540,7 +532,6 @@ void AGod::UpdateAttackState() {
 			}
 			else {
 				attackState = EAttackDirection::BACKWARD;
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Backward !");
 			}
 		}
 		else {
@@ -552,7 +543,7 @@ void AGod::UpdateAttackState() {
 void AGod::InstantTurn()
 {
 	FRotator NewRotation = SkeletalMesh->GetRelativeRotation();
-	NewRotation.Yaw = GodMovement->GetIsFacingRight() ? -90.0f : 90.0f;
+	NewRotation.Yaw *= -1;
 	SkeletalMesh->SetRelativeRotation(NewRotation);
 }
 
