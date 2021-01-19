@@ -111,13 +111,13 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
         
         int frames_ahead = info->u.timesync.frames_ahead;
         int frame = UMythBustersGameInstance::Instance->gs._framenumber;
-        FILE* fp = nullptr;
+        /*FILE* fp = nullptr;
         fopen_s(&fp, "ReadInputsLog.txt", "a");
         if (fp)
         {
             fprintf(fp, "  Paused at frame %i for %i frames \n", frame, frames_ahead);
             fclose(fp);
-        }
+        }*/
         Sleep(1000 * float(frames_ahead) / GEngine->FixedFrameRate);
         break;
     }
@@ -160,13 +160,13 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
         PController->ConsoleCommand(TEXT("t.maxfps = 0"), true);
     }
     UMythBustersGameInstance::Instance->gs.Apply();
-    FILE* fp = nullptr;
+    /*FILE* fp = nullptr;
     fopen_s(&fp, "ReadInputsLog.txt", "a");
     if (fp)
     {
         fprintf(fp, "  Rollback at frame %i\n", UMythBustersGameInstance::Instance->gs._framenumber);
         fclose(fp);
-    }
+    }*/
     return true;
 }
 
