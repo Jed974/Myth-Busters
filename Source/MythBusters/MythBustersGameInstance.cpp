@@ -178,7 +178,7 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
  */
 bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-    AbstractGameState gs = UMythBustersGameInstance::Instance->gs;
+    SAbstractGameState gs = UMythBustersGameInstance::Instance->gs;
     /*FILE* fp = nullptr;
     fopen_s(&fp, "LogInput.txt", "a");
     if (fp)

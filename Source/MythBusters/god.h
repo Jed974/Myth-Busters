@@ -188,7 +188,7 @@ protected:
 	float HorizontalDeadZone = 0.15f;
 	float VerticalDeadZone = 0.15f;
 	
-	bool canMove = true;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<AShield> ShieldClassToSpwan;
@@ -319,8 +319,53 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		EGodState State;
 
+	bool canMove = true;
+
 	UGodMovementComponent* GetGodMovementComponent() { return GodMovement; };
 
 	void HandleAttackNotify(ENotifyType notifyType);
 	void RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack);
+};
+
+
+struct SAbstractGod
+{
+	AGod* Ref;
+	FTransform Transform;
+
+	float GodDamage;
+
+	bool canMove;
+
+	EGodState State;
+
+
+
+	FAttacksSaveState AttackSaveState;
+	SMovementSaveState MovementSaveState;
+
+	void Init(AGod* ref)
+	{
+		Ref = ref;
+		AttackSaveState = FAttacksSaveState();
+		MovementSaveState = SMovementSaveState();
+	};
+
+	void Observe()
+	{
+		Transform = Ref->GetActorTransform();
+		GodDamage = Ref->GodDamage;
+		canMove = Ref->canMove;
+		State = Ref->State;
+		MovementSaveState.Observe();
+	};
+
+	void Apply()
+	{
+		Ref->SetActorTransform(Transform);
+		Ref->GodDamage = GodDamage;
+		Ref->canMove = canMove;
+		Ref->State = State;
+		MovementSaveState.Apply();
+	};
 };

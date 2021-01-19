@@ -17,29 +17,19 @@
 #define FRAME_DELAY     2
 //#define SYNC_TEST
 
-struct AbstractCharacter
-{
-    AGod* ref;
-    FTransform transform;
-    FVector2D velocity;
-    float damage;
-};
 
-struct AbstractGameState
+struct MYTHBUSTERS_API SAbstractGameState
 {
-    TArray<AbstractCharacter> characters;
+    TArray<SAbstractGod> Gods;
     int _framenumber = 0;
     void Init(int num_players, UGameInstance* Instance)
     {
         for (int i = 0; i < num_players; i++)
         {
             AGod* god = (AGod*)Instance->GetLocalPlayers()[i]->PlayerController->GetPawn();
-            AbstractCharacter AbstractGod = AbstractCharacter();
-            AbstractGod.ref = god;
-            AbstractGod.transform = god->GetActorTransform();
-            AbstractGod.velocity = god->GetGodMovementComponent()->Velocity;
-            AbstractGod.damage = god->GodDamage;
-            characters.Add(AbstractGod);
+            SAbstractGod AbstractGod = SAbstractGod();
+            AbstractGod.Init(god);
+            Gods.Add(AbstractGod);
         }
         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "GameState Initiated");
 
@@ -47,14 +37,14 @@ struct AbstractGameState
     void Apply()
     {
         GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Rollback !");
-        for (int i = 0; i < characters.Num(); i++)
+        for (int i = 0; i < Gods.Num(); i++)
         {
-            if (characters[i].ref != nullptr)
+            if (Gods[i].Ref != nullptr)
             {
                 
-                characters[i].ref->SetActorTransform(characters[i].transform);
-                characters[i].ref->GetGodMovementComponent()->Velocity = characters[i].velocity;
-                characters[i].ref->GodDamage = characters[i].damage;
+                //Gods[i].Ref->SetActorTransform(Gods[i].Transform);
+                //Gods[i].ref->GetGodMovementComponent()->Velocity = Gods[i].velocity;
+                //Gods[i].ref->GodDamage = Gods[i].damage;
             }
 
         }
@@ -63,14 +53,14 @@ struct AbstractGameState
     }
     void Observe()
     {
-        for (int i = 0; i < characters.Num(); i++)
+        for (int i = 0; i < Gods.Num(); i++)
         {
-            if (characters[i].ref != nullptr)
+            if (Gods[i].Ref != nullptr)
             {
                 //GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Saving Character " + FString::FromInt(i));
-                characters[i].transform = characters[i].ref->GetActorTransform();
-                characters[i].velocity = characters[i].ref->GetGodMovementComponent()->Velocity;
-                characters[i].damage = characters[i].ref->GodDamage;
+                //Gods[i].Transform = Gods[i].Ref->GetActorTransform();
+                //characters[i].velocity = characters[i].ref->GetGodMovementComponent()->Velocity;
+                //characters[i].damage = characters[i].ref->GodDamage;
             }
 
         }
@@ -118,7 +108,7 @@ public:
     void MythBusters_DisconnectPlayer(int player);
     void MythBusters_Exit();
 
-    AbstractGameState gs;
+    SAbstractGameState gs;
     NonGameState ngs;
     GGPOSession* ggpo;
     static UMythBustersGameInstance* Instance;

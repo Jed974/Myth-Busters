@@ -35,16 +35,16 @@ void UGodMovementComponent::ChangeHorizontalMovementState(EHorizontalMovementSta
 	HorizontalPreviousSpeed = Velocity.X;
 	switch (NewState)
 	{
-		case FlyHorizontalStartup:
+		case EHorizontalMovementState::FlyHorizontalStartup:
 			ChangeMovementState(EMovementState::Flying);
 			break;
-		case FlyHorizontalTurnAround:
+		case EHorizontalMovementState::FlyHorizontalTurnAround:
 			ChangeMovementState(EMovementState::FlyingTurnaroud);
 			break;
-		case HorizontalTurnAround:
+		case EHorizontalMovementState::HorizontalTurnAround:
 			ChangeMovementState(EMovementState::FlyingTurnaroud);
 			break;
-		case HorizontalNeutral:
+		case EHorizontalMovementState::HorizontalNeutral:
 			ChangeMovementState(EMovementState::Flying);
 			break;
 	}
@@ -57,7 +57,7 @@ void UGodMovementComponent::ChangeVerticalMovementState(EVerticalMovementState N
 	VerticalPreviousSpeed = Velocity.Y;
 	switch (NewState)
 	{
-		case FlyVerticalStartup:
+		case EVerticalMovementState::FlyVerticalStartup:
 			break;
 	}
 }
@@ -127,10 +127,10 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
 		}
 
-		if (HorizontalMovementState == SprintHorizontal || HorizontalMovementState == SprintHorizontalStartup || HorizontalMovementState == SprintHorizontalStop || VerticalMovementState == SprintVerticalStartup || VerticalMovementState == SprintVerticalStop)
+		/*if (HorizontalMovementState == EHorizontalMovementState::SprintHorizontal || HorizontalMovementState == SprintHorizontalStartup || HorizontalMovementState == SprintHorizontalStop || VerticalMovementState == SprintVerticalStartup || VerticalMovementState == SprintVerticalStop)
 		{
 			ChangeMovementState(EMovementState::Sprinting);
-		}
+		}*/
 	}
 
 	
@@ -150,6 +150,7 @@ void UGodMovementComponent::Dash()
 void UGodMovementComponent::Eject(FVector2D _EjectionSpeed) {
 	EjectionVelocity = _EjectionSpeed;
 	isFacingRight = EjectionVelocity.X < 0;
+	InstantTurnDelegate.ExecuteIfBound();
 	isFacingUp = EjectionVelocity.Y < 0;
 	ChangeMovementState(EMovementState::Ejected);
 }
@@ -303,25 +304,25 @@ void UGodMovementComponent::ComputeDashingVelocity()
 		}
 		else
 		{
-			ChangeHorizontalMovementState(HorizontalNeutral);
-			ChangeVerticalMovementState(VerticalNeutral);
+			ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
+			ChangeVerticalMovementState(EVerticalMovementState::VerticalNeutral);
 		}
 		
 		/*if (_MovementInput.X != 0)
 		{
-			ChangeHorizontalMovementState(SprintHorizontal);
+			ChangeHorizontalMovementState(EHorizontalMovementState::SprintHorizontal);
 		}
 		else
 		{
-			ChangeHorizontalMovementState(HorizontalNeutral);
+			ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
 		}
 		if (_MovementInput.Y != 0)
 		{
-			ChangeVerticalMovementState(SprintVertical);
+			ChangeVerticalMovementState(EVerticalMovementState::SprintSprintVertical);
 		}
 		else
 		{
-			ChangeVerticalMovementState(VerticalNeutral);
+			ChangeVerticalMovementState(EVerticalMovementState::VerticalNeutral);
 		}*/
 		
 		
@@ -347,27 +348,24 @@ void UGodMovementComponent::ComputeEjectedVelocity()
 		EjectionFrameCounter = 0;
 		//EjectionVelocity = FVector2D::ZeroVector;
 
-		if (_MovementInput.X != 0)
+		if (_MovementInput.X > 0 && isFacingRight || _MovementInput.X < 0 && !isFacingRight)
 		{
-			isFacingRight = _MovementInput.X > 0;
-			Velocity.X = _MovementInput.X * MaxHorizontalFlySpeed;
-			HorizontalSpeed = FMath::Abs(Velocity.X);
-			ChangeHorizontalMovementState(FlyHorizontal);
+			ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontal);
 		}
 		else
 		{
-			ChangeHorizontalMovementState(HorizontalNeutral);
+			ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
 		}
 		if (_MovementInput.Y != 0)
 		{
 			isFacingUp = _MovementInput.Y > 0;
 			Velocity.Y = _MovementInput.Y * MaxVerticalFlySpeed;
 			VerticalSpeed = FMath::Abs(Velocity.Y);
-			ChangeVerticalMovementState(FlyVertical);
+			ChangeVerticalMovementState(EVerticalMovementState::FlyVertical);
 		}
 		else
 		{
-			ChangeVerticalMovementState(VerticalNeutral);
+			ChangeVerticalMovementState(EVerticalMovementState::VerticalNeutral);
 		}
 		ChangeMovementState(EMovementState::Flying);
 	}
@@ -380,19 +378,19 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 {
 	switch (HorizontalMovementState)
 	{
-	case HorizontalNeutral:
+	case EHorizontalMovementState::HorizontalNeutral:
 		HorizontalSpeed = 0;
 		Velocity.X = HorizontalSpeed;
 		if (_MovementInput.X < 0.0 && isFacingRight || _MovementInput.X > 0.0 && !isFacingRight)
 		{
-			ChangeHorizontalMovementState(HorizontalTurnAround);
+			ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalTurnAround);
 		}
 		else if (_MovementInput.X > 0.0 && isFacingRight || _MovementInput.X < 0.0 && !isFacingRight)
 		{
-			ChangeHorizontalMovementState(FlyHorizontalStartup);
+			ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontalStartup);
 		}
 		break;
-	case FlyHorizontalStop:
+	case EHorizontalMovementState::FlyHorizontalStop:
 		if (CurrentHorizontalStateTimer < HorizontalFlyStopTime)
 		{
 			if (_MovementInput.X != 0.0f)
@@ -400,14 +398,14 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 				if (CurrentHorizontalStateTimer >= HorizontalFlyStopCancelFrames)
 				{
 					HorizontalSpeed = 0;
-					ChangeHorizontalMovementState(HorizontalNeutral);
+					ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
 					break;
 				}
 				else
 				{
 					if (FMath::Sign(_MovementInput.X) != (isFacingRight ? 1.0f : -1.0f))
 					{
-						ChangeHorizontalMovementState(FlyHorizontalTurnAround);
+						ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontalTurnAround);
 						break;
 					}
 					
@@ -426,27 +424,27 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 			Velocity.X = HorizontalSpeed * (isFacingRight ? 1.0f : -1.0f);
 			if (_MovementInput.X != 0.0f && FMath::Sign(_MovementInput.X) != (isFacingRight ? 1.0f : - 1.0f))
 			{
-				ChangeHorizontalMovementState(FlyHorizontalTurnAround);
+				ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontalTurnAround);
 			}
 		}
 		else
 		{
 			HorizontalSpeed = 0;
-			ChangeHorizontalMovementState(HorizontalNeutral);
+			ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
 		}
 		break;
-	case HorizontalTurnAround:
+	case EHorizontalMovementState::HorizontalTurnAround:
 		if (CurrentHorizontalStateTimer < HorizontalTurnaroundTime)
 		{
 			CurrentHorizontalStateTimer++;
 		}
 		else
 		{
-			ChangeHorizontalMovementState(FlyHorizontalStartup);
+			ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontalStartup);
 			isFacingRight = !isFacingRight;
 		}
 		break;
-	case FlyHorizontalStartup:
+	case EHorizontalMovementState::FlyHorizontalStartup:
 		if (_MovementInput.X > 0.0 && isFacingRight || _MovementInput.X < 0.0 && !isFacingRight)
 		{
 			if (CurrentHorizontalStateTimer  < HorizontalFlyStartupTime)
@@ -458,38 +456,38 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 			}
 			else
 			{
-				ChangeHorizontalMovementState(FlyHorizontal);
+				ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontal);
 			}
 		}
 		else
 		{
-			ChangeHorizontalMovementState(HorizontalNeutral);
+			ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
 		}
 
 		break;
-	case FlyHorizontal:
+	case EHorizontalMovementState::FlyHorizontal:
 		if (_MovementInput.X > 0.0 && isFacingRight || _MovementInput.X < 0.0 && !isFacingRight)
 		{
 			Velocity.X = _MovementInput.X * HorizontalSpeed;
 		}
 		else if (_MovementInput.X == 0.0)
 		{
-			ChangeHorizontalMovementState(FlyHorizontalStop);
+			ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontalStop);
 		}
 		else
 		{
 			if (FMath::Abs(_MovementInput.X) > 0.50f)
 			{
-				ChangeHorizontalMovementState(FlyHorizontalTurnAround);
+				ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontalTurnAround);
 			}
 			else
 			{
-				ChangeHorizontalMovementState(HorizontalTurnAround);
+				ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalTurnAround);
 			}
 			
 		}
 		break;
-	case FlyHorizontalTurnAround:
+	case EHorizontalMovementState::FlyHorizontalTurnAround:
 		if (CurrentHorizontalStateTimer < HorizontalFlyTurnaroundTime)
 		{
 			HorizontalSpeed -= FMath::Abs(HorizontalPreviousSpeed) / HorizontalFlyTurnaroundTime;
@@ -513,38 +511,38 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		else
 		{
 			HorizontalSpeed = 0;
-			ChangeHorizontalMovementState(HorizontalNeutral);
+			ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
 			isFacingRight = !isFacingRight;
 		}
 		break;
-	case SprintHorizontal:
+	case EHorizontalMovementState::SprintHorizontal:
 		Velocity.X = (isFacingRight ? 1 : -1) * HorizontalSpeed * SprintSpeedScale;
 		if (_MovementInput.X == 0.0)
 		{
-			ChangeHorizontalMovementState(FlyHorizontalStop);
+			ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontalStop);
 		}
 		else if ((_MovementInput.X > 0.0 && !isFacingRight || _MovementInput.X < 0.0 && isFacingRight))
 		{
-			ChangeHorizontalMovementState(FlyHorizontalTurnAround);
+			ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontalTurnAround);
 		}
 		break;
 	}
 
 	switch (VerticalMovementState)
 	{
-	case VerticalNeutral:
+	case EVerticalMovementState::VerticalNeutral:
 		VerticalSpeed = 0;
 		Velocity.Y = VerticalSpeed;
 		if (_MovementInput.Y < 0.0 && isFacingUp || _MovementInput.Y > 0.0 && !isFacingUp)
 		{
-			ChangeVerticalMovementState(VerticalTurnAround);
+			ChangeVerticalMovementState(EVerticalMovementState::VerticalTurnAround);
 		}
 		else if (_MovementInput.Y > 0.0 && isFacingUp || _MovementInput.Y < 0.0 && !isFacingUp)
 		{
-			ChangeVerticalMovementState(FlyVerticalStartup);
+			ChangeVerticalMovementState(EVerticalMovementState::FlyVerticalStartup);
 		}
 		break;
-	case FlyVerticalStop:
+	case EVerticalMovementState::FlyVerticalStop:
 		if (CurrentVerticalStateTimer < VerticalFlyStopTime)
 		{
 			if (_MovementInput.Y != 0.0f)
@@ -552,14 +550,14 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 				if (CurrentVerticalStateTimer >= VerticalFlyStopCancelFrames)
 				{
 					VerticalSpeed = 0;
-					ChangeVerticalMovementState(VerticalNeutral);
+					ChangeVerticalMovementState(EVerticalMovementState::VerticalNeutral);
 					break;
 				}
 				else
 				{
 					if (FMath::Sign(_MovementInput.Y) != (isFacingUp ? 1.0f : -1.0f))
 					{
-						ChangeVerticalMovementState(FlyVerticalTurnAround);
+						ChangeVerticalMovementState(EVerticalMovementState::FlyVerticalTurnAround);
 						break;
 					}
 
@@ -581,21 +579,21 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		else
 		{
 			VerticalSpeed = 0;
-			ChangeVerticalMovementState(VerticalNeutral);
+			ChangeVerticalMovementState(EVerticalMovementState::VerticalNeutral);
 		}
 		break;
-	case VerticalTurnAround:
+	case EVerticalMovementState::VerticalTurnAround:
 		if (CurrentVerticalStateTimer < VerticalTurnaroundTime)
 		{
 			CurrentVerticalStateTimer++;
 		}
 		else
 		{
-			ChangeVerticalMovementState(FlyVerticalStartup);
+			ChangeVerticalMovementState(EVerticalMovementState::FlyVerticalStartup);
 			isFacingUp = !isFacingUp;
 		}
 		break;
-	case FlyVerticalStartup:
+	case EVerticalMovementState::FlyVerticalStartup:
 		if (_MovementInput.Y > 0.0 && isFacingUp || _MovementInput.Y < 0.0 && !isFacingUp)
 		{
 			if (CurrentVerticalStateTimer * DELTA_TIME < VerticalFlyStartupTime * DELTA_TIME)
@@ -607,16 +605,16 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 			}
 			else
 			{
-				ChangeVerticalMovementState(FlyVertical);
+				ChangeVerticalMovementState(EVerticalMovementState::FlyVertical);
 			}
 		}
 		else
 		{
-			ChangeVerticalMovementState(VerticalNeutral);
+			ChangeVerticalMovementState(EVerticalMovementState::VerticalNeutral);
 		}
 
 		break;
-	case FlyVertical:
+	case EVerticalMovementState::FlyVertical:
 
 		if (_MovementInput.Y > 0.0 && isFacingUp || _MovementInput.Y < 0.0 && !isFacingUp)
 		{
@@ -624,21 +622,21 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		}
 		else if (_MovementInput.Y == 0.0)
 		{
-			ChangeVerticalMovementState(FlyVerticalStop);
+			ChangeVerticalMovementState(EVerticalMovementState::FlyVerticalStop);
 		}
 		else
 		{
 			if (FMath::Abs(_MovementInput.Y) > 0.50f)
 			{
-				ChangeVerticalMovementState(FlyVerticalTurnAround);
+				ChangeVerticalMovementState(EVerticalMovementState::FlyVerticalTurnAround);
 			}
 			else
 			{
-				ChangeVerticalMovementState(VerticalTurnAround);
+				ChangeVerticalMovementState(EVerticalMovementState::VerticalTurnAround);
 			}
 		}
 		break;
-	case FlyVerticalTurnAround:
+	case EVerticalMovementState::FlyVerticalTurnAround:
 		if (CurrentVerticalStateTimer < VerticalFlyTurnaroundTime)
 		{
 			VerticalSpeed -= FMath::Abs(VerticalPreviousSpeed) / VerticalFlyTurnaroundTime;
@@ -664,22 +662,22 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		else
 		{
 			VerticalSpeed = 0;
-			ChangeVerticalMovementState(VerticalNeutral);
+			ChangeVerticalMovementState(EVerticalMovementState::VerticalNeutral);
 			isFacingUp = !isFacingUp;
 		}
 		break;
-	case SprintVertical:
+	case EVerticalMovementState::SprintVertical:
 		if (_MovementInput.Y > 0.0 && isFacingUp || _MovementInput.Y < 0.0 && !isFacingUp)
 		{
 			Velocity.Y = (isFacingUp * 2 - 1) * VerticalSpeed * SprintSpeedScale;
 		}
 		else if (_MovementInput.Y == 0.0)
 		{
-			ChangeVerticalMovementState(FlyVerticalStop);
+			ChangeVerticalMovementState(EVerticalMovementState::FlyVerticalStop);
 		}
 		else
 		{
-			ChangeVerticalMovementState(FlyVerticalTurnAround);
+			ChangeVerticalMovementState(EVerticalMovementState::FlyVerticalTurnAround);
 		}
 		break;
 	}
