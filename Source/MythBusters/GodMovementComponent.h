@@ -229,6 +229,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
+	UFUNCTION(BlueprintCallable)
 	virtual void AddMovementInput(FVector2D Direction, float amount);
 
 	virtual void ComputeNewVelocity();
