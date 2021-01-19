@@ -10,6 +10,22 @@
 #include "god.generated.h"
 
 
+struct SAbstractGod
+{
+	AGod* Ref;
+	FTransform Transform;
+
+	float GodDamage;
+
+	FAttacksSaveState AttackSaveState;
+	SMovementSaveState MovementSaveState;
+
+	void Init(AGod* ref)
+	{
+		Ref = ref;
+	};
+};
+
 enum EInputActionState
 {
 	Released,

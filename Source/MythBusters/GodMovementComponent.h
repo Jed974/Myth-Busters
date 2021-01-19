@@ -12,6 +12,8 @@
 DECLARE_DELEGATE_OneParam(FChangeMovementStateDelegate, EMovementState);
 DECLARE_DELEGATE(FInstantTurnDelegate);
 
+
+
 UENUM(BlueprintType)
 enum class EMovementState : uint8 {
 	Flying,
@@ -23,6 +25,36 @@ enum class EMovementState : uint8 {
 	DeathEjected
 };
 
+UENUM(BlueprintType)
+enum class EHorizontalMovementState : uint8
+{
+	HorizontalNeutral,
+	HorizontalTurnAround,
+	FlyHorizontalStartup,
+	FlyHorizontal,
+	FlyHorizontalTurnAround,
+	FlyHorizontalStop,
+	SprintHorizontalStartup,
+	SprintHorizontal,
+	SprintHorizontalTurnAround,
+	SprintHorizontalStop,
+};
+
+UENUM(BlueprintType)
+enum class EVerticalMovementState : uint8
+{
+	VerticalNeutral,
+	VerticalTurnAround,
+	FlyVerticalStartup,
+	FlyVertical,
+	FlyVerticalTurnAround,
+	FlyVerticalStop,
+	SprintVerticalStartup,
+	SprintVertical,
+	SprintVerticalTurnaround,
+	SprintVerticalStop,
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MYTHBUSTERS_API UGodMovementComponent : public UActorComponent
 {
@@ -31,7 +63,13 @@ public:
 	// Sets default values for this component's properties
 	UGodMovementComponent();
 
+	
+
+
 public:
+
+
+
 
 	FChangeMovementStateDelegate ChangeMovementStateDelegate;
 	FInstantTurnDelegate InstantTurnDelegate;
@@ -129,33 +167,7 @@ public:
 	UPROPERTY(Category = "God Movement: Dash & Sprint", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float SprintSpeedScale;
 
-	enum EHorizontalMovementState
-	{
-		HorizontalNeutral,
-		HorizontalTurnAround,
-		FlyHorizontalStartup,
-		FlyHorizontal,
-		FlyHorizontalTurnAround,
-		FlyHorizontalStop,
-		SprintHorizontalStartup,
-		SprintHorizontal,
-		SprintHorizontalTurnAround,
-		SprintHorizontalStop,
-	};
-
-	enum EVerticalMovementState
-	{
-		VerticalNeutral,
-		VerticalTurnAround,
-		FlyVerticalStartup,
-		FlyVertical,
-		FlyVerticalTurnAround,
-		FlyVerticalStop,
-		SprintVerticalStartup,
-		SprintVertical,
-		SprintVerticalTurnaround,
-		SprintVerticalStop,
-	};
+	
 
 	EHorizontalMovementState HorizontalMovementState;
 	EVerticalMovementState VerticalMovementState;
@@ -235,4 +247,74 @@ public:
 	virtual float GetVelocityNorm();
 
 	bool GetIsFacingRight();
+};
+
+
+struct SMovementSaveState
+{
+	UGodMovementComponent* Ref;
+	EMovementState MovementState;
+	EHorizontalMovementState HorizontalMovementState;
+	EVerticalMovementState VerticalMovementState;
+	FVector2D Velocity;
+	FVector2D DashDir;
+	FVector2D PushVelocity;
+	bool IsPushable;
+	FVector2D EjectionVelocity;
+
+	float HorizontalSpeed;
+	float HorizontalPreviousSpeed;
+	int CurrentHorizontalStateTimer;
+
+	int CurrentVerticalStateTimer;
+	float VerticalSpeed;
+	float VerticalPreviousSpeed;
+
+	int DashFrameCounter = 0;
+	int DashStartupCounter = 0;
+	int DashLagCounter = 0;
+	int EjectionFrameCounter = 0;
+	int WallHitFrameCounter = 0;
+
+	bool isFacingRight;
+	bool isFacingUp;
+
+	AActor* CollidingActor;
+
+	void Init(UGodMovementComponent* ref)
+	{
+		Ref = ref;
+	}
+
+	void Observe()
+	{
+		MovementState = Ref->MovementState;
+		/*EHorizontalMovementState HorizontalMovementState;
+		EVerticalMovementState VerticalMovementState;
+		FVector2D Velocity;
+		FVector2D DashDir;
+		FVector2D PushVelocity;
+		bool IsPushable;
+		FVector2D EjectionVelocity;
+
+		float HorizontalSpeed;
+		float HorizontalPreviousSpeed;
+		int CurrentHorizontalStateTimer;
+
+		int CurrentVerticalStateTimer;
+		float VerticalSpeed;
+		float VerticalPreviousSpeed;
+
+		int DashFrameCounter;
+		int DashStartupCounter;
+		int DashLagCounter;
+		int EjectionFrameCounter;
+		int WallHitFrameCounter;
+
+		bool isFacingRight;
+		bool isFacingUp;
+
+		AActor* CollidingActor;*/
+	}
+
 };

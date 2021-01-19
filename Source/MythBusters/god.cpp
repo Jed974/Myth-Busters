@@ -356,7 +356,7 @@ void AGod::ReleaseDash()
 
 void AGod::ReadInputs(SInputs* _Inputs)
 {
-	AbstractGameState gs = UMythBustersGameInstance::Instance->gs;
+	SAbstractGameState gs = UMythBustersGameInstance::Instance->gs;
 	NonGameState ngs = UMythBustersGameInstance::Instance->ngs;
 	
 	FILE* fp = nullptr;
