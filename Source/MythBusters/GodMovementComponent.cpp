@@ -348,11 +348,8 @@ void UGodMovementComponent::ComputeEjectedVelocity()
 		EjectionFrameCounter = 0;
 		//EjectionVelocity = FVector2D::ZeroVector;
 
-		if (_MovementInput.X != 0)
+		if (_MovementInput.X > 0 && isFacingRight || _MovementInput.X < 0 && !isFacingRight)
 		{
-			isFacingRight = _MovementInput.X > 0;
-			Velocity.X = _MovementInput.X * MaxHorizontalFlySpeed;
-			HorizontalSpeed = FMath::Abs(Velocity.X);
 			ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontal);
 		}
 		else
