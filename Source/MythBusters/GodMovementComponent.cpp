@@ -38,6 +38,9 @@ void UGodMovementComponent::ChangeHorizontalMovementState(EHorizontalMovementSta
 		case EHorizontalMovementState::FlyHorizontalStartup:
 			ChangeMovementState(EMovementState::Flying);
 			break;
+		case EHorizontalMovementState::FlyHorizontal:
+			ChangeMovementState(EMovementState::Flying);
+			break;
 		case EHorizontalMovementState::FlyHorizontalTurnAround:
 			ChangeMovementState(EMovementState::FlyingTurnaroud);
 			break;
@@ -292,19 +295,27 @@ void UGodMovementComponent::ComputeDashingVelocity()
 	else if (DashFrameCounter < DashFrames)
 	{
 		const float Alpha = float(DashFrameCounter) / DashFrames;
-		Velocity.X = FMath::Lerp(DashingSpeed * DashDir.X, 0.0f, DashSpeedProfile.EditorCurveData.Eval(Alpha));
-		Velocity.Y = FMath::Lerp(DashingSpeed * DashDir.Y, 0.0f, DashSpeedProfile.EditorCurveData.Eval(Alpha));
+		Velocity.X = FMath::Lerp(DashingSpeed, MaxHorizontalFlySpeed * FMath::Sign(DashDir.X), DashSpeedProfile.EditorCurveData.Eval(Alpha)) * DashDir.X;
+		Velocity.Y = FMath::Lerp(DashingSpeed, MaxVerticalFlySpeed * FMath::Sign(DashDir.Y), DashSpeedProfile.EditorCurveData.Eval(Alpha)) * DashDir.Y;
 		DashFrameCounter++;
 	}
 	else
 	{
 		if (DashLagCounter < DashLagFrames)
 		{
+			//Velocity = FVector2D();
 			DashLagCounter++;
 		}
 		else
 		{
-			ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
+			if (_MovementInput.X > 0 && isFacingRight || _MovementInput.X < 0 && !isFacingRight)
+			{
+				ChangeHorizontalMovementState(EHorizontalMovementState::FlyHorizontal);
+			}
+			else
+			{
+				ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
+			}
 			ChangeVerticalMovementState(EVerticalMovementState::VerticalNeutral);
 		}
 		
