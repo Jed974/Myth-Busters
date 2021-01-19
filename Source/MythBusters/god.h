@@ -6,6 +6,7 @@
 #include "Shield.h"
 #include "GodMovementComponent.h"
 #include "GodAttackComponent.h"
+#include "GodBoostComponent.h"
 #include "GameFramework/Actor.h"
 #include "god.generated.h"
 
@@ -180,6 +181,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
 		UGodAttackComponent* GodAttack;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Boost", meta = (AllowPrivateAccess = "true"))
+		UGodBoostComponent* GodBoost;
+
 
 	float HorizontalDeadZone = 0.15f;
 	float VerticalDeadZone = 0.15f;
@@ -200,6 +204,13 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		bool netplay = false;
+
+	// Boolean de GameMode:
+	bool canDash = true;
+	bool canAttNorm = true;
+	bool canAttSpe = true;
+	bool canAttPush = true;
+	bool canShield = true;
 
 protected:
 	// Called when the game starts or when spawned
@@ -293,7 +304,11 @@ public:
 
     // Called to bind functionality to input
     virtual void SetupPlayerInputComponent(UInputComponent *PlayerInputComponent) override;
+	// Called to Setup what the god can do
+	UFUNCTION(BlueprintCallable)
+	void SetupGodLimitation(bool _canDash, bool _canAttNorm, bool _canAttSpe, bool _canAttPush, bool _canShield);
 
+	// Called by GodAnimInstance to get values nec. for animations blendSpace
 	virtual float GetAnimValues(int _idValueToGet);
 
 	virtual USkeletalMeshComponent* GetSkeletalMesh();

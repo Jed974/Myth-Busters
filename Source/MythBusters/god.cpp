@@ -25,6 +25,8 @@ AGod::AGod()
 	GodMovement->InstantTurnDelegate.BindUObject(this, &AGod::InstantTurn);
 
 	GodAttack = CreateDefaultSubobject<UGodAttackComponent>("GodAttackComponent");
+
+	GodBoost = CreateDefaultSubobject<UGodBoostComponent>("GodBoostComponent");
 }
 
 // Called when the game starts or when spawned
@@ -100,24 +102,25 @@ void AGod::MoveVertical(float AxisValue)
 
 void AGod::AttackNormal()
 {
-	switch (State)
-	{
-	case EGodState::Flying:
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Flying");
-		if (GodAttack->StartNormalAttack(attackState)) {
-			EAttackNormal();
-			ChangeGodState(EGodState::Attacking);
+	if (canAttNorm) {
+		switch (State)
+		{
+		case EGodState::Flying:
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Flying");
+			if (GodAttack->StartNormalAttack(attackState)) {
+				EAttackNormal();
+				ChangeGodState(EGodState::Attacking);
+			}
+			break;
+		case EGodState::FlyingTurnaround:
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Backward attack");
+			if (GodAttack->StartNormalAttack(attackState)) {
+				EAttackNormal();
+				ChangeGodState(EGodState::Attacking);
+			}
+			break;
 		}
-		break;
-	case EGodState::FlyingTurnaround:
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Backward attack");
-		if (GodAttack->StartNormalAttack(attackState)) {
-			EAttackNormal();
-			ChangeGodState(EGodState::Attacking);
-		}
-		break;
-	}
-	
+	}	
 }
 void AGod::StopAttackNormal()
 {
@@ -125,12 +128,23 @@ void AGod::StopAttackNormal()
 }
 void AGod::AttackSpecial()
 {
-	switch (State)
-	{
-	case EGodState::Flying:
-		GodAttack->StartSpecialAttack(attackState);
-		EAttackSpecial();
-		break;
+	if (canAttSpe) {
+		switch (State)
+		{
+		case EGodState::Flying:
+			if (GodAttack->StartSpecialAttack(attackState)) {
+				EAttackSpecial();
+				ChangeGodState(EGodState::Attacking);
+			}
+			break;
+		case EGodState::FlyingTurnaround:
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Backward attack");
+			if (GodAttack->StartSpecialAttack(attackState)) {
+				EAttackSpecial();
+				ChangeGodState(EGodState::Attacking);
+			}
+			break;
+		}
 	}
 }
 void AGod::StopAttackSpecial()
@@ -139,12 +153,23 @@ void AGod::StopAttackSpecial()
 }
 void AGod::AttackPush()
 {
-	switch (State)
-	{
-	case EGodState::Flying:
-		GodAttack->StartPushAttack(attackState);
-		EAttackPush();
-		break;
+	if (canAttPush) {
+		switch (State)
+		{
+		case EGodState::Flying:
+			if (GodAttack->StartPushAttack(attackState)) {
+				EAttackPush();
+				ChangeGodState(EGodState::Attacking);
+			}
+			break;
+		case EGodState::FlyingTurnaround:
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Backward attack");
+			if (GodAttack->StartPushAttack(attackState)) {
+				EAttackPush();
+				ChangeGodState(EGodState::Attacking);
+			}
+			break;
+		}
 	}
 }
 void AGod::StopAttackPush()
@@ -152,22 +177,24 @@ void AGod::StopAttackPush()
 	EStopAttackPush();
 }
 
-void AGod::Shield()
+void AGod::Shield()		// TODO ------------------------------------- Mettre un délai sur le bouclier/coolDown -----------------------------
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Shielding !");
+	if (canShield) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Shielding !");
 
-	FTransform _spawnTransform = GetRootComponent()->GetComponentTransform();
-	FActorSpawnParameters _spawnParams;
-	_spawnParams.Instigator = this;
+		FTransform _spawnTransform = GetRootComponent()->GetComponentTransform();
+		FActorSpawnParameters _spawnParams;
+		_spawnParams.Instigator = this;
 
-	CurrentShield = GetWorld()->SpawnActor<AShield>(ShieldClassToSpwan, _spawnTransform.GetLocation(), _spawnTransform.GetRotation().Rotator(), _spawnParams);
+		CurrentShield = GetWorld()->SpawnActor<AShield>(ShieldClassToSpwan, _spawnTransform.GetLocation(), _spawnTransform.GetRotation().Rotator(), _spawnParams);
 
-	FAttachmentTransformRules _attTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
-	CurrentShield->AttachToComponent(CapsuleComponent, _attTransformRules);
-	CurrentShield->InitShield(ShieldSize, ShieldFresnelColor, ShieldBaseColor);
-	ChangeGodState(EGodState::Shielding);
+		FAttachmentTransformRules _attTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
+		CurrentShield->AttachToComponent(CapsuleComponent, _attTransformRules);
+		CurrentShield->InitShield(ShieldSize, ShieldFresnelColor, ShieldBaseColor);
+		ChangeGodState(EGodState::Shielding);
 
-	EShield();
+		EShield();
+	}
 }
 void AGod::StopShield()
 {
@@ -189,12 +216,14 @@ void AGod::Eject(FVector2D _EjectionSpeed)
 
 void AGod::Dash()
 {
-	switch (State)
-	{
+	if (canDash) {
+		switch (State)
+		{
 		case EGodState::Flying:
 			ChangeGodState(EGodState::Dashing);
 			GodMovement->Dash();
 			break;
+		}
 	}	
 }
 void AGod::StopDash()
@@ -297,12 +326,10 @@ void AGod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 void AGod::WriteInputs(EInputSpecifier Specifier, float Value)
 {
 	Inputs.Update(Specifier, Value);
-
 }
 void AGod::WriteInputs(EInputSpecifier Specifier, EInputActionState ActionState)
 {
 	Inputs.Update(Specifier, ActionState);
-
 }
 void AGod::WriteVerticalAxis(float Value)
 {
@@ -450,6 +477,15 @@ void AGod::ReadInputs(SInputs* _Inputs)
 	}
 	
 }
+void AGod::SetupGodLimitation(bool _canDash, bool _canAttNorm, bool _canAttSpe, bool _canAttPush, bool _canShield) {
+	canDash = _canDash;
+	canAttNorm = _canAttNorm;
+	canAttSpe = _canAttSpe;
+	canAttPush = _canAttPush;
+	canShield = _canShield;
+}
+
+
 
 float AGod::GetAnimValues(int _idValueToGet) {
 	switch (_idValueToGet) {
