@@ -10,22 +10,6 @@
 #include "god.generated.h"
 
 
-struct SAbstractGod
-{
-	AGod* Ref;
-	FTransform Transform;
-
-	float GodDamage;
-
-	FAttacksSaveState AttackSaveState;
-	SMovementSaveState MovementSaveState;
-
-	void Init(AGod* ref)
-	{
-		Ref = ref;
-	};
-};
-
 enum EInputActionState
 {
 	Released,
@@ -324,4 +308,37 @@ public:
 
 	void HandleAttackNotify(ENotifyType notifyType);
 	void RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack);
+};
+
+
+struct SAbstractGod
+{
+	AGod* Ref;
+	FTransform Transform;
+
+	float GodDamage;
+
+	FAttacksSaveState AttackSaveState;
+	SMovementSaveState MovementSaveState;
+
+	void Init(AGod* ref)
+	{
+		Ref = ref;
+		AttackSaveState = FAttacksSaveState();
+		MovementSaveState = SMovementSaveState();
+	};
+
+	void Observe()
+	{
+		Transform = Ref->GetActorTransform();
+		GodDamage = Ref->GodDamage;
+		MovementSaveState.Observe();
+	};
+
+	void Apply()
+	{
+		Ref->SetActorTransform(Transform);
+		Ref->GodDamage = GodDamage;
+		MovementSaveState.Apply();
+	};
 };

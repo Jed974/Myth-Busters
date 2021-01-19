@@ -17,14 +17,6 @@
 #define FRAME_DELAY     2
 //#define SYNC_TEST
 
-struct AbstractCharacter
-{
-    AGod* Ref;
-    FTransform Transform;
-    FVector2D velocity;
-    float damage;
-};
-
 
 struct MYTHBUSTERS_API SAbstractGameState
 {
@@ -36,10 +28,7 @@ struct MYTHBUSTERS_API SAbstractGameState
         {
             AGod* god = (AGod*)Instance->GetLocalPlayers()[i]->PlayerController->GetPawn();
             SAbstractGod AbstractGod = SAbstractGod();
-            //AbstractGod.Init(god);
-            AbstractGod.Transform = god->GetActorTransform();
-            //AbstractGod.velocity = god->GetGodMovementComponent()->Velocity;
-            //AbstractGod.damage = god->GodDamage;
+            AbstractGod.Init(god);
             Gods.Add(AbstractGod);
         }
         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "GameState Initiated");
@@ -53,7 +42,7 @@ struct MYTHBUSTERS_API SAbstractGameState
             if (Gods[i].Ref != nullptr)
             {
                 
-                Gods[i].Ref->SetActorTransform(Gods[i].Transform);
+                //Gods[i].Ref->SetActorTransform(Gods[i].Transform);
                 //Gods[i].ref->GetGodMovementComponent()->Velocity = Gods[i].velocity;
                 //Gods[i].ref->GodDamage = Gods[i].damage;
             }
@@ -69,7 +58,7 @@ struct MYTHBUSTERS_API SAbstractGameState
             if (Gods[i].Ref != nullptr)
             {
                 //GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Saving Character " + FString::FromInt(i));
-                Gods[i].Transform = Gods[i].Ref->GetActorTransform();
+                //Gods[i].Transform = Gods[i].Ref->GetActorTransform();
                 //characters[i].velocity = characters[i].ref->GetGodMovementComponent()->Velocity;
                 //characters[i].damage = characters[i].ref->GodDamage;
             }

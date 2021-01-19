@@ -150,6 +150,7 @@ void UGodMovementComponent::Dash()
 void UGodMovementComponent::Eject(FVector2D _EjectionSpeed) {
 	EjectionVelocity = _EjectionSpeed;
 	isFacingRight = EjectionVelocity.X < 0;
+	InstantTurnDelegate.ExecuteIfBound();
 	isFacingUp = EjectionVelocity.Y < 0;
 	ChangeMovementState(EMovementState::Ejected);
 }

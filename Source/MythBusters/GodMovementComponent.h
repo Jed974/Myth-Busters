@@ -180,15 +180,12 @@ public:
 	bool IsPushable;
 	FVector2D EjectionVelocity;
 
-
-protected:
-	
 	FVector2D _MovementInput;
 
 	float HorizontalSpeed;
 	float HorizontalPreviousSpeed;
 	int CurrentHorizontalStateTimer;
-	
+
 	int CurrentVerticalStateTimer;
 	float VerticalSpeed;
 	float VerticalPreviousSpeed;
@@ -198,8 +195,6 @@ protected:
 	int DashLagCounter = 0;
 	int EjectionFrameCounter = 0;
 	int WallHitFrameCounter = 0;
-	
-	float DELTA_TIME;
 
 	UPROPERTY(BlueprintReadOnly)
 		bool isFacingRight;
@@ -207,6 +202,14 @@ protected:
 		bool isFacingUp;
 	UPROPERTY(BlueprintReadWrite)
 		AActor* CollidingActor;
+
+protected:
+	
+	
+	
+	float DELTA_TIME;
+
+	
 
 protected:
 	// Called when the game starts
@@ -256,11 +259,8 @@ struct SMovementSaveState
 	EMovementState MovementState;
 	EHorizontalMovementState HorizontalMovementState;
 	EVerticalMovementState VerticalMovementState;
-	FVector2D Velocity;
 	FVector2D DashDir;
-	FVector2D PushVelocity;
 	bool IsPushable;
-	FVector2D EjectionVelocity;
 
 	float HorizontalSpeed;
 	float HorizontalPreviousSpeed;
@@ -270,11 +270,11 @@ struct SMovementSaveState
 	float VerticalSpeed;
 	float VerticalPreviousSpeed;
 
-	int DashFrameCounter = 0;
-	int DashStartupCounter = 0;
-	int DashLagCounter = 0;
-	int EjectionFrameCounter = 0;
-	int WallHitFrameCounter = 0;
+	int DashFrameCounter;
+	int DashStartupCounter;
+	int DashLagCounter;
+	int EjectionFrameCounter;
+	int WallHitFrameCounter;
 
 	bool isFacingRight;
 	bool isFacingUp;
@@ -289,32 +289,57 @@ struct SMovementSaveState
 	void Observe()
 	{
 		MovementState = Ref->MovementState;
-		/*EHorizontalMovementState HorizontalMovementState;
-		EVerticalMovementState VerticalMovementState;
-		FVector2D Velocity;
-		FVector2D DashDir;
-		FVector2D PushVelocity;
-		bool IsPushable;
-		FVector2D EjectionVelocity;
+		HorizontalMovementState = Ref->HorizontalMovementState;
+		VerticalMovementState = Ref->VerticalMovementState;
+		DashDir = Ref->DashDir;
+		IsPushable = Ref->IsPushable;
 
-		float HorizontalSpeed;
-		float HorizontalPreviousSpeed;
-		int CurrentHorizontalStateTimer;
+		HorizontalSpeed = Ref->HorizontalSpeed;
+		HorizontalPreviousSpeed = Ref->HorizontalPreviousSpeed;
+		CurrentHorizontalStateTimer = Ref->CurrentHorizontalStateTimer;
 
-		int CurrentVerticalStateTimer;
-		float VerticalSpeed;
-		float VerticalPreviousSpeed;
+		CurrentVerticalStateTimer = Ref->CurrentVerticalStateTimer;
+		VerticalSpeed = Ref->VerticalSpeed;
+		VerticalPreviousSpeed = Ref->VerticalPreviousSpeed;
 
-		int DashFrameCounter;
-		int DashStartupCounter;
-		int DashLagCounter;
-		int EjectionFrameCounter;
-		int WallHitFrameCounter;
+		DashFrameCounter = Ref->DashFrameCounter;
+		DashStartupCounter = Ref->DashStartupCounter;
+		DashLagCounter = Ref->DashLagCounter;
+		EjectionFrameCounter = Ref->EjectionFrameCounter;
+		WallHitFrameCounter = Ref->WallHitFrameCounter;
 
-		bool isFacingRight;
-		bool isFacingUp;
+		isFacingRight = Ref->isFacingRight;
+		isFacingUp = Ref->isFacingUp;
 
-		AActor* CollidingActor;*/
+		CollidingActor = Ref->CollidingActor;
+	};
+
+	void Apply()
+	{
+		Ref->MovementState = MovementState;
+		Ref->HorizontalMovementState = HorizontalMovementState;
+		Ref->VerticalMovementState = VerticalMovementState;
+		Ref->DashDir = DashDir;
+		Ref->IsPushable = IsPushable;
+
+		Ref->HorizontalSpeed = HorizontalSpeed;
+		Ref->HorizontalPreviousSpeed = HorizontalPreviousSpeed;
+		Ref->CurrentHorizontalStateTimer = CurrentHorizontalStateTimer;
+
+		Ref->CurrentVerticalStateTimer = CurrentVerticalStateTimer;
+		Ref->VerticalSpeed = VerticalSpeed;
+		Ref->VerticalPreviousSpeed = VerticalPreviousSpeed;
+
+		Ref->DashFrameCounter = DashFrameCounter;
+		Ref->DashStartupCounter = DashStartupCounter;
+		Ref->DashLagCounter = DashLagCounter;
+		Ref->EjectionFrameCounter = EjectionFrameCounter;
+		Ref->WallHitFrameCounter = WallHitFrameCounter;
+
+		Ref->isFacingRight = isFacingRight;
+		Ref->isFacingUp = isFacingUp;
+
+		Ref->CollidingActor = CollidingActor;
 	}
 
 };
