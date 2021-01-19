@@ -271,10 +271,14 @@ void UGodMovementComponent::ComputeDashingVelocity()
 		if (FMath::Abs(_MovementInput.X) > 0.1)
 		{
 			DashDir.X = _MovementInput.X;
+			isFacingRight = _MovementInput.X > 0;
+			InstantTurnDelegate.ExecuteIfBound();
 		}
 		else
 		{
 			DashDir.X = isFacingRight ? 1 : -1;
+			
+			
 		}
 		
 		if (FMath::Abs(_MovementInput.Y) > 0.1)
