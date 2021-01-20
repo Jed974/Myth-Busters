@@ -150,7 +150,6 @@ bool __cdecl mb_advance_frame_callback(int)
  */
 bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Rollback !");
     memcpy(&UMythBustersGameInstance::Instance->gs, buffer, len);
     UMythBustersGameInstance::Instance->rollbacking = true;
     GEngine->GameViewport->bDisableWorldRendering = true;
@@ -178,8 +177,8 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
  */
 bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-    SAbstractGameState gs = UMythBustersGameInstance::Instance->gs;
-    /*FILE* fp = nullptr;
+    /*SAbstractGameState gs = UMythBustersGameInstance::Instance->gs;
+    FILE* fp = nullptr;
     fopen_s(&fp, "LogInput.txt", "a");
     if (fp)
     {
@@ -582,15 +581,11 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
           }
 
       }
-      /*else
+      else
       {
 
           GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Waiting for other instance");
-          AGod* RemoteGod = (AGod*)GetLocalPlayers()[1]->PlayerController->GetPawn();
-          LocalGod->GGPOInputs = SInputs();
-          RemoteGod->GGPOInputs = SInputs();
-          Sleep(1000 * 1.0f / 60);
-      }*/
+      }
       
   }
 

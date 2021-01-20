@@ -389,10 +389,10 @@ void AGod::ReleaseDash()
 
 void AGod::ReadInputs(SInputs* _Inputs)
 {
-	SAbstractGameState gs = UMythBustersGameInstance::Instance->gs;
+	/*SAbstractGameState gs = UMythBustersGameInstance::Instance->gs;
 	NonGameState ngs = UMythBustersGameInstance::Instance->ngs;
 	
-	/*FILE* fp = nullptr;
+*FILE* fp = nullptr;
 	fopen_s(&fp, "ReadInputsLog.txt", "a");
 	if (fp)
 	{

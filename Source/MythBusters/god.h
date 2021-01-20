@@ -349,6 +349,7 @@ struct SAbstractGod
 		Ref = ref;
 		AttackSaveState = FAttacksSaveState();
 		MovementSaveState = SMovementSaveState();
+		MovementSaveState.Init(Ref->GetGodMovementComponent());
 	};
 
 	void Observe()
