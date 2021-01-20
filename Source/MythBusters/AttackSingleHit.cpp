@@ -16,8 +16,10 @@ void UAttackSingleHit::StartAttack() {
 }
 
 void UAttackSingleHit::StopAttack() {
-	DestroyHitBoxGroup();
-	attackState = EAttackState::OFF;
+	if (attackState != EAttackState::OFF) {
+		DestroyHitBoxGroup();
+		attackState = EAttackState::OFF;
+	}
 }
 
 

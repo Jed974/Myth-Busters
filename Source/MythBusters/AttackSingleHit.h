@@ -13,7 +13,7 @@ UCLASS()
 class MYTHBUSTERS_API UAttackSingleHit : public UAttack
 {
 	GENERATED_BODY()
-	
+
 public :
 	UPROPERTY(Category = "HitCreation", EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<AHitBoxGroup> hitBoxGroupToSpawn;

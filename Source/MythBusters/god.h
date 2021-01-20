@@ -316,7 +316,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		virtual void ChangeGodState(EGodState NewState);
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		EGodState State;
 
 	bool canMove = true;

@@ -106,14 +106,14 @@ void AGod::AttackNormal()
 		switch (State)
 		{
 		case EGodState::Flying:
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Flying");
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Kaka");
 			if (GodAttack->StartNormalAttack(attackState)) {
 				EAttackNormal();
 				ChangeGodState(EGodState::Attacking);
 			}
 			break;
 		case EGodState::FlyingTurnaround:
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "Backward attack");
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Kolé o kuku");
 			if (GodAttack->StartNormalAttack(attackState)) {
 				EAttackNormal();
 				ChangeGodState(EGodState::Attacking);
@@ -240,6 +240,12 @@ void AGod::ChangeGodState(EGodState NewState)
 {
 	/*if (State == EGodState::Shielding && NewState != EGodState::Shielding)
 		StopShield();*/
+
+	// Security anti-attack-lock
+	if (State == EGodState::Attacking && GodAttack->GetIsCurrentAttack()) {
+		GodAttack->InterruptAttack();
+	}
+
 	State = NewState;
 	canMove = true;
 	switch (State)
