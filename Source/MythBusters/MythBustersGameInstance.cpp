@@ -275,9 +275,9 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
   UMythBustersGameInstance::~UMythBustersGameInstance()
   {
       MythBusters_DisconnectPlayer(GGPOPlayerIndex);
-      FILE* fp = nullptr;
+      /*FILE* fp = nullptr;
       fopen_s(&fp, "LogInput.txt", "w");
-      fclose(fp);
+      fclose(fp);*/
       MythBusters_Exit();
   }
 
