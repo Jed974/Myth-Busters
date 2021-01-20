@@ -215,6 +215,18 @@ bool UGodAttackComponent::StartPushAttack(EAttackDirection _attackDirection) {
 	else
 		return false;
 }
+void UGodAttackComponent::InterruptAttack() {
+	for (auto& att : Attacks) {
+		if (att != nullptr) {
+			att->StopAttack();
+		}
+	}
+	currentAttack = -1;
+}
+
+bool UGodAttackComponent::GetIsCurrentAttack() const {
+	return currentAttack > -1;
+}
 
 void UGodAttackComponent::TransmitNotify(ENotifyType _notifyType) {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::White, "Notify avec l'atk : " + FString::SanitizeFloat(currentAttack));

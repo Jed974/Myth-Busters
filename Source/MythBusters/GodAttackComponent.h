@@ -114,6 +114,10 @@ public:
 	bool StartSpecialAttack(EAttackDirection _attackDirection);
 	UFUNCTION(BlueprintCallable)
 	bool StartPushAttack(EAttackDirection _attackDirection);
+	UFUNCTION(BlueprintCallable)
+	void InterruptAttack();
+
+	bool GetIsCurrentAttack() const;
 	
 	void TransmitNotify(ENotifyType _notifyType);
 

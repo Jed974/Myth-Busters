@@ -240,6 +240,12 @@ void AGod::ChangeGodState(EGodState NewState)
 {
 	/*if (State == EGodState::Shielding && NewState != EGodState::Shielding)
 		StopShield();*/
+
+	// Security anti-attack-lock
+	if (State == EGodState::Attacking && GodAttack->GetIsCurrentAttack()) {
+		GodAttack->InterruptAttack();
+	}
+
 	State = NewState;
 	canMove = true;
 	switch (State)

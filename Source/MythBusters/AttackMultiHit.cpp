@@ -15,8 +15,10 @@ void UAttackMultiHit::StartAttack() {
 	PlayMontageFromCurrentState(0);
 }
 void UAttackMultiHit::StopAttack() {
-	DestroyHitBoxGroup();
-	attackState = EAttackState::OFF;
+	if (attackState != EAttackState::OFF) {
+		DestroyHitBoxGroup();
+		attackState = EAttackState::OFF;
+	}
 }
 
 
@@ -53,14 +55,16 @@ void UAttackMultiHit::SpwanHitBoxGroup(int id) {
 }
 
 void UAttackMultiHit::DestroyHitBoxGroup() {
-	bool destroySuccess = hitBoxGroup->Destroy();
-	if (destroySuccess)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Destroy successful");
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroy failed");
-	hitBoxGroup = nullptr;
+	if (hitBoxGroup != nullptr) {
+		bool destroySuccess = hitBoxGroup->Destroy();
+		if (destroySuccess)
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Destroy successful");
+		else
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroy failed");
+		hitBoxGroup = nullptr;
 
-	attackState = EAttackState::RECOVER;
+		attackState = EAttackState::RECOVER;
+	}
 }
 
 void UAttackMultiHit::ApplySaveState(UAttackSaveState _saveState) {
