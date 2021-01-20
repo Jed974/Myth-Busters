@@ -396,7 +396,7 @@ void AGod::ReadInputs(SInputs* _Inputs)
 	fopen_s(&fp, "ReadInputsLog.txt", "a");
 	if (fp)
 	{
-		fprintf(fp, "  Frame %i - Player %i : %f\n", UMythBustersGameInstance::Instance->gs._framenumber, GetController()->GetUniqueID() , GGPOInputs.HorizontalAxis.Value);
+		fprintf(fp, "  Frame %i - Player %i : %f\n", UMythBustersGameInstance::Instance->gs._framenumber, GetController()->GetUniqueID() , GGPOInputs.VerticalAxis.Value);
 		fclose(fp);
 	}
 	MoveHorizontal(_Inputs->HorizontalAxis.Value);
