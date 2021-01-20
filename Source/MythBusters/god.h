@@ -311,7 +311,7 @@ public:
 	// Called by GodAnimInstance to get values nec. for animations blendSpace
 	virtual float GetAnimValues(int _idValueToGet);
 
-	virtual USkeletalMeshComponent* GetSkeletalMesh();
+	USkeletalMeshComponent* GetSkeletalMesh();
 
 	UFUNCTION(BlueprintCallable)
 		virtual void ChangeGodState(EGodState NewState);
@@ -322,6 +322,7 @@ public:
 	bool canMove = true;
 
 	UGodMovementComponent* GetGodMovementComponent() { return GodMovement; };
+	UGodBoostComponent* GetGodBoostComponent() { return GodBoost; };
 
 	void HandleAttackNotify(ENotifyType notifyType);
 	void RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack);

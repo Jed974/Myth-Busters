@@ -99,6 +99,7 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	if (CollidingActor != nullptr && IsPushable && CollidingActor->Tags.Contains(FName("Pusher")))
 	{		
 		ComputePushVelocity(CollidingActor);
+		
 		Location.X += PushVelocity.X * DELTA_TIME;
 		Location.Z += PushVelocity.Y * DELTA_TIME;
 	}
@@ -114,8 +115,9 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		ComputeNewVelocity();
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, Velocity.ToString());
-		Location.X += Velocity.X * DELTA_TIME;
-		Location.Z += Velocity.Y * DELTA_TIME;
+		float speedBoost = Cast<AGod>(GetOwner())->GetGodBoostComponent()->GetBoost(EBoostType::SPEED);
+		Location.X += Velocity.X * DELTA_TIME * speedBoost;
+		Location.Z += Velocity.Y * DELTA_TIME * speedBoost;
 		
 		GetOwner()->SetActorLocation(Location, true, &HitInfo);
 		if (HitInfo.GetActor() != nullptr)
@@ -142,7 +144,7 @@ void UGodMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UGodMovementComponent::AddMovementInput(const FVector2D Direction, const float Amount)
 {
-	_MovementInput += Direction * FMath::Clamp(Amount, -1.f, 1.f);
+	_MovementInput += Direction * FMath::Clamp(Amount, -1.f, 1.f);	// HERE ????????????????????????????????????????????????????????????
 }
 
 void UGodMovementComponent::Dash()
@@ -299,8 +301,9 @@ void UGodMovementComponent::ComputeDashingVelocity()
 	else if (DashFrameCounter < DashFrames)
 	{
 		const float Alpha = float(DashFrameCounter) / DashFrames;
-		Velocity.X = FMath::Lerp(DashingSpeed, MaxHorizontalFlySpeed * FMath::Sign(DashDir.X), DashSpeedProfile.EditorCurveData.Eval(Alpha)) * DashDir.X;
-		Velocity.Y = FMath::Lerp(DashingSpeed, MaxVerticalFlySpeed * FMath::Sign(DashDir.Y), DashSpeedProfile.EditorCurveData.Eval(Alpha)) * DashDir.Y;
+		float dashBoost = Cast<AGod>(GetOwner())->GetGodBoostComponent()->GetBoost(EBoostType::DASH);
+		Velocity.X = FMath::Lerp(DashingSpeed, MaxHorizontalFlySpeed * FMath::Sign(DashDir.X), DashSpeedProfile.EditorCurveData.Eval(Alpha)) * DashDir.X * dashBoost;
+		Velocity.Y = FMath::Lerp(DashingSpeed, MaxVerticalFlySpeed * FMath::Sign(DashDir.Y), DashSpeedProfile.EditorCurveData.Eval(Alpha)) * DashDir.Y * dashBoost;
 		DashFrameCounter++;
 	}
 	else

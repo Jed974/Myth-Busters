@@ -10,10 +10,10 @@
 UENUM(BlueprintType)
 enum class EBoostType : uint8 {
 	SPEED,
+	DASH,
 	SHIELD,
 	ATTACK,
-	SPECIAL,
-	PUSH
+	EJECTION,
 };
 USTRUCT(BlueprintType)
 struct MYTHBUSTERS_API FBoost {

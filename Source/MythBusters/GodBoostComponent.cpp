@@ -9,7 +9,7 @@ FBoost::FBoost() : frameAlive(0), tempPercent(0), definitivePercent(0) {}
 UGodBoostComponent::UGodBoostComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	boosts.Init(FBoost(), 5);
+	boosts.Init(FBoost(), 6);
 }
 
 
