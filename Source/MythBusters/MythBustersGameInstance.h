@@ -41,7 +41,7 @@ struct MYTHBUSTERS_API SAbstractGameState
         {
             if (Gods[i].Ref != nullptr)
             {
-                
+                Gods[i].Apply();
                 //Gods[i].Ref->SetActorTransform(Gods[i].Transform);
                 //Gods[i].ref->GetGodMovementComponent()->Velocity = Gods[i].velocity;
                 //Gods[i].ref->GodDamage = Gods[i].damage;
@@ -57,6 +57,7 @@ struct MYTHBUSTERS_API SAbstractGameState
         {
             if (Gods[i].Ref != nullptr)
             {
+                Gods[i].Observe();
                 //GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Saving Character " + FString::FromInt(i));
                 //Gods[i].Transform = Gods[i].Ref->GetActorTransform();
                 //characters[i].velocity = characters[i].ref->GetGodMovementComponent()->Velocity;
