@@ -260,9 +260,6 @@ struct SMovementSaveState
 	EMovementState MovementState;
 	EHorizontalMovementState HorizontalMovementState;
 	EVerticalMovementState VerticalMovementState;
-	FVector2D Velocity;
-	FVector2D PushVelocity;
-	FVector2D EjectionVelocity;
 	FVector2D DashDir;
 	bool IsPushable;
 
@@ -295,9 +292,6 @@ struct SMovementSaveState
 		MovementState = Ref->MovementState;
 		HorizontalMovementState = Ref->HorizontalMovementState;
 		VerticalMovementState = Ref->VerticalMovementState;
-		Velocity = Ref->Velocity;
-		PushVelocity = Ref->PushVelocity;
-		EjectionVelocity = Ref->EjectionVelocity;
 		DashDir = Ref->DashDir;
 		IsPushable = Ref->IsPushable;
 
@@ -326,9 +320,6 @@ struct SMovementSaveState
 		Ref->MovementState = MovementState;
 		Ref->HorizontalMovementState = HorizontalMovementState;
 		Ref->VerticalMovementState = VerticalMovementState;
-		Ref->Velocity = Velocity;
-		Ref->PushVelocity = PushVelocity;
-		Ref->EjectionVelocity = EjectionVelocity;
 		Ref->DashDir = DashDir;
 		Ref->IsPushable = IsPushable;
 
