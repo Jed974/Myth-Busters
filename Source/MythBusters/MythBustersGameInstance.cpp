@@ -487,6 +487,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         ngs.periodic = ngs.now;
     }
 
+    InputsReadyForFrame = true;
 
     // Update the performance monitor display.
     /*GGPOPlayerHandle handles[MAX_PLAYERS];
@@ -667,9 +668,13 @@ void UMythBustersGameInstance::MythBusters_Idle(int timeout)
 
 void UMythBustersGameInstance::MythBusters_NextFrame()
 {
-    gs._framenumber += 1;
-    // Notify ggpo that we've moved forward exactly 1 frame.
-    ggpo_advance_frame(ggpo);
+    if (InputsReadyForFrame)
+    {
+        gs._framenumber += 1;
+        // Notify ggpo that we've moved forward exactly 1 frame.
+        ggpo_advance_frame(ggpo);
+    }
+    
 }
 
 void UMythBustersGameInstance::MainThreadSleep(float time)
