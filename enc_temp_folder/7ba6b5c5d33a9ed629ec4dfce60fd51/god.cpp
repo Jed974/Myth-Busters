@@ -392,13 +392,13 @@ void AGod::ReadInputs(SInputs* _Inputs)
 	/*SAbstractGameState gs = UMythBustersGameInstance::Instance->gs;
 	NonGameState ngs = UMythBustersGameInstance::Instance->ngs;*/
 	
-	/*FILE* fp = nullptr;
+	FILE* fp = nullptr;
 	fopen_s(&fp, "ReadInputsLog.txt", "a");
 	if (fp)
 	{
 		fprintf(fp, "  Frame %i - Player %i : %f\n", UMythBustersGameInstance::Instance->gs._framenumber, GetController()->GetUniqueID() , GGPOInputs.VerticalAxis.Value);
 		fclose(fp);
-	}*/
+	}
 	MoveHorizontal(_Inputs->HorizontalAxis.Value);
 	MoveVertical(_Inputs->VerticalAxis.Value);
 	if (!_Inputs->InputActions[NORMAL].Consumed)
