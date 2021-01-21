@@ -221,5 +221,5 @@ public:
 	//UMythBustersGameInstance* Instance;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        TArray<int> SelectedGods;
+    TArray<int> SelectedGods;
 };
