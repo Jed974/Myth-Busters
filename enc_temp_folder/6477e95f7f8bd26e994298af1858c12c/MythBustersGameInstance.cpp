@@ -178,14 +178,14 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
 bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
 
-    /*FILE* fp = nullptr;
+    FILE* fp = nullptr;
     fopen_s(&fp, "LogInput.txt", "a");
     if (fp)
     {
         fprintf(fp, "  Frame %i - Player1 : %f\n", UMythBustersGameInstance::Instance->gs._framenumber, UMythBustersGameInstance::Instance->gs.Gods[0].Ref->GGPOInputs.HorizontalAxis.Value);
         fprintf(fp, "  Frame %i - Player2 : %f\n", UMythBustersGameInstance::Instance->gs._framenumber, UMythBustersGameInstance::Instance->gs.Gods[1].Ref->GGPOInputs.HorizontalAxis.Value);
         fclose(fp);
-    }*/
+    }
     if (UMythBustersGameInstance::Instance->rollbacking)
     {
         UMythBustersGameInstance::Instance->rollbacking = false;
