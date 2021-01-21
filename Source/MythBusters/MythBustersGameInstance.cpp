@@ -159,13 +159,13 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
         PController->ConsoleCommand(TEXT("t.maxfps = 0"), true);
     }
     UMythBustersGameInstance::Instance->gs.Apply();
-    FILE* fp = nullptr;
+    /*FILE* fp = nullptr;
     fopen_s(&fp, "ReadInputsLog.txt", "a");
     if (fp)
     {
         fprintf(fp, "  Rollback at frame %i\n", UMythBustersGameInstance::Instance->gs._framenumber);
         fclose(fp);
-    }
+    }*/
     return true;
 }
 
@@ -472,7 +472,7 @@ void UMythBustersGameInstance::StartGGPO()
 void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[], int disconnect_flags)
 {
     //gs.Update(inputs, disconnect_flags);
-    gs._framenumber += 1;
+    
     AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
     AGod* RemoteGod = (AGod*)GetLocalPlayers()[1]->PlayerController->GetPawn();
     LocalGod->GGPOInputs.Readable(&inputs[GGPOPlayerIndex]);
@@ -487,8 +487,6 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         ngs.periodic = ngs.now;
     }
 
-    // Notify ggpo that we've moved forward exactly 1 frame.
-    ggpo_advance_frame(ggpo);
 
     // Update the performance monitor display.
     /*GGPOPlayerHandle handles[MAX_PLAYERS];
@@ -543,51 +541,55 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
   */
   void UMythBustersGameInstance::MythBusters_RunFrame()
   {
-      GGPOErrorCode result = GGPO_ERRORCODE_GENERAL_FAILURE;
-      int disconnect_flags;
-      AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
-      
-      SInputs LocalInputs = LocalGod->Inputs;
-      
-      GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::FromInt(gs._framenumber));
-
-      
-      if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
-          //int input = ReadInputs(hwnd);
-          
-          //GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::SanitizeFloat(LocalInputs.HorizontalAxis.Value));
-
-  #if defined(SYNC_TEST)
-          LocalInputs.HorizontalAxis.Value = float((rand() % 100) - 50.0f)/50.0f; // test: use random inputs to demonstrate sync testing
-  #endif
-          LocalInputs.MakeSendable();
-          while (!GGPO_SUCCEEDED(result))
-          {
-              result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
-              if (!GGPO_SUCCEEDED(result))
-              {
-                  ggpo_idle(ggpo, 1000 * 1.0f / 60);
-              }
-          }
-          
-      }
-
-      // synchronize these inputs with ggpo.  If we have enough input to proceed
-      // ggpo will modify the input list with the correct inputs to use and
-      // return 1.
-      if (GGPO_SUCCEEDED(result)) {
-          result = ggpo_synchronize_input(ggpo, (void*)Inputs, PacketSize * MAX_PLAYERS, &disconnect_flags);
-          if (GGPO_SUCCEEDED(result)) {
-              // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
-              // the game by 1 frame using those inputs.
-              MythBusters_AdvanceFrame(Inputs, disconnect_flags);
-          }
-
-      }
-      else
+      if (ngs.players[GGPOPlayerIndex].state == Running)
       {
 
-          GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Waiting for other instance");
+          GGPOErrorCode result = GGPO_ERRORCODE_GENERAL_FAILURE;
+          int disconnect_flags;
+          AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
+
+          SInputs LocalInputs = LocalGod->Inputs;
+
+          GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::FromInt(gs._framenumber));
+
+
+          if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
+              //int input = ReadInputs(hwnd);
+
+              //GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::SanitizeFloat(LocalInputs.HorizontalAxis.Value));
+
+#if defined(SYNC_TEST)
+              LocalInputs.HorizontalAxis.Value = float((rand() % 100) - 50.0f) / 50.0f; // test: use random inputs to demonstrate sync testing
+#endif
+              LocalInputs.MakeSendable();
+              while (!GGPO_SUCCEEDED(result))
+              {
+                  result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
+                  if (!GGPO_SUCCEEDED(result))
+                  {
+                      ggpo_idle(ggpo, 1000 * 1.0f / 60);
+                  }
+              }
+
+          }
+
+          // synchronize these inputs with ggpo.  If we have enough input to proceed
+          // ggpo will modify the input list with the correct inputs to use and
+          // return 1.
+          if (GGPO_SUCCEEDED(result)) {
+              result = ggpo_synchronize_input(ggpo, (void*)Inputs, PacketSize * NUM_PLAYERS, &disconnect_flags);
+              if (GGPO_SUCCEEDED(result)) {
+                  // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
+                  // the game by 1 frame using those inputs.
+                  MythBusters_AdvanceFrame(Inputs, disconnect_flags);
+              }
+
+          }
+          else
+          {
+
+              GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Waiting for other instance");
+          }
       }
       
   }
@@ -619,16 +621,26 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
 void UMythBustersGameInstance::LoadState()
 {
     //Static_MythBusters_LoadState(_buffer, _len);
-    mb_load_game_state_callback(_buffer, _len);
+    memcpy(&UMythBustersGameInstance::Instance->gs, _buffer, _len);
 
-    //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "State loaded");
+    UMythBustersGameInstance::Instance->gs.Apply();
+
+    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "State loaded");
 }
 
 void UMythBustersGameInstance::SaveState()
 {
     //Static_MythBusters_SaveState(&_buffer, &_len, &_checksum, 0);
-    mb_save_game_state_callback(&_buffer, &_len, &_checksum, 0);
-    //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "State Saved");
+    //mb_save_game_state_callback(&_buffer, &_len, &_checksum, 0);
+    UMythBustersGameInstance::Instance->gs.Observe();
+    _len = sizeof(UMythBustersGameInstance::Instance->gs);
+    _buffer = (unsigned char*)malloc(_len);
+    if (!_buffer) {
+        return;
+    }
+    memcpy(_buffer, &UMythBustersGameInstance::Instance->gs, _len);
+    _checksum = fletcher32_checksum((short*)_buffer, _len / 2);
+    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "State Saved");
 }
 
 void UMythBustersGameInstance::InitState()
@@ -640,19 +652,25 @@ void UMythBustersGameInstance::InitState()
 
 void UMythBustersGameInstance::MythBusters_Idle(int timeout)
 {
-    if (ngs.players[GGPOPlayerIndex].state == Running)
+    /*if (ngs.players[GGPOPlayerIndex].state == Running)
     {
         if (!rollbacking)
         {
             MythBusters_RunFrame();
         }
-    }
+    }*/
     
     ggpo_idle(ggpo, timeout);
     
-    
 }
 
+
+void UMythBustersGameInstance::MythBusters_NextFrame()
+{
+    gs._framenumber += 1;
+    // Notify ggpo that we've moved forward exactly 1 frame.
+    ggpo_advance_frame(ggpo);
+}
 
 void UMythBustersGameInstance::MainThreadSleep(float time)
 {

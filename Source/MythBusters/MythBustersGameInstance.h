@@ -163,6 +163,7 @@ public:
     //void MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port);
     //void MythBusters_DrawCurrentFrame();
     void MythBusters_AdvanceFrame(SSendableInputs inputs[], int disconnect_flags);
+    UFUNCTION(BlueprintCallable)
     void MythBusters_RunFrame();
     //void MythBusters_Idle(int time);
     void MythBusters_DisconnectPlayer(int player);
@@ -204,9 +205,14 @@ public:
     UFUNCTION(BlueprintCallable)
     void MythBusters_Idle(int timeout);
 
+    UFUNCTION(BlueprintCallable)
+    void MythBusters_NextFrame();
+
     void MainThreadSleep(float time);
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     bool rollbacking = false;
+    bool InputsReadyForFrame = false;
 
 	/*bool __cdecl mb_advance_frame_callback(int);
 	bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len);
