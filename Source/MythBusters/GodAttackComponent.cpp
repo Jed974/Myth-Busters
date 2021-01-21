@@ -333,13 +333,15 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 
 	// Projectiles
 	for (int i = 0; i < 14; i++) {
-		if (AllProjectiles.Contains(i) && saveState.projectiles.Contains(i)) {
+		if (AllProjectiles.Contains(i) && !saveState.projectiles.Contains(i)) {
+			GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Green, "Proj présents mais pas dans le saveState");
 			// Currently we have some projectiles but they were not present when state was saved => destroy them
 			for (auto &proj : AllProjectiles[i].Projectiles) {
 				proj->Destroy();
 			}
 		}
 		else if (!AllProjectiles.Contains(i) && saveState.projectiles.Contains(i)) {
+			GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Red, "Proj absents mais présents dans le saveState");
 			// There were some projectiles in the past but not they are gone => recreate them + a slot for the attack
 			UAttackProjectile* attackProjectile = Cast<UAttackProjectile>(Attacks[i]);
 			if (attackProjectile == nullptr) {
@@ -356,6 +358,7 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 			}
 		}
 		else if (AllProjectiles.Contains(i) && saveState.projectiles.Contains(i)) {
+			GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Yellow, "Proj présents dans le savestate et la scene");
 			// There are projectiles in game and in save state for the same attack
 			if (AllProjectiles[i].Projectiles.Num() > saveState.projectiles[i].Projectiles.Num()) {
 				// Il y a plus de projectiles in game que dans le save state : détruire le surplus
@@ -365,7 +368,7 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 					AllProjectiles[i].Projectiles.RemoveAt(0);
 				}
 			}
-			else if (AllProjectiles[i].Projectiles.Num() > saveState.projectiles[i].Projectiles.Num()) {
+			else if (AllProjectiles[i].Projectiles.Num() < saveState.projectiles[i].Projectiles.Num()) {
 				// Il y a moins de projectiles in game que dans le save state : ajouter le manque
 				UAttackProjectile* attackProjectile = Cast<UAttackProjectile>(Attacks[i]);
 				if (attackProjectile == nullptr) {
