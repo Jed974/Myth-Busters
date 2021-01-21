@@ -177,15 +177,15 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
  */
 bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-    /*SAbstractGameState gs = UMythBustersGameInstance::Instance->gs;
+
     FILE* fp = nullptr;
     fopen_s(&fp, "LogInput.txt", "a");
     if (fp)
     {
-        fprintf(fp, "  Frame %i - Player1 : %f\n", gs._framenumber, gs.characters[0].ref->GGPOInputs.HorizontalAxis.Value);
-        fprintf(fp, "  Frame %i - Player2 : %f\n", gs._framenumber, gs.characters[1].ref->GGPOInputs.HorizontalAxis.Value);
+        fprintf(fp, "  Frame %i - Player1 : %f\n", UMythBustersGameInstance::Instance->gs._framenumber, UMythBustersGameInstance::Instance->gs.Gods[0].Ref->GGPOInputs.HorizontalAxis.Value);
+        fprintf(fp, "  Frame %i - Player2 : %f\n", UMythBustersGameInstance::Instance->gs._framenumber, UMythBustersGameInstance::Instance->gs.Gods[1].Ref->GGPOInputs.HorizontalAxis.Value);
         fclose(fp);
-    }*/
+    }
     if (UMythBustersGameInstance::Instance->rollbacking)
     {
         UMythBustersGameInstance::Instance->rollbacking = false;
@@ -269,16 +269,17 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
       ngs = { 0 };
       ggpo = NULL;
       GGPOPlayerIndex = 0;
-  }
-
-  UMythBustersGameInstance::~UMythBustersGameInstance()
-  {
-      MythBusters_DisconnectPlayer(GGPOPlayerIndex);
       FILE* fp = nullptr;
       fopen_s(&fp, "LogInput.txt", "w");
       fclose(fp);
       fopen_s(&fp, "ReadInputsLog.txt", "w");
       fclose(fp);
+  }
+
+  UMythBustersGameInstance::~UMythBustersGameInstance()
+  {
+      MythBusters_DisconnectPlayer(GGPOPlayerIndex);
+      
       MythBusters_Exit();
   }
 
@@ -619,6 +620,7 @@ void UMythBustersGameInstance::LoadState()
 {
     //Static_MythBusters_LoadState(_buffer, _len);
     mb_load_game_state_callback(_buffer, _len);
+
     //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "State loaded");
 }
 
