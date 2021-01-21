@@ -472,7 +472,7 @@ void UMythBustersGameInstance::StartGGPO()
 void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[], int disconnect_flags)
 {
     //gs.Update(inputs, disconnect_flags);
-    //gs._framenumber += 1;
+    gs._framenumber += 1;
     AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
     AGod* RemoteGod = (AGod*)GetLocalPlayers()[1]->PlayerController->GetPawn();
     LocalGod->GGPOInputs.Readable(&inputs[GGPOPlayerIndex]);
@@ -670,7 +670,7 @@ void UMythBustersGameInstance::MythBusters_NextFrame()
 {
     if (InputsReadyForFrame)
     {
-        gs._framenumber += 1;
+        
         // Notify ggpo that we've moved forward exactly 1 frame.
         ggpo_advance_frame(ggpo);
         InputsReadyForFrame = false;
