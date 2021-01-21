@@ -210,7 +210,7 @@ protected:
 	bool canAttNorm = true;
 	bool canAttSpe = true;
 	bool canAttPush = true;
-	bool canShield = true;
+	bool canShield = false;
 
 protected:
 	// Called when the game starts or when spawned
@@ -350,6 +350,7 @@ struct SAbstractGod
 		Ref = ref;
 		AttackSaveState = FAttacksSaveState();
 		MovementSaveState = SMovementSaveState();
+		MovementSaveState.Init(Ref->GetGodMovementComponent());
 	};
 
 	void Observe()
