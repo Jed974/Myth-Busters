@@ -16,6 +16,8 @@ UGodBoostComponent::UGodBoostComponent()
 void UGodBoostComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	particleHandler = NewObject<UGodBoostParticleHandler>(this, *particleHandlerClass);
+	particleHandler->SetUpGod(GetOwner());
 }
 
 
@@ -24,11 +26,12 @@ void UGodBoostComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	for (auto &boost : boosts) {
-		if (boost.frameAlive > 0) {
-			boost.frameAlive--;
-			if (boost.frameAlive == 0) {
-				boost.tempPercent = 0;
+	for (int i = 0; i < boosts.Num(); i++) {
+		if (boosts[i].frameAlive > 0) {
+			boosts[i].frameAlive--;
+			if (boosts[i].frameAlive == 0) {
+				boosts[i].tempPercent = 0;
+				particleHandler->DeleteParticleSystem(i);
 			}
 		}
 	}
@@ -39,6 +42,7 @@ void UGodBoostComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 void UGodBoostComponent::TemporaryBoost(EBoostType type, int percent, int durationFrames) {
 	boosts[(int)type].tempPercent = percent;
 	boosts[(int)type].frameAlive = durationFrames;
+	particleHandler->SpawnParticleSystem((int)type, (percent > 0));
 }
 void UGodBoostComponent::GameBoost(EBoostType type, int percent) {
 	boosts[(int)type].definitivePercent = percent;

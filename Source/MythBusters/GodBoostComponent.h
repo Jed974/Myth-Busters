@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GodBoostParticleHandler.h"
 #include "Components/ActorComponent.h"
 #include "GodBoostComponent.generated.h"
 
@@ -41,6 +42,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FBoost> boosts;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGodBoostParticleHandler> particleHandlerClass;
+
+	UGodBoostParticleHandler* particleHandler;
 
 public:	
 
@@ -57,4 +62,5 @@ public:
 
 	TArray<FBoost> GetBoostSaveState() const;
 	void SetBoostSaveState(TArray<FBoost> savedBoosts);
+
 };
