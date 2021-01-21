@@ -14,7 +14,7 @@
 //#define SYNC_TEST    // test: turn on synctest
 #define MAX_PLAYERS     2
 #define NUM_PLAYERS     2
-#define FRAME_DELAY     20
+#define FRAME_DELAY     2
 //#define SYNC_TEST
 
 struct AbstractCharacter
@@ -219,4 +219,7 @@ public:
 	bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int);*/
 
 	//UMythBustersGameInstance* Instance;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TArray<int> SelectedGods;
 };
