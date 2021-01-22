@@ -717,6 +717,7 @@ void UMythBustersGameInstance::MythBusters_NextFrame()
         InputsReadyForFrame = false;
         // Notify ggpo that we've moved forward exactly 1 frame.
         ggpo_advance_frame(ggpo);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "framecount++");
         
     }
     
