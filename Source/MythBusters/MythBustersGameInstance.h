@@ -224,4 +224,5 @@ public:
 	TArray<int> SelectedGods = { 0, -1 }; // 0 = god local; 1 = god distant
 
 	char ThorSelectedCode = 0b01111111;
+	char Thor2SelectedCode = 0b01111110;
 };
