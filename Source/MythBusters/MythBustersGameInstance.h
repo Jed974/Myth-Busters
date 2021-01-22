@@ -210,9 +210,10 @@ public:
 
 	void MainThreadSleep(float time);
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		bool rollbacking = false;
-	bool InputsReadyForFrame = false;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    bool rollbacking = false;
+    bool InputsReadyForFrame = false;
+    bool GGPOIdleDone = false;
 
 	/*bool __cdecl mb_advance_frame_callback(int);
 	bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len);
