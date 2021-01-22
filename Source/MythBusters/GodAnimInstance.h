@@ -93,65 +93,11 @@ public:
 	/** Reference to the pawn owner of type God */
 	UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
 		AHitBoxGroup* InterruptableAttGroup;
-	//
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* NormalNeutralGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* NormalForwardGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* NormalBackwardGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* NormalUpwardGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* NormalDownwardGroup;
 
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* SpeNeutralGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* SpeForwardGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* SpeBackwardGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* SpeUpwardGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* SpeDownwardGroup;
-
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* PushNeutralGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* PushForwardGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* PushBackwardGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* PushUpwardGroup;
-	///** Reference to the pawn owner of type God */
-	//UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-	//	AHitBoxGroup* PushDownwardGroup;
-	//
-	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
-		UAnimMontage* NormalForwardMontage;
-	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
-		UAnimMontage* SpecialForwardMontage;
-	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
-		UAnimMontage* PushForwardMontage;
-	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
-		UAnimSequenceBase* HurtAnimation;
-	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
-		UAnimMontage* HurtMontage;
+	//UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+	//	UAnimSequenceBase* HurtAnimation;
+	//UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
+	//	UAnimMontage* HurtMontage;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimSequenceBase* ShieldAnimation;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)

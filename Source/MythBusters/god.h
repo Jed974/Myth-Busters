@@ -2,6 +2,7 @@
 
 #pragma once
 
+class AHitBoxGroup;
 #include "CoreMinimal.h"
 #include "Shield.h"
 #include "GodMovementComponent.h"
@@ -302,17 +303,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-    // Called to bind functionality to input
+    /// Called to bind functionality to input
     virtual void SetupPlayerInputComponent(UInputComponent *PlayerInputComponent) override;
-	// Called to Setup what the god can do
+	/// Called to Setup what the god can do
 	UFUNCTION(BlueprintCallable)
 	void SetupGodLimitation(bool _canDash, bool _canAttNorm, bool _canAttSpe, bool _canAttPush, bool _canShield);
 
-	// Called by GodAnimInstance to get values nec. for animations blendSpace
+	/// Called by GodAnimInstance to get values nec. for animations blendSpace
 	virtual float GetAnimValues(int _idValueToGet);
 
-	USkeletalMeshComponent* GetSkeletalMesh();
-
+	
+	/// Allow to change good state properly (with canMove and other ajustements)
 	UFUNCTION(BlueprintCallable)
 		virtual void ChangeGodState(EGodState NewState);
 
@@ -321,10 +322,18 @@ public:
 
 	bool canMove = true;
 
+	// Component getters methods
+	USkeletalMeshComponent* GetSkeletalMesh();
 	UGodMovementComponent* GetGodMovementComponent() { return GodMovement; };
 	UGodBoostComponent* GetGodBoostComponent() { return GodBoost; };
 
+	/// Method called when the god hits a hitBoxGroup
+	UFUNCTION(BlueprintCallable)
+	void HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup);
+
+	/// Method to call to transmit attack anim notify to GodAttackComponent
 	void HandleAttackNotify(ENotifyType notifyType);
+	/// Method to call to transmit Porjectile to register to the GodAttackComponent
 	void RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack);
 };
 

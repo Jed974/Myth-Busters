@@ -30,5 +30,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	bool GodHitIsValid(AGod* godHit);
+	void RegisterGodHit(AGod* godHit);
 };
