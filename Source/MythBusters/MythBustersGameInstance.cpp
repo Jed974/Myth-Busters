@@ -140,6 +140,7 @@ bool __cdecl mb_advance_frame_callback(int)
     // the game state instead of reading from the keyboard.
     ggpo_synchronize_input(UMythBustersGameInstance::Instance->ggpo, (void*)inputs, UMythBustersGameInstance::Instance->PacketSize * NUM_PLAYERS, &disconnect_flags);
     UMythBustersGameInstance::Instance->MythBusters_AdvanceFrame(inputs, disconnect_flags);
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Advance frame callback");
 
     return true;
 }
@@ -716,6 +717,7 @@ void UMythBustersGameInstance::MythBusters_NextFrame()
         InputsReadyForFrame = false;
         // Notify ggpo that we've moved forward exactly 1 frame.
         ggpo_advance_frame(ggpo);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "framecount++");
         
     }
     
