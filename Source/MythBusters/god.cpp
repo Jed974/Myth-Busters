@@ -27,6 +27,8 @@ AGod::AGod()
 	GodMovement->ChangeMovementStateDelegate.BindUObject(this, &AGod::UpdateState);
 	GodMovement->InstantTurnDelegate.BindUObject(this, &AGod::InstantTurn);
 
+	GodShield = CreateDefaultSubobject<UGodShieldComponent>("GodShieldComponent");
+
 	GodAttack = CreateDefaultSubobject<UGodAttackComponent>("GodAttackComponent");
 
 	GodBoost = CreateDefaultSubobject<UGodBoostComponent>("GodBoostComponent");
@@ -606,7 +608,11 @@ void AGod::HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup) {
 	if (hitBoxGroup->GodHitIsValid(this)) {
 		// Get the hitBox colliding with actor having highest priority
 		UHitBox* HighestPriorityHB = nullptr;
-		for (auto const &HB : hitBoxGroup->GetComponentsByClass(TSubclassOf<UHitBox>())) {
+		auto subclass = TSubclassOf<UHitBox>();
+		TArray<UHitBox*> components;
+		hitBoxGroup->GetComponents(components);
+		//auto components = hitBoxGroup->GetComponentsByClass(subclass);
+		for (auto const &HB : components) {
 			UHitBox* currentHB = Cast<UHitBox>(HB);
 			if (currentHB != nullptr && currentHB->IsOverlappingActor(this)) {
 				if (HighestPriorityHB == nullptr || HighestPriorityHB->Priority < currentHB->Priority)

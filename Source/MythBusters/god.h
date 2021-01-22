@@ -4,8 +4,8 @@
 
 class AHitBoxGroup;
 #include "CoreMinimal.h"
-#include "Shield.h"
 #include "GodMovementComponent.h"
+#include "GodShieldComponent.h"
 #include "GodAttackComponent.h"
 #include "GodBoostComponent.h"
 #include "GameFramework/Actor.h"
@@ -177,6 +177,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Movement", meta = (AllowPrivateAccess = "true"))
 		UGodMovementComponent* GodMovement;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
+		UGodShieldComponent* GodShield;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
 		EAttackDirection attackState;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
@@ -200,18 +203,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
 		float ShieldSize = 1.0f;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Shield")
 		AShield* CurrentShield = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		bool netplay = false;
 
-	// Boolean de GameMode:
+	// Boolean de GameMode (ne sont pas sensé changer au cours d'une partie) :
 	bool canDash = true;
 	bool canAttNorm = true;
 	bool canAttSpe = true;
 	bool canAttPush = true;
-	bool canShield = false;
+	bool canShield = true;
 
 protected:
 	// Called when the game starts or when spawned
