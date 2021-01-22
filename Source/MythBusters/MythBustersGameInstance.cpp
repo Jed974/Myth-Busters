@@ -551,10 +551,6 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
 
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::FromInt(gs._framenumber));
 
-    if (SelectedGods[0] != -1 && SelectedGods[1] == -1) {
-
-    }
-
     if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
         //int input = ReadInputs(hwnd);
 
@@ -564,6 +560,13 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         LocalInputs.HorizontalAxis.Value = float((rand() % 100) - 50.0f) / 50.0f; // test: use random inputs to demonstrate sync testing
     #endif
         LocalInputs.MakeSendable();
+
+        //While god selection information is initiated localy but not recieved, send local selection 
+        if (SelectedGods[0] != -1 && SelectedGods[1] == -1) {
+            GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Sending god selection");
+            LocalInputs.SendableInputs.Actions = ThorSelectedCode;
+        }
+
         while (!GGPO_SUCCEEDED(result))
         {
             result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
@@ -581,9 +584,18 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
     if (GGPO_SUCCEEDED(result)) {
         result = ggpo_synchronize_input(ggpo, (void*)Inputs, PacketSize * NUM_PLAYERS, &disconnect_flags);
         if (GGPO_SUCCEEDED(result)) {
-            // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
-            // the game by 1 frame using those inputs.
-            MythBusters_AdvanceFrame(Inputs, disconnect_flags);
+
+            //Recieve god selection info
+            if (SelectedGods[0] != -1 && SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == ThorSelectedCode) {
+                GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR IS SELECTED");
+                //SelectedGods[1] = 0;
+            }
+            else
+            {
+                // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
+                // the game by 1 frame using those inputs.
+                MythBusters_AdvanceFrame(Inputs, disconnect_flags);
+            }
         }
 
     }
