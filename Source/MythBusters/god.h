@@ -2,9 +2,10 @@
 
 #pragma once
 
+class AHitBoxGroup;
 #include "CoreMinimal.h"
-#include "Shield.h"
 #include "GodMovementComponent.h"
+#include "GodShieldComponent.h"
 #include "GodAttackComponent.h"
 #include "GodBoostComponent.h"
 #include "GameFramework/Actor.h"
@@ -176,6 +177,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Movement", meta = (AllowPrivateAccess = "true"))
 		UGodMovementComponent* GodMovement;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
+		UGodShieldComponent* GodShield;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
 		EAttackDirection attackState;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
@@ -199,18 +203,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
 		float ShieldSize = 1.0f;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Shield")
 		AShield* CurrentShield = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		bool netplay = false;
 
-	// Boolean de GameMode:
+	// Boolean de GameMode (ne sont pas sensé changer au cours d'une partie) :
 	bool canDash = true;
 	bool canAttNorm = true;
 	bool canAttSpe = true;
 	bool canAttPush = true;
-	bool canShield = false;
+	bool canShield = true;
 
 protected:
 	// Called when the game starts or when spawned
@@ -302,17 +306,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-    // Called to bind functionality to input
+    /// Called to bind functionality to input
     virtual void SetupPlayerInputComponent(UInputComponent *PlayerInputComponent) override;
-	// Called to Setup what the god can do
+	/// Called to Setup what the god can do
 	UFUNCTION(BlueprintCallable)
 	void SetupGodLimitation(bool _canDash, bool _canAttNorm, bool _canAttSpe, bool _canAttPush, bool _canShield);
 
-	// Called by GodAnimInstance to get values nec. for animations blendSpace
+	/// Called by GodAnimInstance to get values nec. for animations blendSpace
 	virtual float GetAnimValues(int _idValueToGet);
 
-	USkeletalMeshComponent* GetSkeletalMesh();
-
+	
+	/// Allow to change good state properly (with canMove and other ajustements)
 	UFUNCTION(BlueprintCallable)
 		virtual void ChangeGodState(EGodState NewState);
 
@@ -321,10 +325,18 @@ public:
 
 	bool canMove = true;
 
+	// Component getters methods
+	USkeletalMeshComponent* GetSkeletalMesh();
 	UGodMovementComponent* GetGodMovementComponent() { return GodMovement; };
 	UGodBoostComponent* GetGodBoostComponent() { return GodBoost; };
 
+	/// Method called when the god hits a hitBoxGroup
+	UFUNCTION(BlueprintCallable)
+	void HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup);
+
+	/// Method to call to transmit attack anim notify to GodAttackComponent
 	void HandleAttackNotify(ENotifyType notifyType);
+	/// Method to call to transmit Porjectile to register to the GodAttackComponent
 	void RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack);
 };
 

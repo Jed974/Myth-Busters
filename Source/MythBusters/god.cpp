@@ -2,6 +2,9 @@
 
 
 #include "god.h"
+#include "HitBoxGroup.h"
+#include "HitBox.h"
+#include "GodAnimInstance.h"
 #include <string>
 #include <MythBusters\MythBustersGameInstance.h>
 
@@ -23,6 +26,8 @@ AGod::AGod()
 
 	GodMovement->ChangeMovementStateDelegate.BindUObject(this, &AGod::UpdateState);
 	GodMovement->InstantTurnDelegate.BindUObject(this, &AGod::InstantTurn);
+
+	GodShield = CreateDefaultSubobject<UGodShieldComponent>("GodShieldComponent");
 
 	GodAttack = CreateDefaultSubobject<UGodAttackComponent>("GodAttackComponent");
 
@@ -595,6 +600,50 @@ void AGod::InstantTurn()
 	FRotator NewRotation = SkeletalMesh->GetRelativeRotation();
 	NewRotation.Yaw = GodMovement->GetIsFacingRight() ? -90.0f : 90.0f;
 	SkeletalMesh->SetRelativeRotation(NewRotation);
+}
+
+
+void AGod::HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup) {
+	// Check if the god hit hasn't already been hit or is instigator
+	if (hitBoxGroup->GodHitIsValid(this)) {
+		// Get the hitBox colliding with actor having highest priority
+		UHitBox* HighestPriorityHB = nullptr;
+		auto subclass = TSubclassOf<UHitBox>();
+		TArray<UHitBox*> components;
+		hitBoxGroup->GetComponents(components);
+		//auto components = hitBoxGroup->GetComponentsByClass(subclass);
+		for (auto const &HB : components) {
+			UHitBox* currentHB = Cast<UHitBox>(HB);
+			if (currentHB != nullptr && currentHB->IsOverlappingActor(this)) {
+				if (HighestPriorityHB == nullptr || HighestPriorityHB->Priority < currentHB->Priority)
+					HighestPriorityHB = currentHB;
+			}
+		}
+
+		// Check final que le hitbox selectionné n'est pas nul
+		if (HighestPriorityHB != nullptr) {
+			// Interrupt attacks
+			Cast<UGodAnimInstance>(SkeletalMesh->GetAnimInstance())->InterruptAttack();
+			GodAttack->InterruptAttack();
+
+			// Perform ejection
+			FVector2D ejectionVector(1, 0);
+			ejectionVector = ejectionVector.GetRotated(HighestPriorityHB->AngleDeg);
+			if (!hitBoxGroup->facingRight)
+				ejectionVector.X *= -1;
+			ejectionVector *= (GodDamage / 10 + 1) * HighestPriorityHB->BaseKnockBack;
+			Eject(ejectionVector);
+
+			// Add dammages
+			ApplyGodDamage(HighestPriorityHB->BaseDamage);
+
+			// Register god as hit
+			hitBoxGroup->RegisterGodHit(this);
+		}
+		else {
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Unexpected error : HitBoxGroup touched god but hitBox couldn't be found");
+		}
+	}
 }
 
 void AGod::HandleAttackNotify(ENotifyType notifyType) {
