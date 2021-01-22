@@ -140,6 +140,10 @@ bool __cdecl mb_advance_frame_callback(int)
     // the game state instead of reading from the keyboard.
     ggpo_synchronize_input(UMythBustersGameInstance::Instance->ggpo, (void*)inputs, UMythBustersGameInstance::Instance->PacketSize * NUM_PLAYERS, &disconnect_flags);
     UMythBustersGameInstance::Instance->MythBusters_AdvanceFrame(inputs, disconnect_flags);
+    while (UMythBustersGameInstance::Instance->InputsReadyForFrame)
+    {
+
+    }
     return true;
 }
 
@@ -649,6 +653,26 @@ void UMythBustersGameInstance::InitState()
 
 void UMythBustersGameInstance::MythBusters_Idle(int timeout)
 {
+    /*GGPOIdleDone = false;
+    AsyncTask(ENamedThreads::AnyBackgroundHiPriTask, [&]()
+    {
+        GGPOErrorCode result = GGPO_ERRORCODE_GENERAL_FAILURE;
+        result = 
+        AsyncTask(ENamedThreads::GameThread, []()
+        {
+            UMythBustersGameInstance::Instance->GGPOIdleDone = true;
+
+        });
+
+    });
+    if (!GGPOIdleDone)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Idle is not done");
+    }
+    else
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Idle is not done");
+    }*/
     ggpo_idle(ggpo, timeout);
     if (ngs.players[GGPOPlayerIndex].state == Running)
     {
