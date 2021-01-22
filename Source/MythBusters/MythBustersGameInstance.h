@@ -221,5 +221,7 @@ public:
 	//UMythBustersGameInstance* Instance;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<int> SelectedGods;
+        TArray<int> SelectedGods = { -1, -1 }; // 0 = god local; 1 = god distant
+
+    const SInputs ThorSelectedCode;
 };

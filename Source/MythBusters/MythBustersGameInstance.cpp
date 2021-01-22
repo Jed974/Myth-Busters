@@ -551,6 +551,9 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
 
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::FromInt(gs._framenumber));
 
+    if (SelectedGods[0] != -1 && SelectedGods[1] == -1) {
+
+    }
 
     if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
         //int input = ReadInputs(hwnd);
