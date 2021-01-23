@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+class AGod;
 #include "Shield.h"
 #include "Components/ActorComponent.h"
 #include "GodShieldComponent.generated.h"
@@ -18,8 +19,7 @@ public:
 	UGodShieldComponent();
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	AGod* godOwner;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<AShield> ShieldClassToSpwan;
@@ -28,14 +28,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
 		FColor ShieldBaseColor = FColor::Red;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
-		float ShieldSize = 1.0f;
+		float ShieldSize = 1.8f;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Shield")
 		AShield* CurrentShield = nullptr;
 
-public:	
-	// Called every frame
+	float DELTA_TIME;
+	float shieldLifeTime = 0;
+
+	virtual void BeginPlay() override;
+
+public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	bool StartShield();
+	void StopShield();
+
+	void OrientShieldX(float AxisValue);
+	void OrientShieldY(float AxisValue);
 };

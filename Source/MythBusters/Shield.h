@@ -2,6 +2,8 @@
 
 #pragma once
 
+class AHitBoxGroup;
+class AGod;
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Shield.generated.h"
@@ -35,38 +37,37 @@ protected:
 	UPROPERTY(Category = "Shield", VisibleAnywhere, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0"))
 		FVector2D InputDirection = FVector2D::ZeroVector;
 
-
 	float DELTA_TIME;
+	AGod* godOwner;
 
 
 public:
-
 	UPROPERTY(Category = "Shield", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 		float decreaseDuration = 3;
 
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// Update the rotation of the shield based on InputDirection
+	/// Update the rotation of the shield based on InputDirection
 	virtual void SetAngleFromVector();
 
+
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void InitShield(float _size, float _lifeTime, FColor _colorFresnel, FColor _colorBase);
 
-	UFUNCTION(BlueprintCallable)
-	virtual void InitShield(float _size, FColor _colorFresnel, FColor _colorBase);
+	
+	void SetLifeTime(float _lifeTime);
+	void SetAngle(float _angle);
+	void SetMaterialFillRate(float _fillRate);
+	void SetInputDirectionVectorX(float _inputX);
+	void SetInputDirectionVectorY(float _inputY);
 
-	UFUNCTION(BlueprintCallable)
-	virtual void SetAngle(float _angle);
-	UFUNCTION(BlueprintCallable)
-	virtual void SetMaterialFillRate(float _fillRate);
-	UFUNCTION(BlueprintCallable)
-	virtual void SetInputDirectionVectorX(float _inputX);
-	UFUNCTION(BlueprintCallable)
-	virtual void SetInputDirectionVectorY(float _inputY);
+	float GetLifeTime();
 
+	//UFUNCTION(BlueprintCallable)
+	void ProtectGodFromDamage(AHitBoxGroup* hitBoxGroup);
 };
