@@ -10,15 +10,6 @@
 #include "GodAnimInstance.generated.h"
 
 
-UENUM(BlueprintType)
-enum class EAttackDir : uint8{
-	Neutral,
-	Forward,
-	Backward,
-	UpWard,
-	DownWard
-};
-
 /**
  * 
  */
@@ -36,14 +27,7 @@ public:
 	/** Copies the State of the owner God */
 	UPROPERTY(Category = "References", EditAnywhere, BlueprintReadWrite)
 		EGodState GodState;
-	
-	/** Variable to set to true to get in the Dash State */
-	UPROPERTY(Category = "Transition Booleans", EditAnywhere, BlueprintReadWrite)
-		bool Dashing;
-	/** Variable to set to true to stop an animation after it is finished */
-	UPROPERTY(Category = "Transition Booleans", EditAnywhere, BlueprintReadWrite)
-		bool AnimCanStop;
-	
+
 
 	/** Value to blend the fly animation on X axis */
 	UPROPERTY(Category = "BlendSpace Values", EditAnywhere, BlueprintReadWrite)
@@ -59,45 +43,7 @@ public:
 		float EjectY;
 
 
-	/** Variable to set to true to get in a NormalAtt SubState */
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		bool AttNormal;
-	/** Variable to set to true to get in a SpecialAtt SubState */
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		bool AttSpe;
-	/** Variable to set to true to get in a PushAtt SubState */
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		bool AttPush;
-	/** Variable to set to true to get in a PushAtt SubState */
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		EAttackDir AttDirection;
-	/** Name of the socket where to attach the Normal Forward Attack hitboxes */
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		FName NormalForwardSocketName;
-	/** The HitBoxGroup Class to spawn for the Normal Forward Attack */
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AHitBoxGroup> NormalForwardHitBoxGroupClass;
-	/** Name of the socket where to attach the Push Forward Attack hitboxes */
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		FName PushForwardSocketName;
-	/** The HitBoxGroup Class to spawn for the Push Forward Attack */
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AHitBoxGroup> PushForwardHitBoxGroupClass;
-	/** Name of the socket where to attach the Special Forward Attack hitboxes */
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		FName SpecialForwardSocketName;
-	/** The HitBoxGroup Class to spawn for the Special Forward Attack*/
-	UPROPERTY(Category = "Attack : Properties", EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AHitBoxGroup> SpecialForwardHitBoxGroupClass;
-	
-	/** Reference to the pawn owner of type God */
-	UPROPERTY(Category = "Attack : HitBoxGroups", EditAnywhere, BlueprintReadWrite)
-		AHitBoxGroup* InterruptableAttGroup;
 
-	//UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
-	//	UAnimSequenceBase* HurtAnimation;
-	//UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
-	//	UAnimMontage* HurtMontage;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimSequenceBase* ShieldAnimation;
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
@@ -119,9 +65,5 @@ public :
 	void HandleAttackNotify(ENotifyType notifyType);
 
 	UFUNCTION(BlueprintCallable)	
-	virtual void InterruptAttack();
-	UFUNCTION(BlueprintCallable)
-	virtual void StartAttackInterruptable(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo);
-	UFUNCTION(BlueprintCallable)
-	virtual void StartAttackProjectile(TSubclassOf<AHitBoxGroup> ClassToSpwan, FName SocketToAttachTo);
+	virtual void InterruptAllMontages();
 };
