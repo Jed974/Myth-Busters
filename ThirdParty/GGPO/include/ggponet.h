@@ -38,7 +38,6 @@ extern "C" {
 
 typedef struct GGPOSession GGPOSession;
 
-
 typedef int GGPOPlayerHandle;
 
 typedef enum {
@@ -248,6 +247,12 @@ typedef struct {
     * structure above for more information.
     */
    bool (__cdecl *on_event)(GGPOEvent *info);
+
+   /*
+    * end_rollback - Called at the end of the rollback. Used to reset specifici 
+    * rollback properties to normal
+    */
+   bool(__cdecl* end_rollback)();
 } GGPOSessionCallbacks;
 
 /*
