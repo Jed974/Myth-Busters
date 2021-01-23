@@ -133,6 +133,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
  */
 bool __cdecl mb_advance_frame_callback(int)
 {
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Advance frame callback");
     SSendableInputs inputs[NUM_PLAYERS] = { 0 };
     int disconnect_flags;
 
@@ -140,7 +141,7 @@ bool __cdecl mb_advance_frame_callback(int)
     // the game state instead of reading from the keyboard.
     ggpo_synchronize_input(UMythBustersGameInstance::Instance->ggpo, (void*)inputs, UMythBustersGameInstance::Instance->PacketSize * NUM_PLAYERS, &disconnect_flags);
     UMythBustersGameInstance::Instance->MythBusters_AdvanceFrame(inputs, disconnect_flags);
-    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Advance frame callback");
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Frame advanced");
 
     return true;
 }
