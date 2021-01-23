@@ -190,6 +190,7 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
     }*/
     if (UMythBustersGameInstance::Instance->rollbacking)
     {
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Rollback Done !");
         UMythBustersGameInstance::Instance->rollbacking = false;
         GEngine->GameViewport->bDisableWorldRendering = false;
         APlayerController* PController = UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController;
