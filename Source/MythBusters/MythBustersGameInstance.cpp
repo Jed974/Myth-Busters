@@ -189,17 +189,7 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
         fprintf(fp, "  Frame %i - Player2 : %f\n", UMythBustersGameInstance::Instance->gs._framenumber, UMythBustersGameInstance::Instance->gs.Gods[1].Ref->GGPOInputs.HorizontalAxis.Value);
         fclose(fp);
     }*/
-    if (UMythBustersGameInstance::Instance->rollbacking)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Rollback Done !");
-        UMythBustersGameInstance::Instance->rollbacking = false;
-        GEngine->GameViewport->bDisableWorldRendering = false;
-        APlayerController* PController = UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController;
-        if (PController)
-        {
-            PController->ConsoleCommand(TEXT("t.maxfps = 60"), true);
-        }
-    }
+    
     UMythBustersGameInstance::Instance->gs.Observe();
     *len = sizeof(UMythBustersGameInstance::Instance->gs);
     *buffer = (unsigned char*)malloc(*len);
@@ -264,6 +254,27 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
   {
       free(buffer);
   }
+
+  /*
+  * vw_free_buffer --
+  *
+  * Free a save state buffer previously returned in vw_save_game_state_callback.
+  */
+  bool __cdecl mb_end_rollback_callback()
+  {
+      if (UMythBustersGameInstance::Instance->rollbacking)
+      {
+          GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Rollback Done !");
+          UMythBustersGameInstance::Instance->rollbacking = false;
+          GEngine->GameViewport->bDisableWorldRendering = false;
+          APlayerController* PController = UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController;
+          if (PController)
+          {
+              PController->ConsoleCommand(TEXT("t.maxfps = 60"), true);
+          }
+      }
+      return true;
+  }
   
 
   UMythBustersGameInstance::UMythBustersGameInstance()
@@ -316,6 +327,7 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
     cb.free_buffer = mb_free_buffer_callback;
     cb.on_event = mb_on_event_callback;
     cb.log_game_state = mb_log_game_state_callback;
+    cb.end_rollback = mb_end_rollback_callback;
 
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Callback binded");
 
