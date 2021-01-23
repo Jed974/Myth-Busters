@@ -77,6 +77,7 @@ struct SInputs
 	};
 	void Update(EInputSpecifier Specifier, SInputAction NewInputAction)
 	{
+		NewInputAction.Consumed = InputActions[Specifier].Consumed;
 		InputActions[Specifier] = NewInputAction;
 	};
 	void Update(EInputSpecifier Specifier, EInputActionState State)
@@ -192,19 +193,6 @@ protected:
 	float HorizontalDeadZone = 0.15f;
 	float VerticalDeadZone = 0.15f;
 	
-	
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<AShield> ShieldClassToSpwan;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
-		FColor ShieldFresnelColor = FColor::Blue;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
-		FColor ShieldBaseColor = FColor::Red;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
-		float ShieldSize = 1.0f;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Shield")
-		AShield* CurrentShield = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		bool netplay = false;

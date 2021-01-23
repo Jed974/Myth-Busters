@@ -56,16 +56,23 @@ void AGod::Tick(float DeltaTime)
 		ReadInputs(&Inputs);
 	}
 			
+	//Check les collisions :
+	TArray<AActor*> OverlappingActors;
+	GetOverlappingActors(OverlappingActors, TSubclassOf<AHitBoxGroup>());
+	for (auto& hitBoxGroupActor : OverlappingActors) {
+		AHitBoxGroup* hitBoxGroup = Cast<AHitBoxGroup>(hitBoxGroupActor);
+		if (hitBoxGroup != nullptr)
+			HandleHitBoxGroupCollision(hitBoxGroup);
+	}
+
 	UpdateAttackState();
 }
 
 
 void AGod::MoveHorizontal(float AxisValue)
 {
-	if (CurrentShield != nullptr) {
-		CurrentShield->SetInputDirectionVectorX(AxisValue);
-		GodMovement->AddMovementInput(FVector2D(1.0, 0.0), 0.f);
-		EMoveHorizontal(AxisValue);
+	if (State == EGodState::Shielding) {
+		GodShield->OrientShieldX(AxisValue);
 	}
 	else if (canMove)
 	{
@@ -84,10 +91,8 @@ void AGod::MoveHorizontal(float AxisValue)
 }
 void AGod::MoveVertical(float AxisValue)
 {
-	if (CurrentShield != nullptr) {
-		CurrentShield->SetInputDirectionVectorY(AxisValue*-1);
-		GodMovement->AddMovementInput(FVector2D(0.0, 1.0), 0.f);
-		EMoveVertical(AxisValue);
+	if (State == EGodState::Shielding) {
+		GodShield->OrientShieldY(AxisValue);
 	}
 	else if (canMove)
 	{
@@ -182,33 +187,19 @@ void AGod::StopAttackPush()
 	EStopAttackPush();
 }
 
-void AGod::Shield()		// TODO ------------------------------------- Mettre un délai sur le bouclier/coolDown -----------------------------
+void AGod::Shield()	
 {
-	if (canShield) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Shielding !");
-
-		FTransform _spawnTransform = GetRootComponent()->GetComponentTransform();
-		FActorSpawnParameters _spawnParams;
-		_spawnParams.Instigator = this;
-
-		CurrentShield = GetWorld()->SpawnActor<AShield>(ShieldClassToSpwan, _spawnTransform.GetLocation(), _spawnTransform.GetRotation().Rotator(), _spawnParams);
-
-		FAttachmentTransformRules _attTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
-		CurrentShield->AttachToComponent(CapsuleComponent, _attTransformRules);
-		CurrentShield->InitShield(ShieldSize, ShieldFresnelColor, ShieldBaseColor);
+	if (canShield && State==EGodState::Flying && GodShield->StartShield()) {
 		ChangeGodState(EGodState::Shielding);
-
 		EShield();
 	}
 }
 void AGod::StopShield()
 {
-	if (CurrentShield != nullptr)
-	{
-		CurrentShield->Destroy();
-		CurrentShield = nullptr;
+	if (State == EGodState::Shielding) {
+		ChangeGodState(EGodState::Flying);
+		EStopShield();
 	}
-	EStopShield();
 }
 
 
@@ -250,6 +241,10 @@ void AGod::ChangeGodState(EGodState NewState)
 	if (State == EGodState::Attacking && GodAttack->GetIsCurrentAttack()) {
 		GodAttack->InterruptAttack();
 	}
+	// Détruit le bouclier
+	else if (State == EGodState::Shielding && NewState != EGodState::Shielding) {
+		GodShield->StopShield();
+	}
 
 	State = NewState;
 	canMove = true;
@@ -278,8 +273,8 @@ void AGod::ChangeGodState(EGodState NewState)
 		case EGodState::Attacking:
 			canMove = false;
 			break;
-		case EGodState::Shielding: 
-			
+		case EGodState::Shielding:
+			canMove = false;			
 			break;
 		case EGodState::Dead: 
 			Die();
@@ -333,7 +328,7 @@ void AGod::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 	PlayerInputComponent->BindAction("Dash", IE_Released, this, &AGod::ReleaseDash);
 }
 
-
+#pragma region WriteRegion
 void AGod::WriteInputs(EInputSpecifier Specifier, float Value)
 {
 	Inputs.Update(Specifier, Value);
@@ -391,6 +386,7 @@ void AGod::ReleaseDash()
 {
 	WriteInputs(DASH, Released);
 }
+#pragma endregion
 
 void AGod::ReadInputs(SInputs* _Inputs)
 {
@@ -613,17 +609,16 @@ void AGod::HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup) {
 		hitBoxGroup->GetComponents(components);
 		//auto components = hitBoxGroup->GetComponentsByClass(subclass);
 		for (auto const &HB : components) {
-			UHitBox* currentHB = Cast<UHitBox>(HB);
-			if (currentHB != nullptr && currentHB->IsOverlappingActor(this)) {
-				if (HighestPriorityHB == nullptr || HighestPriorityHB->Priority < currentHB->Priority)
-					HighestPriorityHB = currentHB;
+			if (HB != nullptr && HB->IsOverlappingActor(this)) {
+				if (HighestPriorityHB == nullptr || HighestPriorityHB->Priority < HB->Priority)
+					HighestPriorityHB = HB;
 			}
 		}
 
 		// Check final que le hitbox selectionné n'est pas nul
 		if (HighestPriorityHB != nullptr) {
 			// Interrupt attacks
-			Cast<UGodAnimInstance>(SkeletalMesh->GetAnimInstance())->InterruptAttack();
+			Cast<UGodAnimInstance>(SkeletalMesh->GetAnimInstance())->InterruptAllMontages();
 			GodAttack->InterruptAttack();
 
 			// Perform ejection
