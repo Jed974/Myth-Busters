@@ -140,6 +140,8 @@ bool __cdecl mb_advance_frame_callback(int)
     // the game state instead of reading from the keyboard.
     ggpo_synchronize_input(UMythBustersGameInstance::Instance->ggpo, (void*)inputs, UMythBustersGameInstance::Instance->PacketSize * NUM_PLAYERS, &disconnect_flags);
     UMythBustersGameInstance::Instance->MythBusters_AdvanceFrame(inputs, disconnect_flags);
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Advance frame callback");
+
     return true;
 }
 
@@ -551,10 +553,6 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
 
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::FromInt(gs._framenumber));
 
-    if (SelectedGods[0] != -1 && SelectedGods[1] == -1) {
-
-    }
-
     if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
         //int input = ReadInputs(hwnd);
 
@@ -564,6 +562,19 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         LocalInputs.HorizontalAxis.Value = float((rand() % 100) - 50.0f) / 50.0f; // test: use random inputs to demonstrate sync testing
     #endif
         LocalInputs.MakeSendable();
+
+        //While god selection information is initiated localy but not recieved, send local selection 
+        //if (SelectedGods[0] != -1 && SelectedGods[1] == -1) {
+        //    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Sending god selection");
+        //    if (SelectedGods[0] == 0) {
+        //        LocalInputs.SendableInputs.Actions = ThorSelectedCode;
+        //    }
+        //    else
+        //    {
+        //        LocalInputs.SendableInputs.Actions = Thor2SelectedCode;
+        //    }
+        //}
+
         while (!GGPO_SUCCEEDED(result))
         {
             result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
@@ -581,9 +592,22 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
     if (GGPO_SUCCEEDED(result)) {
         result = ggpo_synchronize_input(ggpo, (void*)Inputs, PacketSize * NUM_PLAYERS, &disconnect_flags);
         if (GGPO_SUCCEEDED(result)) {
-            // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
-            // the game by 1 frame using those inputs.
-            MythBusters_AdvanceFrame(Inputs, disconnect_flags);
+
+            //Recieve god selection info
+            //if (SelectedGods[0] != -1 && SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == ThorSelectedCode) {
+            //    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR IS SELECTED");
+            //    SelectedGods[1] = 0;
+            //    Inputs[GGPOPlayerIndex].Actions = (char)0b0000000;
+            //}
+            //else if (SelectedGods[0] != -1 && SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == Thor2SelectedCode) {
+            //    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR2 IS SELECTED");
+            //    SelectedGods[1] = 1;
+            //    Inputs[GGPOPlayerIndex].Actions = (char)0b0000000;
+            //}
+
+             // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
+             // the game by 1 frame using those inputs.
+             MythBusters_AdvanceFrame(Inputs, disconnect_flags);
         }
 
     }
@@ -652,6 +676,26 @@ void UMythBustersGameInstance::InitState()
 
 void UMythBustersGameInstance::MythBusters_Idle(int timeout)
 {
+    /*GGPOIdleDone = false;
+    AsyncTask(ENamedThreads::AnyBackgroundHiPriTask, [&]()
+    {
+        GGPOErrorCode result = GGPO_ERRORCODE_GENERAL_FAILURE;
+        result = 
+        AsyncTask(ENamedThreads::GameThread, []()
+        {
+            UMythBustersGameInstance::Instance->GGPOIdleDone = true;
+
+        });
+
+    });
+    if (!GGPOIdleDone)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Idle is not done");
+    }
+    else
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Idle is not done");
+    }*/
     ggpo_idle(ggpo, timeout);
     if (ngs.players[GGPOPlayerIndex].state == Running)
     {
@@ -673,6 +717,7 @@ void UMythBustersGameInstance::MythBusters_NextFrame()
         InputsReadyForFrame = false;
         // Notify ggpo that we've moved forward exactly 1 frame.
         ggpo_advance_frame(ggpo);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "framecount++");
         
     }
     
