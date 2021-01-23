@@ -155,7 +155,7 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
     memcpy(&UMythBustersGameInstance::Instance->gs, buffer, len);
     UMythBustersGameInstance::Instance->rollbacking = true;
     GEngine->GameViewport->bDisableWorldRendering = true;
-    APlayerController* PController = UGameplayStatics::GetPlayerController(UMythBustersGameInstance::Instance->GetWorld(), 0);
+    APlayerController* PController = UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController;
     if (PController)
     {
         PController->ConsoleCommand(TEXT("t.maxfps = 0"), true);
@@ -192,7 +192,7 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
     {
         UMythBustersGameInstance::Instance->rollbacking = false;
         GEngine->GameViewport->bDisableWorldRendering = false;
-        APlayerController* PController = UGameplayStatics::GetPlayerController(UMythBustersGameInstance::Instance->GetWorld(), 0);
+        APlayerController* PController = UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController;
         if (PController)
         {
             PController->ConsoleCommand(TEXT("t.maxfps = 60"), true);
@@ -716,9 +716,10 @@ void UMythBustersGameInstance::MythBusters_NextFrame()
     {
         InputsReadyForFrame = false;
         // Notify ggpo that we've moved forward exactly 1 frame.
-        ggpo_advance_frame(ggpo);
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "framecount++");
         
+        ggpo_advance_frame(ggpo);
+        
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "framecount++");
     }
     
 }
