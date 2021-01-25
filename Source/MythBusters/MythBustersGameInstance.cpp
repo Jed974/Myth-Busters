@@ -105,7 +105,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
     case GGPO_EVENTCODE_DISCONNECTED_FROM_PEER:
         UMythBustersGameInstance::Instance->ngs.SetConnectState(info->u.disconnected.player, Disconnected);
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Disconnected from peer !");
-        UMythBustersGameInstance::Instance->MythBusters_DisconnectPlayer(info->u.disconnected.player);
+        UMythBustersGameInstance::Instance->MythBusters_DisconnectPlayer(!UMythBustersGameInstance::Instance->GGPOPlayerIndex);
         break;
     case GGPO_EVENTCODE_TIMESYNC:
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Time Synching...");
@@ -455,13 +455,12 @@ void UMythBustersGameInstance::StartGGPO()
   void UMythBustersGameInstance::MythBusters_DisconnectPlayer(int player)
   {
       if (player < ngs.num_players) {
-          char logbuf[128];
           GGPOErrorCode result = ggpo_disconnect_player(ggpo, ngs.players[player].handle);
           if (GGPO_SUCCEEDED(result)) {
-              sprintf_s(logbuf, ARRAYSIZE(logbuf), "Disconnected player %d.\n", player);
+              GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Disconnected player " + player);
           }
           else {
-              sprintf_s(logbuf, ARRAYSIZE(logbuf), "Error while disconnecting player (err:%d).\n", result);
+              GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Error while disconnecting player(err: " + FString::FromInt(player) + "). \n");
           }
       }
   }
