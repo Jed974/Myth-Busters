@@ -10,10 +10,6 @@ UAttackMultiHit::UAttackMultiHit() : UAttack() {
 }
 
 
-void UAttackMultiHit::StartAttack() {
-	attackState = EAttackState::START;
-	PlayMontageFromCurrentState(0);
-}
 void UAttackMultiHit::StopAttack() {
 	if (attackState != EAttackState::OFF) {
 		DestroyHitBoxGroup();

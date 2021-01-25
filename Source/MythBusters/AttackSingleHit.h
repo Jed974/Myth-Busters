@@ -27,7 +27,6 @@ public :
 
 public:
 	UAttackSingleHit();
-	virtual void StartAttack() override;
 	virtual void StopAttack() override;
 
 	UFUNCTION(BlueprintCallable)

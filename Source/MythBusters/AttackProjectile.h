@@ -28,8 +28,6 @@ public:
 
 public:
 	UAttackProjectile();
-	virtual void StartAttack() override;
-	virtual void StopAttack() override;
 
 	UFUNCTION(BlueprintCallable)
 	AHitBoxGroupProjectile* SpwanHitBoxGroup();

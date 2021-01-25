@@ -10,11 +10,6 @@ UAttackSingleHit::UAttackSingleHit() : UAttack(){
 }
 
 
-void UAttackSingleHit::StartAttack() {
-	attackState = EAttackState::START;
-	PlayMontageFromCurrentState(0);
-}
-
 void UAttackSingleHit::StopAttack() {
 	if (attackState != EAttackState::OFF) {
 		DestroyHitBoxGroup();

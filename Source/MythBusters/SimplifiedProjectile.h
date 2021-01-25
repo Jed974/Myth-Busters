@@ -22,6 +22,7 @@ struct MYTHBUSTERS_API FSimplifiedProjectile
 	bool facingRight;
 	int lifeTime;
 	FTransform transform;
+	int auxiliaryInfo;
 
 	FSimplifiedProjectile();
 	FSimplifiedProjectile(AHitBoxGroupProjectile* model);

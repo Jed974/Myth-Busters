@@ -31,7 +31,6 @@ public:
 
 public:
 	UAttackMultiHit();
-	virtual void StartAttack() override;
 	virtual void StopAttack() override;
 
 	UFUNCTION(BlueprintCallable)

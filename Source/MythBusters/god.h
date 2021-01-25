@@ -305,8 +305,8 @@ public:
 
 	
 	/// Allow to change good state properly (with canMove and other ajustements)
-	UFUNCTION(BlueprintCallable)
-		virtual void ChangeGodState(EGodState NewState);
+	//UFUNCTION(BlueprintCallable)
+	virtual void ChangeGodState(EGodState NewState);
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		EGodState State;

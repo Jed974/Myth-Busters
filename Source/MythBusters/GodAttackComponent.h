@@ -18,7 +18,8 @@ enum class ENotifyType : uint8 {
 	OVER,
 	ACTIVE,
 	CHANGE,
-	INACTIVE
+	INACTIVE,
+	NEXT
 };
 UENUM(BlueprintType)
 enum class EAttackDirection : uint8 {
@@ -33,13 +34,13 @@ USTRUCT(BlueprintType)
 struct MYTHBUSTERS_API FAttacksSaveState {
 	GENERATED_BODY()
 
-	int idCurrentAttack;
+	int idCurrentSubAttack;
 	UAttackSaveState attackState;
 	float montageFrame;
-	//TMap<int, USimplifiedProjectileArray> projectiles;
+	TArray<int> coolDowns;
 	TMap<int, FSimplifiedProjectileArray> projectiles;
 
-	FAttacksSaveState() : idCurrentAttack(-1) {}
+	FAttacksSaveState() : idCurrentSubAttack(-1) {}
 };
 
 USTRUCT(BlueprintType)
@@ -70,40 +71,41 @@ public:
 		TArray<UAttack*> Attacks;
 	
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Normal", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Normal", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Normal_Neutral;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Normal", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Normal", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Normal_Forward;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Normal", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Normal", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Normal_Backward;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Normal", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Normal", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Normal_Up;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Normal", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Normal", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Normal_Down;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Special", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Special", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Special_Neutral;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Special", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Special", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Special_Forward;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Special", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Special", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Special_Backward;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Special", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Special", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Special_Up;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Special", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Special", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Special_Down;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Push", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Push", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Push_Forward;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Push", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Push", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Push_Backward;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Push", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Push", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Push_Up;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack Push", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attack Push", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UAttack> Att_Push_Down;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	bool TryApplySequentialProjectileArray(int idAtt, FAttacksSaveState &saveState);
 	
 public:	
 	// Called every frame
