@@ -39,6 +39,7 @@ class MYTHBUSTERS_API AHitBoxGroupProjectile : public AHitBoxGroup
 	GENERATED_BODY()
 
 public:
+	int auxiliaryInfo = -1;
 	/** Delay before the group is deleted */
 	UPROPERTY(Category = "Projectile Parameters", EditAnywhere, BlueprintReadWrite)
 		int LifeTime;

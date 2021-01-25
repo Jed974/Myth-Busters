@@ -10,14 +10,7 @@ UAttackProjectile::UAttackProjectile() : UAttack() {
 }
 
 
-void UAttackProjectile::StartAttack() {
-	attackState = EAttackState::START;
-	PlayMontageFromCurrentState(0);
-}
 
-void UAttackProjectile::StopAttack() {
-	attackState = EAttackState::OFF;
-}
 
 
 AHitBoxGroupProjectile* UAttackProjectile::SpwanHitBoxGroup() {
@@ -29,24 +22,10 @@ AHitBoxGroupProjectile* UAttackProjectile::SpwanHitBoxGroup() {
 
 	AHitBoxGroupProjectile* proj = GetWorld()->SpawnActor<AHitBoxGroupProjectile>(projectileToSpawn, _spawnTransform.GetLocation(), god->GetSkeletalMesh()->GetRelativeRotation(), _spawnParams);
 	proj->facingRight = god->GetGodMovementComponent()->GetIsFacingRight();
+	proj->auxiliaryInfo = auxiliaryInfo;
 	
 	return proj;
 }
-
-
-/*void UAttackProjectile::DestroyAllProjectiles() {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Destoy all " + FString::SanitizeFloat(Projectiles.Num()));
-	for (auto &proj : Projectiles) {
-		bool destroySuccess = proj->Destroy();
-		if (destroySuccess)
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Destroy successful");
-		else
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroy failed");
-		proj = nullptr;
-	}
-	Projectiles.Empty();
-}*/
-
 
 void UAttackProjectile::OnActiveNotify() {
 	god->RegisterProjectile(SpwanHitBoxGroup(), idAttackOnGodAttackComponent);

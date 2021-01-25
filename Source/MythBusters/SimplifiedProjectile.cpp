@@ -5,6 +5,6 @@
 #include "HitBoxGroupProjectile.h"
 
 
-FSimplifiedProjectile::FSimplifiedProjectile() : facingRight(true), lifeTime(0), transform() {}
-FSimplifiedProjectile::FSimplifiedProjectile(AHitBoxGroupProjectile* model) : facingRight(model->facingRight), lifeTime(model->LifeTime), transform(model->GetActorTransform()) {}
+FSimplifiedProjectile::FSimplifiedProjectile() : facingRight(true), lifeTime(0), transform(), auxiliaryInfo(-1) {}
+FSimplifiedProjectile::FSimplifiedProjectile(AHitBoxGroupProjectile* model) : facingRight(model->facingRight), lifeTime(model->LifeTime), transform(model->GetActorTransform()), auxiliaryInfo(model->auxiliaryInfo) {}
 FSimplifiedProjectile::~FSimplifiedProjectile() {}
