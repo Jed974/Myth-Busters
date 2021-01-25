@@ -643,6 +643,8 @@ void AGod::HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup) {
 
 void AGod::HandleAttackNotify(ENotifyType notifyType) {
 	GodAttack->TransmitNotify(notifyType);
+	if (notifyType == ENotifyType::OVER)
+		ChangeGodState(EGodState::Flying);
 }
 void AGod::RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack) {
 	GodAttack->RegisterProjectile(_projectile, _idAttack);

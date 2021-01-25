@@ -445,6 +445,16 @@ GGPO_API GGPOErrorCode __cdecl ggpo_idle(GGPOSession *,
                                          int timeout);
 
 /*
+ * ggpo_poll --
+ * Similar to ggpo_idle but doesn't check simulation and rollback
+ *
+ * timeout - The amount of time GGPO.net is allowed to spend in this function,
+ * in milliseconds.
+ */
+GGPO_API GGPOErrorCode __cdecl ggpo_poll(GGPOSession*,
+    int timeout);
+
+/*
  * ggpo_add_local_input --
  *
  * Used to notify GGPO.net of inputs that should be trasmitted to remote

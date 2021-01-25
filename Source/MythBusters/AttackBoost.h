@@ -25,8 +25,6 @@ public :
 
 public :
 	UAttackBoost();
-	virtual void StartAttack() override;
-	virtual void StopAttack() override;
 
 	void ApplyBoost();
 
