@@ -222,8 +222,11 @@ public:
 	//UMythBustersGameInstance* Instance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<int> SelectedGods = { -1, -1 ,0,0}; // 0 = local selected god; 1 = remote selected god, 2 = just recieved remote selection ,3 = sending local selection to remote
+	TArray<int> SelectedGods = { -1, -1 , 0 , 0 }; // 0 = local selected god; 1 = remote selected god, 2 = just recieved remote selection ,3 = sending local selection to remote
 	char ThorSelectedCode = 0b01111111;
 	char Thor2SelectedCode = 0b01111110;
 	char GodSelectionReceived = 0b01111101;
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void SpawnSelectedGods();
 };
