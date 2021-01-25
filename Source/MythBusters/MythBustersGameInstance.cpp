@@ -599,6 +599,10 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
             if (!GGPO_SUCCEEDED(result))
             {
                 ggpo_idle(ggpo, 1000 * 1.0f / 60);
+                if (rollbacking)
+                {
+                    break;
+                }
             }
         }
 
@@ -743,7 +747,6 @@ void UMythBustersGameInstance::MythBusters_NextFrame()
         
         ggpo_advance_frame(ggpo);
         
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "framecount++");
     }
     
 }
