@@ -598,11 +598,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
             result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
             if (!GGPO_SUCCEEDED(result))
             {
-                ggpo_idle(ggpo, 1000 * 1.0f / 60);
-                if (rollbacking)
-                {
-                    break;
-                }
+                ggpo_poll(ggpo, 1000 * 1.0f / 60);
             }
         }
 
