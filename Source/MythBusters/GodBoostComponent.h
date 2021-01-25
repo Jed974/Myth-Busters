@@ -40,11 +40,12 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Boosts")
 	TArray<FBoost> boosts;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Boosts")
 	TSubclassOf<UGodBoostParticleHandler> particleHandlerClass;
 
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = "Boosts")
 	UGodBoostParticleHandler* particleHandler;
 
 public:	
