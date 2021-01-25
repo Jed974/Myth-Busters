@@ -20,9 +20,9 @@ public :
 	AGod* godOwner;
 
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Particle")
 	void SpawnParticleSystem(int boostId, bool boosting);
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Particle")
 	void DeleteParticleSystem(int boostId);
 	
 	UFUNCTION(BlueprintImplementableEvent)
