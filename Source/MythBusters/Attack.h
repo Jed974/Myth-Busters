@@ -96,4 +96,5 @@ public:
 	void SetCoolDown(int _cd);
 
 	FVector2D GetInducedMovement();
+	int GetAuxInfo();
 };

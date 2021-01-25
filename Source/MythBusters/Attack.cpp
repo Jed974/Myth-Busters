@@ -44,7 +44,7 @@ void UAttack::ApplySaveState(UAttackSaveState _saveState) {
 }
 UAttackSaveState UAttack::GetSaveState() {
 	UAttackSaveState _saveState;
-	_saveState.attackState_Saved = attackState;
+	_saveState.attackState_Saved = GetAttackState();
 	_saveState.animationFrame_Saved = GetAttackFrame();
 	_saveState.inducedMovementAbscissa = curveAbscissa;
 	return _saveState;
@@ -111,3 +111,5 @@ FVector2D UAttack::GetInducedMovement() {
 	else
 		return FVector2D(-3,0);
 }
+
+int UAttack::GetAuxInfo() { return auxiliaryInfo; }

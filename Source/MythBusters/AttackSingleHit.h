@@ -34,7 +34,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DestroyHitBoxGroup();
 
-	virtual void ApplySaveState(UAttackSaveState _saveState) override;
+	//virtual void ApplySaveState(UAttackSaveState _saveState) override;
+	virtual void LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad = -1, bool LoadAnimation = true) override;
+
 
 	virtual void OnActiveNotify() override;
 	virtual void OnInactiveNotify() override;

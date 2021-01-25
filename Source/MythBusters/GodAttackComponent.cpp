@@ -376,7 +376,6 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 				}
 			}
 			else if (AllProjectiles.Contains(i) && saveState.projectiles.Contains(i)) {
-				GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Yellow, "Proj présents dans le savestate et la scene");
 				// There are projectiles in game and in save state for the same attack
 				if (AllProjectiles[i].Projectiles.Num() > saveState.projectiles[i].Projectiles.Num()) {
 					// Il y a plus de projectiles in game que dans le save state : détruire le surplus
@@ -408,6 +407,7 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 				// Check if there is the same amount of projectiles + all projectiles have same auxInfo (bool method)
 					// just apply all simplified
 				if (!TryApplySequentialProjectileArray(i, saveState)) {
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Try False ! ");
 					// previous method failed
 					// Les projectiles pouvant être issus de différentes Attack Proj, le + simple est de tous les détruire et refaire
 					if (AllProjectiles.Contains(i)) {
@@ -424,15 +424,20 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 						AllProjectiles.Add(i, FProjectileArray());
 						UAttackProjectile* subProjectileAttack = nullptr;
 						for (auto& simpProj : saveState.projectiles[i].Projectiles) {
+							//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(i) + " - " + FString::SanitizeFloat(simpProj.auxiliaryInfo));
 							if (attackSeq->GetProjectileAttack(simpProj.auxiliaryInfo, subProjectileAttack)) {
-
+								//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(i) + " - " + FString::SanitizeFloat(subProjectileAttack->GetAuxInfo()));
 								AHitBoxGroupProjectile* projectile = subProjectileAttack->SpwanHitBoxGroup();
 								projectile->applySimplifiedVersion(simpProj);
 								AllProjectiles[i].Projectiles.Add(projectile);
 							}
 						}
+						//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Contains " +FString::SanitizeFloat(AllProjectiles[i].Projectiles.Num()));
 					}
 				}
+				/*else {
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Try true ! ");
+				}*/
 			}
 		}
 
@@ -453,12 +458,13 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 }
 bool UGodAttackComponent::TryApplySequentialProjectileArray(int idAtt, FAttacksSaveState& saveState) {
 	if (!AllProjectiles.Contains(idAtt) || !saveState.projectiles.Contains(idAtt))
-		return false;
+		return false;	// there is no projectiles in the save state or in the scene
 	else if (AllProjectiles[idAtt].Projectiles.Num() != saveState.projectiles[idAtt].Projectiles.Num())
-		return false;
+		return false;	// there is not the same amount of projectiles registered in the save state on in the scene
 	else
 		for (int j = 0; j < saveState.projectiles[idAtt].Projectiles.Num(); j++) {
-			if (AllProjectiles[idAtt].Projectiles[j] != nullptr && AllProjectiles[idAtt].Projectiles[j]->auxiliaryInfo == saveState.projectiles[idAtt].Projectiles[j].auxiliaryInfo)
+			if (!IsValid(AllProjectiles[idAtt].Projectiles[j]) && AllProjectiles[idAtt].Projectiles[j]->auxiliaryInfo == saveState.projectiles[idAtt].Projectiles[j].auxiliaryInfo)
+				// the projectile number j exists and was spawned by the same attack than the simpProj number (=> same class)
 				AllProjectiles[idAtt].Projectiles[j]->applySimplifiedVersion(saveState.projectiles[idAtt].Projectiles[j]);
 			else
 				return false;

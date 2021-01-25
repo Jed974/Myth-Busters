@@ -52,8 +52,14 @@ void UAttackSingleHit::DestroyHitBoxGroup() {
 	}
 }
 
-void UAttackSingleHit::ApplySaveState(UAttackSaveState _saveState) {
+/*void UAttackSingleHit::ApplySaveState(UAttackSaveState _saveState) {
 	Super::ApplySaveState(_saveState);
+	if (attackState == EAttackState::HITACTIVE1) {
+		SpwanHitBoxGroup();
+	}
+}*/
+void UAttackSingleHit::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
+	Super::LoadAtAttackStateAndFrame(_stateToLoad, _animationFrameToLoad, LoadAnimation);
 	if (attackState == EAttackState::HITACTIVE1) {
 		SpwanHitBoxGroup();
 	}

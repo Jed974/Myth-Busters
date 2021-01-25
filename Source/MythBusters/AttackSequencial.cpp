@@ -41,9 +41,9 @@ void UAttackSequencial::SetUpAttack(AGod* _god, int _idAttack, int _auxInfo) {
 
 
 void UAttackSequencial::ApplySaveState(UAttackSaveState _saveState) {
-	idCurrentSubAttack = 3;
-	int ntm = _saveState.auxiliaryInfo;
-	idCurrentSubAttack = ntm;
+	idCurrentSubAttack = _saveState.auxiliaryInfo;
+	if (_saveState.attackState_Saved != EAttackState::OFF)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat((int)_saveState.attackState_Saved));
 	Super::ApplySaveState(_saveState);
 }
 UAttackSaveState UAttackSequencial::GetSaveState() {

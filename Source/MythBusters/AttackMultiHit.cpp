@@ -63,8 +63,24 @@ void UAttackMultiHit::DestroyHitBoxGroup() {
 	}
 }
 
-void UAttackMultiHit::ApplySaveState(UAttackSaveState _saveState) {
+/*void UAttackMultiHit::ApplySaveState(UAttackSaveState _saveState) {
 	Super::ApplySaveState(_saveState);
+	switch (attackState) {
+	case EAttackState::HITACTIVE1:
+		SpwanHitBoxGroup(0);
+		break;
+	case EAttackState::HITACTIVE2:
+		SpwanHitBoxGroup(1);
+		break;
+	case EAttackState::HITACTIVE3:
+		SpwanHitBoxGroup(2);
+		break;
+	default:
+		break;
+	}
+}*/
+void UAttackMultiHit::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
+	Super::LoadAtAttackStateAndFrame(_stateToLoad, _animationFrameToLoad, LoadAnimation);
 	switch (attackState) {
 	case EAttackState::HITACTIVE1:
 		SpwanHitBoxGroup(0);
