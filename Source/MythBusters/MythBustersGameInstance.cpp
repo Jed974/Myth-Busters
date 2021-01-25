@@ -105,6 +105,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
     case GGPO_EVENTCODE_DISCONNECTED_FROM_PEER:
         UMythBustersGameInstance::Instance->ngs.SetConnectState(info->u.disconnected.player, Disconnected);
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Disconnected from peer !");
+        UMythBustersGameInstance::Instance->MythBusters_DisconnectPlayer(!UMythBustersGameInstance::Instance->GGPOPlayerIndex);
         break;
     case GGPO_EVENTCODE_TIMESYNC:
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Blue, "Time Synching...");
@@ -133,6 +134,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
  */
 bool __cdecl mb_advance_frame_callback(int)
 {
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Advance frame callback");
     SSendableInputs inputs[NUM_PLAYERS] = { 0 };
     int disconnect_flags;
 
@@ -140,7 +142,7 @@ bool __cdecl mb_advance_frame_callback(int)
     // the game state instead of reading from the keyboard.
     ggpo_synchronize_input(UMythBustersGameInstance::Instance->ggpo, (void*)inputs, UMythBustersGameInstance::Instance->PacketSize * NUM_PLAYERS, &disconnect_flags);
     UMythBustersGameInstance::Instance->MythBusters_AdvanceFrame(inputs, disconnect_flags);
-    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Advance frame callback");
+    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Frame advanced");
 
     return true;
 }
@@ -155,7 +157,7 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
     memcpy(&UMythBustersGameInstance::Instance->gs, buffer, len);
     UMythBustersGameInstance::Instance->rollbacking = true;
     GEngine->GameViewport->bDisableWorldRendering = true;
-    APlayerController* PController = UGameplayStatics::GetPlayerController(UMythBustersGameInstance::Instance->GetWorld(), 0);
+    APlayerController* PController = UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController;
     if (PController)
     {
         PController->ConsoleCommand(TEXT("t.maxfps = 0"), true);
@@ -188,16 +190,7 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
         fprintf(fp, "  Frame %i - Player2 : %f\n", UMythBustersGameInstance::Instance->gs._framenumber, UMythBustersGameInstance::Instance->gs.Gods[1].Ref->GGPOInputs.HorizontalAxis.Value);
         fclose(fp);
     }*/
-    if (UMythBustersGameInstance::Instance->rollbacking)
-    {
-        UMythBustersGameInstance::Instance->rollbacking = false;
-        GEngine->GameViewport->bDisableWorldRendering = false;
-        APlayerController* PController = UGameplayStatics::GetPlayerController(UMythBustersGameInstance::Instance->GetWorld(), 0);
-        if (PController)
-        {
-            PController->ConsoleCommand(TEXT("t.maxfps = 60"), true);
-        }
-    }
+    
     UMythBustersGameInstance::Instance->gs.Observe();
     *len = sizeof(UMythBustersGameInstance::Instance->gs);
     *buffer = (unsigned char*)malloc(*len);
@@ -262,6 +255,27 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
   {
       free(buffer);
   }
+
+  /*
+  * vw_free_buffer --
+  *
+  * Free a save state buffer previously returned in vw_save_game_state_callback.
+  */
+  bool __cdecl mb_end_rollback_callback()
+  {
+      if (UMythBustersGameInstance::Instance->rollbacking)
+      {
+          GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Yellow, "Rollback Done !");
+          UMythBustersGameInstance::Instance->rollbacking = false;
+          GEngine->GameViewport->bDisableWorldRendering = false;
+          APlayerController* PController = UMythBustersGameInstance::Instance->GetLocalPlayers()[0]->PlayerController;
+          if (PController)
+          {
+              PController->ConsoleCommand(TEXT("t.maxfps = 60"), true);
+          }
+      }
+      return true;
+  }
   
 
   UMythBustersGameInstance::UMythBustersGameInstance()
@@ -280,7 +294,7 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
 
   UMythBustersGameInstance::~UMythBustersGameInstance()
   {
-      MythBusters_DisconnectPlayer(GGPOPlayerIndex);
+      //MythBusters_DisconnectPlayer(GGPOPlayerIndex);
       
       MythBusters_Exit();
   }
@@ -314,6 +328,7 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
     cb.free_buffer = mb_free_buffer_callback;
     cb.on_event = mb_on_event_callback;
     cb.log_game_state = mb_log_game_state_callback;
+    cb.end_rollback = mb_end_rollback_callback;
 
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Callback binded");
 
@@ -440,13 +455,12 @@ void UMythBustersGameInstance::StartGGPO()
   void UMythBustersGameInstance::MythBusters_DisconnectPlayer(int player)
   {
       if (player < ngs.num_players) {
-          char logbuf[128];
           GGPOErrorCode result = ggpo_disconnect_player(ggpo, ngs.players[player].handle);
           if (GGPO_SUCCEEDED(result)) {
-              sprintf_s(logbuf, ARRAYSIZE(logbuf), "Disconnected player %d.\n", player);
+              GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Disconnected player " + player);
           }
           else {
-              sprintf_s(logbuf, ARRAYSIZE(logbuf), "Error while disconnecting player (err:%d).\n", result);
+              GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Error while disconnecting player(err: " + FString::FromInt(player) + "). \n");
           }
       }
   }
@@ -474,7 +488,7 @@ void UMythBustersGameInstance::StartGGPO()
 void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[], int disconnect_flags)
 {
     //gs.Update(inputs, disconnect_flags);
-    gs._framenumber += 1;
+    
     AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
     AGod* RemoteGod = (AGod*)GetLocalPlayers()[1]->PlayerController->GetPawn();
     LocalGod->GGPOInputs.Readable(&inputs[GGPOPlayerIndex]);
@@ -564,7 +578,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         LocalInputs.MakeSendable();
 
         //While god selection information is initiated localy but not recieved, send local selection 
-        //if (SelectedGods[0] != -1 && SelectedGods[1] == -1) {
+        //if (SelectedGods[3] == 0) {
         //    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Sending god selection");
         //    if (SelectedGods[0] == 0) {
         //        LocalInputs.SendableInputs.Actions = ThorSelectedCode;
@@ -573,14 +587,22 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         //    {
         //        LocalInputs.SendableInputs.Actions = Thor2SelectedCode;
         //    }
+        //    if (SelectedGods[2] == 1) {
+        //        LocalInputs.SendableInputs.Actions = GodSelectionReceived;
+        //        SelectedGods[2] = 0;
+        //    }
         //}
 
-        while (!GGPO_SUCCEEDED(result))
+        while (!GGPO_SUCCEEDED(result) && ngs.players[GGPOPlayerIndex].state == Running)
         {
             result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
             if (!GGPO_SUCCEEDED(result))
             {
                 ggpo_idle(ggpo, 1000 * 1.0f / 60);
+                if (rollbacking)
+                {
+                    break;
+                }
             }
         }
 
@@ -593,15 +615,21 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         result = ggpo_synchronize_input(ggpo, (void*)Inputs, PacketSize * NUM_PLAYERS, &disconnect_flags);
         if (GGPO_SUCCEEDED(result)) {
 
-            //Recieve god selection info
-            //if (SelectedGods[0] != -1 && SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == ThorSelectedCode) {
+            //Receive confirmation that remote gameinstance received local god selection
+            //if (SelectedGods[3] == 0 && Inputs[GGPOPlayerIndex].Actions == GodSelectionReceived) {
+            //    SelectedGods[3] = 1;
+            //}
+            ////Receive god selection info
+            //if (SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == ThorSelectedCode) {
             //    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR IS SELECTED");
             //    SelectedGods[1] = 0;
+            //    SelectedGods[2] = 1;
             //    Inputs[GGPOPlayerIndex].Actions = (char)0b0000000;
             //}
-            //else if (SelectedGods[0] != -1 && SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == Thor2SelectedCode) {
+            //else if ( SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == Thor2SelectedCode) {
             //    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR2 IS SELECTED");
             //    SelectedGods[1] = 1;
+            //    SelectedGods[2] = 1;
             //    Inputs[GGPOPlayerIndex].Actions = (char)0b0000000;
             //}
 
@@ -609,7 +637,6 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
              // the game by 1 frame using those inputs.
              MythBusters_AdvanceFrame(Inputs, disconnect_flags);
         }
-
     }
     else
     {
@@ -715,9 +742,10 @@ void UMythBustersGameInstance::MythBusters_NextFrame()
     if (InputsReadyForFrame)
     {
         InputsReadyForFrame = false;
+        gs._framenumber += 1;
         // Notify ggpo that we've moved forward exactly 1 frame.
+        
         ggpo_advance_frame(ggpo);
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "framecount++");
         
     }
     
