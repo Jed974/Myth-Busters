@@ -59,7 +59,9 @@ void UGodAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 			Cast<AGod>(GetOwner())->ChangeGodState(EGodState::Flying);
 		}
 		else {
-			Cast<AGod>(GetOwner())->GetGodMovementComponent()->AddMovementInput(Attacks[currentAttack]->GetInducedMovement(), 1.0);
+			FVector2D induced = Attacks[currentAttack]->GetInducedMovement();
+			if (induced.X  > -2)
+				Cast<AGod>(GetOwner())->GetGodMovementComponent()->AddMovementInput(induced, 1.0);
 		}
 	}
 
@@ -411,7 +413,8 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 					if (AllProjectiles.Contains(i)) {
 						// Currently we have some projectiles => destroy them
 						for (auto& proj : AllProjectiles[i].Projectiles) {
-							proj->Destroy();
+							if (proj != nullptr)
+								proj->Destroy();
 						}
 						AllProjectiles.Empty();
 					}
@@ -455,7 +458,7 @@ bool UGodAttackComponent::TryApplySequentialProjectileArray(int idAtt, FAttacksS
 		return false;
 	else
 		for (int j = 0; j < saveState.projectiles[idAtt].Projectiles.Num(); j++) {
-			if (AllProjectiles[idAtt].Projectiles[j]->auxiliaryInfo == saveState.projectiles[idAtt].Projectiles[j].auxiliaryInfo)
+			if (AllProjectiles[idAtt].Projectiles[j] != nullptr && AllProjectiles[idAtt].Projectiles[j]->auxiliaryInfo == saveState.projectiles[idAtt].Projectiles[j].auxiliaryInfo)
 				AllProjectiles[idAtt].Projectiles[j]->applySimplifiedVersion(saveState.projectiles[idAtt].Projectiles[j]);
 			else
 				return false;

@@ -108,12 +108,12 @@ void UAttackSequencial::OnNextNotify() {
 }
 
 bool UAttackSequencial::GetProjectileAttack(int id_Att, UAttackProjectile* &outAttack) {
-	if (idCurrentSubAttack != -1 && idCurrentSubAttack < Attacks.Num() && Attacks[idCurrentSubAttack] != nullptr) {
+	//if (idCurrentSubAttack != -1 && idCurrentSubAttack < Attacks.Num() && Attacks[idCurrentSubAttack] != nullptr) {
 		outAttack = Cast<UAttackProjectile>(Attacks[id_Att]);
 		return (outAttack != nullptr);
-	}
+	/*}
 	else {
 		outAttack = nullptr;
 		return false;
-	}
+	}*/
 }
