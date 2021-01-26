@@ -302,7 +302,9 @@ public:
 
 	/// Called by GodAnimInstance to get values nec. for animations blendSpace
 	virtual float GetAnimValues(int _idValueToGet);
-
+	/// Called to set up the skeletal mesh custom depth pencil
+	UFUNCTION(BlueprintCallable)
+	void SetUpCustomPencilDeth(int depth);
 	
 	/// Allow to change good state properly (with canMove and other ajustements)
 	//UFUNCTION(BlueprintCallable)
