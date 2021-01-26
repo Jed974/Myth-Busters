@@ -12,15 +12,16 @@ class MYTHBUSTERS_API AHitBoxGroup : public AActor
 {
 	GENERATED_BODY()
 
-protected:
+/*protected:
 	UPROPERTY(BlueprintReadWrite)
-	TArray<AGod*> AlreadyHitGods;
+	TArray<AGod*> AlreadyHitGods;*/
 	
 public:	
 	// Sets default values for this actor's properties
 	AHitBoxGroup();
 	UPROPERTY(Category = "Orientation", BlueprintReadWrite)
 	bool facingRight;
+	bool alreadyHit = false;
 
 
 protected:
@@ -31,5 +32,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	bool GodHitIsValid(AGod* godHit);
-	void RegisterGodHit(AGod* godHit);
+	//void RegisterGodHit(AGod* godHit);
 };

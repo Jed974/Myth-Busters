@@ -29,10 +29,11 @@ struct UAttackSaveState {
 	EAttackState attackState_Saved;
 	float animationFrame_Saved;
 	int inducedMovementAbscissa;
+	bool auxAlreadyHit;
 	int auxiliaryInfo;
 	// Other, car be derived for attacks that need more information as projectile position
 
-	UAttackSaveState() : attackState_Saved(EAttackState::OFF), animationFrame_Saved(-1), auxiliaryInfo(-1){};
+	UAttackSaveState() : attackState_Saved(EAttackState::OFF), animationFrame_Saved(-1), auxAlreadyHit(false), auxiliaryInfo(-1) {};
 };
 
 /**

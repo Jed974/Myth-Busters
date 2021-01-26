@@ -67,6 +67,7 @@ public:
 	void SetInputDirectionVectorY(float _inputY);
 
 	float GetLifeTime();
+	float GetAngle();
 
 	//UFUNCTION(BlueprintCallable)
 	void ProtectGodFromDamage(AHitBoxGroup* hitBoxGroup);

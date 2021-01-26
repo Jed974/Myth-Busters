@@ -31,11 +31,11 @@ void AHitBoxGroup::Tick(float DeltaTime)
 bool AHitBoxGroup::GodHitIsValid(AGod* godHit) {
 	if (godHit == GetInstigator())
 		return false;
-	else if (AlreadyHitGods.Contains(godHit))
+	else if (alreadyHit)//(AlreadyHitGods.Contains(godHit))
 		return false;
 	else
 		return true;
 }
-void AHitBoxGroup::RegisterGodHit(AGod* godHit) {
+/*void AHitBoxGroup::RegisterGodHit(AGod* godHit) {
 	AlreadyHitGods.Add(godHit);
-}
+}*/

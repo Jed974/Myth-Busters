@@ -9,6 +9,17 @@ class AGod;
 #include "GodShieldComponent.generated.h"
 
 
+
+
+USTRUCT(BlueprintType)
+struct MYTHBUSTERS_API FShieldSaveState {
+	GENERATED_BODY()
+
+	bool out;
+	int lifeTime;
+	float angle;
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MYTHBUSTERS_API UGodShieldComponent : public UActorComponent
 {
@@ -46,4 +57,9 @@ public:
 
 	void OrientShieldX(float AxisValue);
 	void OrientShieldY(float AxisValue);
+
+	UFUNCTION(BlueprintCallable)
+	FShieldSaveState GetShieldSaveState();
+	UFUNCTION(BlueprintCallable)
+	void ApplyShieldSaveState(FShieldSaveState ShSvSt);
 };

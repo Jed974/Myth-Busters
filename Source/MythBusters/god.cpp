@@ -633,7 +633,8 @@ void AGod::HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup) {
 			ApplyGodDamage(HighestPriorityHB->BaseDamage);
 
 			// Register god as hit
-			hitBoxGroup->RegisterGodHit(this);
+			hitBoxGroup->alreadyHit = true;
+			//hitBoxGroup->RegisterGodHit(this);
 		}
 		else {
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Unexpected error : HitBoxGroup touched god but hitBox couldn't be found");
