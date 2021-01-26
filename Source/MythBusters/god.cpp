@@ -512,6 +512,7 @@ void AGod::SetUpCustomPencilDeth(int depth) {
 	//SkeletalMesh->CustomDepthStencilValue = depth;
 	SkeletalMesh->SetCustomDepthStencilValue(depth);
 	SkeletalMesh->bRenderCustomDepth = true;
+	GodShield->SetNoneCustomColors(depth);
 }
 
 
