@@ -38,9 +38,12 @@ void UAttack::OverAttack(){
 }
 
 
-void UAttack::ApplySaveState(UAttackSaveState _saveState) {
+void UAttack::ApplySaveState(UAttackSaveState _saveState, bool _playAnimation) {
 	curveAbscissa = _saveState.inducedMovementAbscissa;
-	LoadAtAttackStateAndFrame(_saveState.attackState_Saved, _saveState.animationFrame_Saved);
+	attackState = _saveState.attackState_Saved;	
+	if (_playAnimation)
+		PlayMontageFromCurrentState(_saveState.animationFrame_Saved);
+	//LoadAtAttackStateAndFrame(_saveState.attackState_Saved, _saveState.animationFrame_Saved);
 }
 UAttackSaveState UAttack::GetSaveState() {
 	UAttackSaveState _saveState;
@@ -49,11 +52,11 @@ UAttackSaveState UAttack::GetSaveState() {
 	_saveState.inducedMovementAbscissa = curveAbscissa;
 	return _saveState;
 }
-void UAttack::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
+/*void UAttack::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
 	attackState = _stateToLoad;
 	if (LoadAnimation)
 		PlayMontageFromCurrentState(_animationFrameToLoad);
-}
+}*/
 float UAttack::GetAttackFrame() {
 	if (attackState != EAttackState::OFF)
 		return godAnimInstance->Montage_GetPosition(attackMontage);

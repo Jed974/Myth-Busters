@@ -40,18 +40,38 @@ void UAttackSequencial::SetUpAttack(AGod* _god, int _idAttack, int _auxInfo) {
 }
 
 
-void UAttackSequencial::ApplySaveState(UAttackSaveState _saveState) {
+void UAttackSequencial::ApplySaveState(UAttackSaveState _saveState, bool _playAnimation) {
 	idCurrentSubAttack = _saveState.auxiliaryInfo;
-	if (_saveState.attackState_Saved != EAttackState::OFF)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat((int)_saveState.attackState_Saved));
-	Super::ApplySaveState(_saveState);
+	//if (_saveState.attackState_Saved != EAttackState::OFF)
+	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat((int)_saveState.attackState_Saved));
+	//curveAbscissa = _saveState.inducedMovementAbscissa;
+	Super::ApplySaveState(_saveState, _playAnimation);
+		/*curveAbscissa = _saveState.inducedMovementAbscissa;
+		attackState = _saveState.attackState_Saved;
+		if (_playAnimation)
+			PlayMontageFromCurrentState(_saveState.animationFrame_Saved);*/
+
+	if (_saveState.attackState_Saved == EAttackState::OFF)
+		OverAttack();
+	else {
+		attackState = EAttackState::START;
+
+		/* if currentAttack is aim attack + state of wait -> aim attack handles animation
+			 stuff....
+		else*/
+
+		if (Attacks[idCurrentSubAttack] != nullptr)
+			Attacks[idCurrentSubAttack]->ApplySaveState(_saveState, false); //LoadAtAttackStateAndFrame(_stateToLoad, -1, false);
+
+		PlayMontageFromCurrentState(_saveState.animationFrame_Saved);	// the animation is handle by sequential animation only
+	}
 }
 UAttackSaveState UAttackSequencial::GetSaveState() {
 	UAttackSaveState svst = Super::GetSaveState();
 	svst.auxiliaryInfo = idCurrentSubAttack;
 	return svst;
 }
-void UAttackSequencial::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
+/*void UAttackSequencial::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
 	if (_stateToLoad == EAttackState::OFF)
 		OverAttack();
 	else {
@@ -65,7 +85,7 @@ void UAttackSequencial::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, flo
 
 		PlayMontageFromCurrentState(_animationFrameToLoad);	// the animation is handle by sequential animation only
 	}
-}
+}*/
 EAttackState UAttackSequencial::GetAttackState() {
 	if (attackState == EAttackState::OFF)
 		return EAttackState::OFF;		// If the attack is off, we tell so

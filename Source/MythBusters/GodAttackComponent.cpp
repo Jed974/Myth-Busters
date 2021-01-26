@@ -440,18 +440,6 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 				}*/
 			}
 		}
-
-		//GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Yellow, "Proj absents mais présents dans le saveState");
-		/**/
-			// TODO : sequentielles
-			// Ajouter des int Aux aux Attack ou AtttackProj + mettre param opt de SetUp avec l'aux		-> OK
-			// + Ajouter des int Aux aux projectiles													-> OK
-			// + Ajouter des int Aux aux simplifiedProjectiles											-> OK
-			// Connection de l'info :
-				// Att seq -> att																		-> OK
-				// att -> proj																			-> OK
-				// proj -> proj simp																	-> OK
-				// proj simp attcomp																	-> 
 	}
 
 	CleanUpProjectile(); // in case we have destroy some projectiles during rollback

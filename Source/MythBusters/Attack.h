@@ -79,9 +79,9 @@ public:
 	/** Method called to set up the attack for further use*/
 	virtual void SetUpAttack(AGod* _god, int _idAttack, int _auxInfo = -1);
 
-	virtual void ApplySaveState(UAttackSaveState _saveState);
+	virtual void ApplySaveState(UAttackSaveState _saveState, bool _playAnimation = true);
 	virtual UAttackSaveState GetSaveState();
-	virtual void LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad = -1, bool LoadAnimation = true);
+	//virtual void LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad = -1, bool LoadAnimation = true);
 	virtual float GetAttackFrame();
 	virtual EAttackState GetAttackState();
 	EAttackState GAS();

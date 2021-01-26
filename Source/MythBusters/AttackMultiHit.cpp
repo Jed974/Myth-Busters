@@ -18,7 +18,7 @@ void UAttackMultiHit::StopAttack() {
 }
 
 
-void UAttackMultiHit::SpwanHitBoxGroup(int id) {
+void UAttackMultiHit::SpwanHitBoxGroup(int id, bool alreadyHit) {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "AttackSingleHit started an attack !");
 
 	FTransform _spawnTransform = god->GetRootComponent()->GetSocketTransform(SocketToAttachTo);
@@ -33,8 +33,10 @@ void UAttackMultiHit::SpwanHitBoxGroup(int id) {
 		hitBoxGroup->AttachToComponent(god->GetSkeletalMesh(), _attTransformRules, SocketToAttachTo);
 	else
 		hitBoxGroup->AttachToComponent(god->GetSkeletalMesh(), _attTransformRules);
-	hitBoxGroup->facingRight = god->GetGodMovementComponent()->GetIsFacingRight();
-	
+	hitBoxGroup->facingRight = god->GetGodMovementComponent()->GetIsFacingRight();	
+	hitBoxGroup->alreadyHit = alreadyHit;	
+
+
 	idHitboxGroup = id;
 
 	switch (idHitboxGroup) {
@@ -63,23 +65,23 @@ void UAttackMultiHit::DestroyHitBoxGroup() {
 	}
 }
 
-/*void UAttackMultiHit::ApplySaveState(UAttackSaveState _saveState) {
-	Super::ApplySaveState(_saveState);
+void UAttackMultiHit::ApplySaveState(UAttackSaveState _saveState, bool _playAnimation) {
+	Super::ApplySaveState(_saveState, _playAnimation);
 	switch (attackState) {
 	case EAttackState::HITACTIVE1:
-		SpwanHitBoxGroup(0);
+		SpwanHitBoxGroup(0, _saveState.auxAlreadyHit);
 		break;
 	case EAttackState::HITACTIVE2:
-		SpwanHitBoxGroup(1);
+		SpwanHitBoxGroup(1, _saveState.auxAlreadyHit);
 		break;
 	case EAttackState::HITACTIVE3:
-		SpwanHitBoxGroup(2);
+		SpwanHitBoxGroup(2, _saveState.auxAlreadyHit);
 		break;
 	default:
 		break;
 	}
-}*/
-void UAttackMultiHit::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
+}
+/*void UAttackMultiHit::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
 	Super::LoadAtAttackStateAndFrame(_stateToLoad, _animationFrameToLoad, LoadAnimation);
 	switch (attackState) {
 	case EAttackState::HITACTIVE1:
@@ -94,7 +96,7 @@ void UAttackMultiHit::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float
 	default:
 		break;
 	}
-}
+}*/
 
 void UAttackMultiHit::OnActiveNotify() {
 	SpwanHitBoxGroup(0);

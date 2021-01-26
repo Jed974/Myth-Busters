@@ -18,7 +18,7 @@ void UAttackSingleHit::StopAttack() {
 }
 
 
-void UAttackSingleHit::SpwanHitBoxGroup() {
+void UAttackSingleHit::SpwanHitBoxGroup(bool alreadyHit) {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "AttackSingleHit started an attack !");
 
 	FTransform _spawnTransform = god->GetRootComponent()->GetSocketTransform(SocketToAttachTo);
@@ -35,6 +35,7 @@ void UAttackSingleHit::SpwanHitBoxGroup() {
 		hitBoxGroup->AttachToComponent(god->GetSkeletalMesh(), _attTransformRules);
 
 	hitBoxGroup->facingRight = god->GetGodMovementComponent()->GetIsFacingRight();
+	hitBoxGroup->alreadyHit = alreadyHit;
 
 	attackState = EAttackState::HITACTIVE1;
 }
@@ -52,18 +53,18 @@ void UAttackSingleHit::DestroyHitBoxGroup() {
 	}
 }
 
-/*void UAttackSingleHit::ApplySaveState(UAttackSaveState _saveState) {
-	Super::ApplySaveState(_saveState);
+void UAttackSingleHit::ApplySaveState(UAttackSaveState _saveState, bool _playAnimation) {
+	Super::ApplySaveState(_saveState, _playAnimation);
 	if (attackState == EAttackState::HITACTIVE1) {
-		SpwanHitBoxGroup();
+		SpwanHitBoxGroup(_saveState.auxAlreadyHit);
 	}
-}*/
-void UAttackSingleHit::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
+}
+/*void UAttackSingleHit::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
 	Super::LoadAtAttackStateAndFrame(_stateToLoad, _animationFrameToLoad, LoadAnimation);
 	if (attackState == EAttackState::HITACTIVE1) {
 		SpwanHitBoxGroup();
 	}
-}
+}*/
 
 void UAttackSingleHit::OnActiveNotify() {
 	SpwanHitBoxGroup();
