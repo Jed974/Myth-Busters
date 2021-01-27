@@ -578,7 +578,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         LocalInputs.MakeSendable();
 
         //While god selection information is initiated localy but not recieved, send local selection 
-        if (SelectedGods[3] == 0 && true == false) {
+        if (SelectedGods[3] == 0) {
             GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Sending god selection");
             if (SelectedGods[0] == 0) {
                 LocalInputs.SendableInputs.Actions = ThorSelectedCode;
@@ -588,8 +588,8 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
                 LocalInputs.SendableInputs.Actions = Thor2SelectedCode;
             }
             if (SelectedGods[2] == 1) {
+                GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Confirmation received !");
                 LocalInputs.SendableInputs.Actions = GodSelectionReceived;
-                SpawnSelectedGods();
                 SelectedGods[2] = 0;
             }
         }
