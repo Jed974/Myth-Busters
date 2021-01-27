@@ -51,6 +51,7 @@ protected:
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void SetNoneCustomColors(int idPlayer);
 
 	bool StartShield();
 	void StopShield();
