@@ -55,6 +55,8 @@ protected:
 	UPROPERTY(Category = "Animation", EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* attackMontage;
 
+	
+
 	AGod* god;
 	UGodAnimInstance* godAnimInstance;
 
@@ -62,6 +64,11 @@ protected:
 	UPROPERTY(Category = "Movement", EditAnywhere, BlueprintReadOnly)
 	UCurveVector* InducedMovement;
 	int curveAbscissa = 0;
+	UPROPERTY(Category = "Movement", EditAnywhere, BlueprintReadOnly)
+		float MaxDirectionalInfluenceSpeed;
+	UPROPERTY(Category = "Movement", EditAnywhere, BlueprintReadOnly)
+		float DirectionalInfluenceAcceleration;
+
 
 	virtual void PlayMontageFromCurrentState(float _animationFrameToLoad);
 
@@ -97,5 +104,7 @@ public:
 	void SetCoolDown(int _cd);
 
 	FVector2D GetInducedMovement();
+	float GetMaxDirectionalInfluenceSpeed() { return MaxDirectionalInfluenceSpeed; };
+	float GetDirectionalInfluenceAcceleration() { return DirectionalInfluenceAcceleration; };
 	int GetAuxInfo();
 };

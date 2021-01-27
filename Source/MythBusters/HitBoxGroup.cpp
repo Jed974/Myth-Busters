@@ -23,7 +23,7 @@ void AHitBoxGroup::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//SetActorLocation(FVector(GetActorLocation().X, 0.f, GetActorLocation().Z));
-	//SetActorRotation(FRotator(0.f, 0.f, GetActorRotation().Roll));
+	//SetActorRotation(FRotator(0.f, GetActorRotation().Pitch, GetActorRotation().Roll));
 
 }
 

@@ -59,9 +59,9 @@ void UGodAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 			Cast<AGod>(GetOwner())->ChangeGodState(EGodState::Flying);
 		}
 		else {
-			FVector2D induced = Attacks[currentAttack]->GetInducedMovement();
+			/*FVector2D induced = Attacks[currentAttack]->GetInducedMovement();
 			if (induced.X  > -2)
-				Cast<AGod>(GetOwner())->GetGodMovementComponent()->AddMovementInput(induced, 1.0);
+				Cast<AGod>(GetOwner())->GetGodMovementComponent()->AddMovementInput(induced, 1.0);*/
 		}
 	}
 

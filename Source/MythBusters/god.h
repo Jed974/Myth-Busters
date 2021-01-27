@@ -318,6 +318,7 @@ public:
 	// Component getters methods
 	USkeletalMeshComponent* GetSkeletalMesh();
 	UGodMovementComponent* GetGodMovementComponent() { return GodMovement; };
+	UGodAttackComponent* GetGodAttackComponent() { return GodAttack; };
 	UGodBoostComponent* GetGodBoostComponent() { return GodBoost; };
 
 	/// Method called when the god hits a hitBoxGroup
