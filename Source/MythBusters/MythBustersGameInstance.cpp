@@ -559,6 +559,11 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
   void UMythBustersGameInstance::MythBusters_RunFrame()
   {
 
+      for (auto i : SelectedGods) {
+          GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::FromInt(i));
+    }
+     
+
     GGPOErrorCode result = GGPO_ERRORCODE_GENERAL_FAILURE;
     int disconnect_flags;
     AGod* LocalGod = (AGod*)GetLocalPlayers()[0]->PlayerController->GetPawn();
@@ -578,7 +583,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         LocalInputs.MakeSendable();
 
         //While god selection information is initiated localy but not recieved, send local selection 
-        if (SelectedGods[3] == 0) {
+        if (SelectedGods[3] == 0 && true == false) {
             GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Sending god selection");
             if (SelectedGods[0] == 0) {
                 LocalInputs.SendableInputs.Actions = ThorSelectedCode;
@@ -589,6 +594,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
             }
             if (SelectedGods[2] == 1) {
                 LocalInputs.SendableInputs.Actions = GodSelectionReceived;
+                SpawnSelectedGods();
                 SelectedGods[2] = 0;
             }
         }
@@ -614,6 +620,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
             //Receive confirmation that remote gameinstance received local god selection
             if (SelectedGods[3] == 0 && Inputs[GGPOPlayerIndex].Actions == GodSelectionReceived) {
                 SelectedGods[3] = 1;
+                Inputs[GGPOPlayerIndex].Actions = (char)0b0000000;
             }
             //Receive god selection info
             if (SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == ThorSelectedCode) {
