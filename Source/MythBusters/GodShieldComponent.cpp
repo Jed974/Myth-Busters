@@ -75,14 +75,14 @@ void UGodShieldComponent::OrientShieldY(float AxisValue) {
 	CurrentShield->SetInputDirectionVectorY(AxisValue * -1);
 }
 
-FShieldSaveState UGodShieldComponent::GetShieldSaveState() {
+FShieldSaveState UGodShieldComponent::SaveShieldState() {
 	FShieldSaveState ShSvSt;
 	ShSvSt.out = CurrentShield != nullptr;
 	ShSvSt.lifeTime = ShSvSt.out ? CurrentShield->GetLifeTime() : shieldLifeTime;
 	ShSvSt.angle = ShSvSt.out ? CurrentShield->GetAngle() : 0;
 	return ShSvSt;
 }
-void UGodShieldComponent::ApplyShieldSaveState(FShieldSaveState ShSvSt) {
+void UGodShieldComponent::LoadShieldState(FShieldSaveState &ShSvSt) {
 	if (ShSvSt.out) {
 		if (CurrentShield == nullptr)
 			StartShield();

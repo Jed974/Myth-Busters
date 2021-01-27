@@ -60,7 +60,7 @@ public:
 	void OrientShieldY(float AxisValue);
 
 	UFUNCTION(BlueprintCallable)
-	FShieldSaveState GetShieldSaveState();
+	FShieldSaveState SaveShieldState();
 	UFUNCTION(BlueprintCallable)
-	void ApplyShieldSaveState(FShieldSaveState ShSvSt);
+	void LoadShieldState(FShieldSaveState &ShSvSt);
 };

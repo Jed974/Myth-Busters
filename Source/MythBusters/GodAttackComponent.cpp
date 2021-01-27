@@ -5,6 +5,7 @@
 #include "HitBoxGroupProjectile.h"
 #include "AttackProjectile.h"
 #include "AttackSequencial.h"
+#include "GodAnimInstance.h"
 #include "god.h"
 
 // Sets default values for this component's properties
@@ -350,6 +351,17 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 		}
 	}
 
+	// Stop montage animations
+	if (currentAttack != -1 && saveState.idCurrentSubAttack == -1) {
+		AGod* god = Cast<AGod>(GetOwner());
+		if (god != nullptr) {
+			UGodAnimInstance* AnimIntance = Cast<UGodAnimInstance>(god->GetSkeletalMesh()->GetAnimInstance());
+			if (AnimIntance != nullptr)
+				AnimIntance->InterruptAllMontages();
+		}
+	}
+
+	
 	// Go back to past attack
 	currentAttack = saveState.idCurrentSubAttack;
 	if (currentAttack != -1)

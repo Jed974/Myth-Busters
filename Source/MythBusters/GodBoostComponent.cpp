@@ -53,9 +53,9 @@ float UGodBoostComponent::GetBoost(EBoostType type) {
 	return std::max(1 + ((float)percentBoost) / 100, 0.0f);
 }
 
-TArray<FBoost> UGodBoostComponent::GetBoostSaveState() const {
+TArray<FBoost> UGodBoostComponent::SaveBoostState() const {
 	return boosts;
 }
-void UGodBoostComponent::SetBoostSaveState(TArray<FBoost> savedBoosts) {
+void UGodBoostComponent::LoadBoostState(TArray<FBoost> &savedBoosts) {
 	boosts = savedBoosts;
 }
