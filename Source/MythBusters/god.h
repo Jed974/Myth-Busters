@@ -12,6 +12,7 @@ class AHitBoxGroup;
 #include "god.generated.h"
 
 
+
 enum EInputActionState
 {
 	Released,
@@ -107,6 +108,7 @@ struct SInputs
 		if (InputActions[SHIELD].State == Pressed){
 			act += 0b00010000;
 		}
+		//act = AGod::SendGodSelection(act);
 		SendableInputs.Actions = act;
 	};
 	void Readable(SSendableInputs const * const Inputs)
@@ -120,6 +122,7 @@ struct SInputs
 			InputActions[PUSH].State = ((Inputs->Actions & 0b00000100) != 0) ? Pressed : Released;
 			InputActions[DASH].State = ((Inputs->Actions & 0b00001000) != 0) ? Pressed : Released;
 			InputActions[SHIELD].State = ((Inputs->Actions & 0b00010000) != 0) ? Pressed : Released;
+			//AGod::ReadGodSelection(Inputs->Actions);
 		}		
 	};
 };
@@ -336,6 +339,10 @@ public:
 	void HandleAttackNotify(ENotifyType notifyType);
 	/// Method to call to transmit Porjectile to register to the GodAttackComponent
 	void RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack);
+	// Method to add GodSelection to action char
+	static char SendGodSelection(char act);
+	//Method to read GodSelection and modify gamestate
+	static void ReadGodSelection(char act);
 };
 
 
