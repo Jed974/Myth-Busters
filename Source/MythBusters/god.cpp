@@ -74,8 +74,8 @@ void AGod::MoveHorizontal(float AxisValue)
 	if (State == EGodState::Shielding) {
 		GodShield->OrientShieldX(AxisValue);
 	}
-	else if (canMove)
-	{
+	//else if (canMove)
+	//{
 		if (FMath::Abs(AxisValue) > HorizontalDeadZone)
 		{
 			GodMovement->AddMovementInput(FVector2D(1.0, 0.0), AxisValue);
@@ -86,7 +86,7 @@ void AGod::MoveHorizontal(float AxisValue)
 			GodMovement->AddMovementInput(FVector2D(1.0, 0.0), 0.f);
 			EMoveHorizontal(0.f);
 		}
-	}
+	//}
 	
 }
 void AGod::MoveVertical(float AxisValue)
@@ -94,8 +94,8 @@ void AGod::MoveVertical(float AxisValue)
 	if (State == EGodState::Shielding) {
 		GodShield->OrientShieldY(AxisValue);
 	}
-	else if (canMove)
-	{
+	//else if (canMove)
+	//{
 		if (FMath::Abs(AxisValue) > VerticalDeadZone)
 		{
 			GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
@@ -106,7 +106,7 @@ void AGod::MoveVertical(float AxisValue)
 			GodMovement->AddMovementInput(FVector2D(0.0, 1.0), 0.f);
 			EMoveVertical(0.f);
 		}
-	}
+	//}
 }
 
 
@@ -272,6 +272,7 @@ void AGod::ChangeGodState(EGodState NewState)
 			break;
 		case EGodState::Attacking:
 			canMove = false;
+			GodMovement->ChangeMovementState(EMovementState::Attacking);
 			break;
 		case EGodState::Shielding:
 			canMove = false;			
@@ -651,7 +652,11 @@ void AGod::HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup) {
 void AGod::HandleAttackNotify(ENotifyType notifyType) {
 	GodAttack->TransmitNotify(notifyType);
 	if (notifyType == ENotifyType::OVER)
+	{
 		ChangeGodState(EGodState::Flying);
+		GodMovement->ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
+	}
+		
 }
 void AGod::RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack) {
 	GodAttack->RegisterProjectile(_projectile, _idAttack);

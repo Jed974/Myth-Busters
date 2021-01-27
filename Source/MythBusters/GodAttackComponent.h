@@ -58,8 +58,7 @@ class MYTHBUSTERS_API UGodAttackComponent : public UActorComponent
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(Category = "Attack", VisibleAnywhere, BlueprintReadWrite)
-	int currentAttack = -1;
+	
 	UPROPERTY(Category = "Attack", VisibleAnywhere)
 	TMap<int, FProjectileArray> AllProjectiles;
 
@@ -67,6 +66,9 @@ public:
 	// Sets default values for this component's properties
 	UGodAttackComponent();
 
+
+	UPROPERTY(Category = "Attack", VisibleAnywhere, BlueprintReadWrite)
+		int currentAttack = -1;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
 		TArray<UAttack*> Attacks;
 	

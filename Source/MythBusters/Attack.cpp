@@ -112,7 +112,7 @@ FVector2D UAttack::GetInducedMovement() {
 		return FVector2D(v3.X, v3.Y);
 	}
 	else
-		return FVector2D(-3,0);
+		return FVector2D();
 }
 
 int UAttack::GetAuxInfo() { return auxiliaryInfo; }

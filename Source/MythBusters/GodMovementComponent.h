@@ -22,7 +22,8 @@ enum class EMovementState : uint8 {
 	Sprinting,
 	Ejected,
 	WallHit,
-	DeathEjected
+	DeathEjected,
+	Attacking
 };
 
 UENUM(BlueprintType)
@@ -180,6 +181,8 @@ public:
 	bool IsPushable;
 	FVector2D EjectionVelocity;
 
+	FVector2D DirectionalInfluence;
+
 	FVector2D _MovementInput;
 
 	float HorizontalSpeed;
@@ -203,6 +206,10 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 		AActor* CollidingActor;
 
+	
+	virtual void ChangeHorizontalMovementState(EHorizontalMovementState NewState);
+	virtual void ChangeMovementState(EMovementState NewState);
+
 protected:
 	
 	
@@ -215,11 +222,11 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	virtual void ChangeHorizontalMovementState(EHorizontalMovementState NewState);
+	
 
 	virtual void ChangeVerticalMovementState(EVerticalMovementState NewState);
 
-	virtual void ChangeMovementState(EMovementState NewState);
+	
 
 	
 
@@ -241,6 +248,8 @@ public:
 	virtual void ComputeDashingVelocity();
 	
 	virtual void ComputeEjectedVelocity();
+
+	virtual void ComputeAttackingVelocity();
 
 	virtual void ComputePushVelocity(const AActor* OtherActor);
 
@@ -264,6 +273,7 @@ struct SMovementSaveState
 	FVector2D PushVelocity;
 	FVector2D EjectionVelocity;
 	FVector2D DashDir;
+	FVector2D DirectionalInfluence;
 	bool IsPushable;
 
 	float HorizontalSpeed;
@@ -299,6 +309,7 @@ struct SMovementSaveState
 		PushVelocity = Ref->PushVelocity;
 		EjectionVelocity = Ref->EjectionVelocity;
 		DashDir = Ref->DashDir;
+		DirectionalInfluence = Ref->DirectionalInfluence;
 		IsPushable = Ref->IsPushable;
 
 		HorizontalSpeed = Ref->HorizontalSpeed;
@@ -330,6 +341,7 @@ struct SMovementSaveState
 		Ref->PushVelocity = PushVelocity;
 		Ref->EjectionVelocity = EjectionVelocity;
 		Ref->DashDir = DashDir;
+		Ref->DirectionalInfluence = DirectionalInfluence;
 		Ref->IsPushable = IsPushable;
 
 		Ref->HorizontalSpeed = HorizontalSpeed;
