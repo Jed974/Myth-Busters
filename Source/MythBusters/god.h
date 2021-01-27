@@ -204,6 +204,10 @@ protected:
 	bool canAttPush = true;
 	bool canShield = true;
 
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
+	int BackwardAttackFrameWindow = 0;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -315,6 +319,8 @@ public:
 
 	bool canMove = true;
 
+	int TurnTimer = 0;
+
 	// Component getters methods
 	USkeletalMeshComponent* GetSkeletalMesh();
 	UGodMovementComponent* GetGodMovementComponent() { return GodMovement; };
@@ -342,6 +348,8 @@ struct SAbstractGod
 
 	bool canMove;
 
+	int TurnTimer;
+
 	EGodState State;
 
 
@@ -355,11 +363,11 @@ struct SAbstractGod
 	void Init(AGod* ref)
 	{
 		Ref = ref;
-		//AttackSaveState = FAttacksSaveState();
-		//Boosts.Init(FBoost(), 5);
+		AttackSaveState = FAttacksSaveState();
+		Boosts.Init(FBoost(), 5);
 		MovementSaveState = SMovementSaveState();
 		MovementSaveState.Init(Ref->GetGodMovementComponent());
-		//ShieldSaveState = FShieldSaveState();
+		ShieldSaveState = FShieldSaveState();
 	};
 
 	void Observe()
@@ -367,11 +375,12 @@ struct SAbstractGod
 		Transform = Ref->GetActorTransform();
 		GodDamage = Ref->GodDamage;
 		canMove = Ref->canMove;
+		TurnTimer = Ref->TurnTimer;
 		State = Ref->State;
 		MovementSaveState.Observe();
-		//AttackSaveState = Ref->GetGodAttackComponent()->SaveAttacksState();
-		//Boosts = Ref->GetGodBoostComponent()->SaveBoostState();
-		//ShieldSaveState = Ref->GetGodShieldComponent()->SaveShieldState();
+		AttackSaveState = Ref->GetGodAttackComponent()->SaveAttacksState();
+		Boosts = Ref->GetGodBoostComponent()->SaveBoostState();
+		ShieldSaveState = Ref->GetGodShieldComponent()->SaveShieldState();
 	};
 
 	void Apply()
@@ -379,10 +388,11 @@ struct SAbstractGod
 		Ref->SetActorTransform(Transform);
 		Ref->GodDamage = GodDamage;
 		Ref->canMove = canMove;
+		Ref->TurnTimer = TurnTimer;
 		Ref->State = State;
 		MovementSaveState.Apply();
-		//Ref->GetGodAttackComponent()->LoadAttacksState(AttackSaveState);
-		//Ref->GetGodBoostComponent()->LoadBoostState(Boosts);
-		//Ref->GetGodShieldComponent()->LoadShieldState(ShieldSaveState);
+		Ref->GetGodAttackComponent()->LoadAttacksState(AttackSaveState);
+		Ref->GetGodBoostComponent()->LoadBoostState(Boosts);
+		Ref->GetGodShieldComponent()->LoadShieldState(ShieldSaveState);
 	};
 };
