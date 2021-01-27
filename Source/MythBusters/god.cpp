@@ -64,7 +64,7 @@ void AGod::Tick(float DeltaTime)
 		if (hitBoxGroup != nullptr)
 			HandleHitBoxGroupCollision(hitBoxGroup);
 	}
-
+	TurnTimer++;
 	UpdateAttackState();
 }
 
@@ -74,8 +74,8 @@ void AGod::MoveHorizontal(float AxisValue)
 	if (State == EGodState::Shielding) {
 		GodShield->OrientShieldX(AxisValue);
 	}
-	//else if (canMove)
-	//{
+	else
+	{
 		if (FMath::Abs(AxisValue) > HorizontalDeadZone)
 		{
 			GodMovement->AddMovementInput(FVector2D(1.0, 0.0), AxisValue);
@@ -86,7 +86,7 @@ void AGod::MoveHorizontal(float AxisValue)
 			GodMovement->AddMovementInput(FVector2D(1.0, 0.0), 0.f);
 			EMoveHorizontal(0.f);
 		}
-	//}
+	}
 	
 }
 void AGod::MoveVertical(float AxisValue)
@@ -94,8 +94,8 @@ void AGod::MoveVertical(float AxisValue)
 	if (State == EGodState::Shielding) {
 		GodShield->OrientShieldY(AxisValue);
 	}
-	//else if (canMove)
-	//{
+	else
+	{
 		if (FMath::Abs(AxisValue) > VerticalDeadZone)
 		{
 			GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
@@ -106,7 +106,7 @@ void AGod::MoveVertical(float AxisValue)
 			GodMovement->AddMovementInput(FVector2D(0.0, 1.0), 0.f);
 			EMoveVertical(0.f);
 		}
-	//}
+	}
 }
 
 
@@ -116,14 +116,16 @@ void AGod::AttackNormal()
 		switch (State)
 		{
 		case EGodState::Flying:
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Kaka");
 			if (GodAttack->StartNormalAttack(attackState)) {
+				if (attackState == EAttackDirection::BACKWARD)
+				{
+					GodMovement->isFacingRight = !GodMovement->isFacingRight;
+				}
 				EAttackNormal();
 				ChangeGodState(EGodState::Attacking);
 			}
 			break;
 		case EGodState::FlyingTurnaround:
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Kolé o kuku");
 			if (GodAttack->StartNormalAttack(attackState)) {
 				EAttackNormal();
 				ChangeGodState(EGodState::Attacking);
@@ -143,6 +145,10 @@ void AGod::AttackSpecial()
 		{
 		case EGodState::Flying:
 			if (GodAttack->StartSpecialAttack(attackState)) {
+				if (attackState == EAttackDirection::BACKWARD)
+				{
+					GodMovement->isFacingRight = !GodMovement->isFacingRight;
+				}
 				EAttackSpecial();
 				ChangeGodState(EGodState::Attacking);
 			}
@@ -168,6 +174,10 @@ void AGod::AttackPush()
 		{
 		case EGodState::Flying:
 			if (GodAttack->StartPushAttack(attackState)) {
+				if (attackState == EAttackDirection::BACKWARD)
+				{
+					GodMovement->isFacingRight = !GodMovement->isFacingRight;
+				}
 				EAttackPush();
 				ChangeGodState(EGodState::Attacking);
 			}
@@ -254,6 +264,7 @@ void AGod::ChangeGodState(EGodState NewState)
 			break;
 		case EGodState::FlyingTurnaround:
 			TurnaroundEvent();
+			TurnTimer = 0;
 			break;
 		case EGodState::Dashing:
 
@@ -586,7 +597,7 @@ void AGod::UpdateAttackState() {
 	}
 	else {
 		if (FMath::Abs(horizAxis) > HorizontalDeadZone*2) {
-			if ((horizAxis > 0 && GodMovement->GetIsFacingRight()) || (horizAxis < 0 && !GodMovement->GetIsFacingRight())) {
+			if (TurnTimer >= BackwardAttackFrameWindow) {
 				attackState = EAttackDirection::FORWARD;
 			}
 			else {
