@@ -634,7 +634,7 @@ void AGod::HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup) {
 			ejectionVector = ejectionVector.GetRotated(HighestPriorityHB->AngleDeg);
 			if (!hitBoxGroup->facingRight)
 				ejectionVector.X *= -1;
-			ejectionVector *= (GodDamage / 10 + 1) * HighestPriorityHB->BaseKnockBack;
+			ejectionVector *= (GodDamage / 10000 + 1) * HighestPriorityHB->BaseKnockBack;
 			Eject(ejectionVector);
 
 			// Add dammages
