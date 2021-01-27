@@ -30,11 +30,13 @@ public:
 	virtual void StopAttack() override;
 
 	UFUNCTION(BlueprintCallable)
-	void SpwanHitBoxGroup();
+	void SpwanHitBoxGroup(bool alreadyHit = false);
 	UFUNCTION(BlueprintCallable)
 	void DestroyHitBoxGroup();
 
-	virtual void ApplySaveState(UAttackSaveState _saveState) override;
+	virtual void ApplySaveState(UAttackSaveState _saveState, bool _playAnimation = true) override;
+	//virtual void LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad = -1, bool LoadAnimation = true) override;
+
 
 	virtual void OnActiveNotify() override;
 	virtual void OnInactiveNotify() override;

@@ -38,22 +38,25 @@ void UAttack::OverAttack(){
 }
 
 
-void UAttack::ApplySaveState(UAttackSaveState _saveState) {
+void UAttack::ApplySaveState(UAttackSaveState _saveState, bool _playAnimation) {
 	curveAbscissa = _saveState.inducedMovementAbscissa;
-	LoadAtAttackStateAndFrame(_saveState.attackState_Saved, _saveState.animationFrame_Saved);
+	attackState = _saveState.attackState_Saved;	
+	if (_playAnimation)
+		PlayMontageFromCurrentState(_saveState.animationFrame_Saved);
+	//LoadAtAttackStateAndFrame(_saveState.attackState_Saved, _saveState.animationFrame_Saved);
 }
 UAttackSaveState UAttack::GetSaveState() {
 	UAttackSaveState _saveState;
-	_saveState.attackState_Saved = attackState;
+	_saveState.attackState_Saved = GetAttackState();
 	_saveState.animationFrame_Saved = GetAttackFrame();
 	_saveState.inducedMovementAbscissa = curveAbscissa;
 	return _saveState;
 }
-void UAttack::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
+/*void UAttack::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
 	attackState = _stateToLoad;
 	if (LoadAnimation)
 		PlayMontageFromCurrentState(_animationFrameToLoad);
-}
+}*/
 float UAttack::GetAttackFrame() {
 	if (attackState != EAttackState::OFF)
 		return godAnimInstance->Montage_GetPosition(attackMontage);
@@ -109,5 +112,7 @@ FVector2D UAttack::GetInducedMovement() {
 		return FVector2D(v3.X, v3.Y);
 	}
 	else
-		return FVector2D(-3,0);
+		return FVector2D();
 }
+
+int UAttack::GetAuxInfo() { return auxiliaryInfo; }

@@ -23,7 +23,7 @@ void AHitBoxGroup::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//SetActorLocation(FVector(GetActorLocation().X, 0.f, GetActorLocation().Z));
-	//SetActorRotation(FRotator(0.f, 0.f, GetActorRotation().Roll));
+	//SetActorRotation(FRotator(0.f, GetActorRotation().Pitch, GetActorRotation().Roll));
 
 }
 
@@ -31,11 +31,11 @@ void AHitBoxGroup::Tick(float DeltaTime)
 bool AHitBoxGroup::GodHitIsValid(AGod* godHit) {
 	if (godHit == GetInstigator())
 		return false;
-	else if (AlreadyHitGods.Contains(godHit))
+	else if (alreadyHit)//(AlreadyHitGods.Contains(godHit))
 		return false;
 	else
 		return true;
 }
-void AHitBoxGroup::RegisterGodHit(AGod* godHit) {
+/*void AHitBoxGroup::RegisterGodHit(AGod* godHit) {
 	AlreadyHitGods.Add(godHit);
-}
+}*/

@@ -61,7 +61,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetBoost(EBoostType type);
 
-	TArray<FBoost> GetBoostSaveState() const;
-	void SetBoostSaveState(TArray<FBoost> savedBoosts);
+	TArray<FBoost> SaveBoostState() const;
+	void LoadBoostState(TArray<FBoost> &savedBoosts);
 
 };

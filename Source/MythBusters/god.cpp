@@ -74,8 +74,8 @@ void AGod::MoveHorizontal(float AxisValue)
 	if (State == EGodState::Shielding) {
 		GodShield->OrientShieldX(AxisValue);
 	}
-	else if (canMove)
-	{
+	//else if (canMove)
+	//{
 		if (FMath::Abs(AxisValue) > HorizontalDeadZone)
 		{
 			GodMovement->AddMovementInput(FVector2D(1.0, 0.0), AxisValue);
@@ -86,7 +86,7 @@ void AGod::MoveHorizontal(float AxisValue)
 			GodMovement->AddMovementInput(FVector2D(1.0, 0.0), 0.f);
 			EMoveHorizontal(0.f);
 		}
-	}
+	//}
 	
 }
 void AGod::MoveVertical(float AxisValue)
@@ -94,8 +94,8 @@ void AGod::MoveVertical(float AxisValue)
 	if (State == EGodState::Shielding) {
 		GodShield->OrientShieldY(AxisValue);
 	}
-	else if (canMove)
-	{
+	//else if (canMove)
+	//{
 		if (FMath::Abs(AxisValue) > VerticalDeadZone)
 		{
 			GodMovement->AddMovementInput(FVector2D(0.0, 1.0), AxisValue);
@@ -106,7 +106,7 @@ void AGod::MoveVertical(float AxisValue)
 			GodMovement->AddMovementInput(FVector2D(0.0, 1.0), 0.f);
 			EMoveVertical(0.f);
 		}
-	}
+	//}
 }
 
 
@@ -272,6 +272,7 @@ void AGod::ChangeGodState(EGodState NewState)
 			break;
 		case EGodState::Attacking:
 			canMove = false;
+			GodMovement->ChangeMovementState(EMovementState::Attacking);
 			break;
 		case EGodState::Shielding:
 			canMove = false;			
@@ -508,6 +509,13 @@ float AGod::GetAnimValues(int _idValueToGet) {
 			return 0;
 	}
 }
+void AGod::SetUpCustomPencilDeth(int depth) {
+	//SkeletalMesh->CustomDepthStencilValue = depth;
+	SkeletalMesh->SetCustomDepthStencilValue(depth);
+	SkeletalMesh->bRenderCustomDepth = true;
+	GodShield->SetNoneCustomColors(depth);
+}
+
 
 USkeletalMeshComponent* AGod::GetSkeletalMesh() {
 	return SkeletalMesh;
@@ -626,14 +634,15 @@ void AGod::HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup) {
 			ejectionVector = ejectionVector.GetRotated(HighestPriorityHB->AngleDeg);
 			if (!hitBoxGroup->facingRight)
 				ejectionVector.X *= -1;
-			ejectionVector *= (GodDamage / 10 + 1) * HighestPriorityHB->BaseKnockBack;
+			ejectionVector *= (GodDamage / 10000 + 1) * HighestPriorityHB->BaseKnockBack;
 			Eject(ejectionVector);
 
 			// Add dammages
 			ApplyGodDamage(HighestPriorityHB->BaseDamage);
 
 			// Register god as hit
-			hitBoxGroup->RegisterGodHit(this);
+			hitBoxGroup->alreadyHit = true;
+			//hitBoxGroup->RegisterGodHit(this);
 		}
 		else {
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Unexpected error : HitBoxGroup touched god but hitBox couldn't be found");
@@ -644,7 +653,11 @@ void AGod::HandleHitBoxGroupCollision(AHitBoxGroup* hitBoxGroup) {
 void AGod::HandleAttackNotify(ENotifyType notifyType) {
 	GodAttack->TransmitNotify(notifyType);
 	if (notifyType == ENotifyType::OVER)
+	{
 		ChangeGodState(EGodState::Flying);
+		GodMovement->ChangeHorizontalMovementState(EHorizontalMovementState::HorizontalNeutral);
+	}
+		
 }
 void AGod::RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack) {
 	GodAttack->RegisterProjectile(_projectile, _idAttack);

@@ -35,9 +35,9 @@ public :
 	virtual void OverAttack() override;
 	virtual void SetUpAttack(AGod* _god, int _idAttack, int _auxInfo = -1) override;
 
-	virtual void ApplySaveState(UAttackSaveState _saveState) override;
+	virtual void ApplySaveState(UAttackSaveState _saveState, bool _playAnimation = true) override;
 	virtual UAttackSaveState GetSaveState() override;
-	virtual void LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad = -1, bool LoadAnimation = true) override;
+	//virtual void LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad = -1, bool LoadAnimation = true) override;
 	virtual EAttackState GetAttackState() override;
 
 	virtual void OnActiveNotify() override;

@@ -59,7 +59,7 @@ void AShield::Tick(float DeltaTime)
 
 
 void AShield::InitShield(float _size, float _lifeTime, FColor _colorFresnel, FColor _colorBase) {
-	SetActorRotation(FRotator(0, 0, 90), ETeleportType::None);
+	SetActorRotation(FRotator(90, 0, 90), ETeleportType::None);
 	SetActorScale3D(FVector(_size, _size, _size));
 	SetLifeTime(_lifeTime);
 
@@ -119,14 +119,16 @@ void AShield::SetInputDirectionVectorY(float _inputY) {
 	InputDirection.Y = _inputY;
 }
 
+
 float AShield::GetLifeTime() {
 	return lifeTime;
 }
+float AShield::GetAngle() {
+	//SetActorRotation(FRotator(_angle, 0, 90), ETeleportType::None);
+	return GetActorRotation().GetComponentForAxis(EAxis::X);
+}
 
-/*void AShield::ProtectGodFromDamage(float _lifeTime) {
-	float lft = std::min(decreaseDuration, lifeTime + _lifeTime);
-	SetLifeTime(lft);
-}*/
+
 void AShield::ProtectGodFromDamage(AHitBoxGroup* hitBoxGroup) {
 	// Check if the god hit hasn't already been hit or is instigator	
 	if (godOwner != nullptr && hitBoxGroup->GodHitIsValid(godOwner)) {
@@ -149,7 +151,8 @@ void AShield::ProtectGodFromDamage(AHitBoxGroup* hitBoxGroup) {
 			SetLifeTime(lft);
 
 			// Register god as hit
-			hitBoxGroup->RegisterGodHit(godOwner);
+			hitBoxGroup->alreadyHit = true;
+			//hitBoxGroup->RegisterGodHit(godOwner);
 		}
 		else {
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Unexpected error : HitBoxGroup touched god but hitBox couldn't be found");

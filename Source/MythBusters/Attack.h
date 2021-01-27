@@ -29,10 +29,11 @@ struct UAttackSaveState {
 	EAttackState attackState_Saved;
 	float animationFrame_Saved;
 	int inducedMovementAbscissa;
+	bool auxAlreadyHit;
 	int auxiliaryInfo;
 	// Other, car be derived for attacks that need more information as projectile position
 
-	UAttackSaveState() : attackState_Saved(EAttackState::OFF), animationFrame_Saved(-1), auxiliaryInfo(-1){};
+	UAttackSaveState() : attackState_Saved(EAttackState::OFF), animationFrame_Saved(-1), auxAlreadyHit(false), auxiliaryInfo(-1) {};
 };
 
 /**
@@ -54,6 +55,8 @@ protected:
 	UPROPERTY(Category = "Animation", EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* attackMontage;
 
+	
+
 	AGod* god;
 	UGodAnimInstance* godAnimInstance;
 
@@ -61,6 +64,11 @@ protected:
 	UPROPERTY(Category = "Movement", EditAnywhere, BlueprintReadOnly)
 	UCurveVector* InducedMovement;
 	int curveAbscissa = 0;
+	UPROPERTY(Category = "Movement", EditAnywhere, BlueprintReadOnly)
+		float MaxDirectionalInfluenceSpeed;
+	UPROPERTY(Category = "Movement", EditAnywhere, BlueprintReadOnly)
+		float DirectionalInfluenceAcceleration;
+
 
 	virtual void PlayMontageFromCurrentState(float _animationFrameToLoad);
 
@@ -78,9 +86,9 @@ public:
 	/** Method called to set up the attack for further use*/
 	virtual void SetUpAttack(AGod* _god, int _idAttack, int _auxInfo = -1);
 
-	virtual void ApplySaveState(UAttackSaveState _saveState);
+	virtual void ApplySaveState(UAttackSaveState _saveState, bool _playAnimation = true);
 	virtual UAttackSaveState GetSaveState();
-	virtual void LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad = -1, bool LoadAnimation = true);
+	//virtual void LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad = -1, bool LoadAnimation = true);
 	virtual float GetAttackFrame();
 	virtual EAttackState GetAttackState();
 	EAttackState GAS();
@@ -96,4 +104,7 @@ public:
 	void SetCoolDown(int _cd);
 
 	FVector2D GetInducedMovement();
+	float GetMaxDirectionalInfluenceSpeed() { return MaxDirectionalInfluenceSpeed; };
+	float GetDirectionalInfluenceAcceleration() { return DirectionalInfluenceAcceleration; };
+	int GetAuxInfo();
 };

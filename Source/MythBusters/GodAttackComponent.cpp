@@ -5,6 +5,7 @@
 #include "HitBoxGroupProjectile.h"
 #include "AttackProjectile.h"
 #include "AttackSequencial.h"
+#include "GodAnimInstance.h"
 #include "god.h"
 
 // Sets default values for this component's properties
@@ -59,9 +60,9 @@ void UGodAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 			Cast<AGod>(GetOwner())->ChangeGodState(EGodState::Flying);
 		}
 		else {
-			FVector2D induced = Attacks[currentAttack]->GetInducedMovement();
+			/*FVector2D induced = Attacks[currentAttack]->GetInducedMovement();
 			if (induced.X  > -2)
-				Cast<AGod>(GetOwner())->GetGodMovementComponent()->AddMovementInput(induced, 1.0);
+				Cast<AGod>(GetOwner())->GetGodMovementComponent()->AddMovementInput(induced, 1.0);*/
 		}
 	}
 
@@ -350,6 +351,17 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 		}
 	}
 
+	// Stop montage animations
+	if (currentAttack != -1 && saveState.idCurrentSubAttack == -1) {
+		AGod* god = Cast<AGod>(GetOwner());
+		if (god != nullptr) {
+			UGodAnimInstance* AnimIntance = Cast<UGodAnimInstance>(god->GetSkeletalMesh()->GetAnimInstance());
+			if (AnimIntance != nullptr)
+				AnimIntance->InterruptAllMontages();
+		}
+	}
+
+	
 	// Go back to past attack
 	currentAttack = saveState.idCurrentSubAttack;
 	if (currentAttack != -1)
@@ -376,7 +388,6 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 				}
 			}
 			else if (AllProjectiles.Contains(i) && saveState.projectiles.Contains(i)) {
-				GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Yellow, "Proj présents dans le savestate et la scene");
 				// There are projectiles in game and in save state for the same attack
 				if (AllProjectiles[i].Projectiles.Num() > saveState.projectiles[i].Projectiles.Num()) {
 					// Il y a plus de projectiles in game que dans le save state : détruire le surplus
@@ -408,6 +419,7 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 				// Check if there is the same amount of projectiles + all projectiles have same auxInfo (bool method)
 					// just apply all simplified
 				if (!TryApplySequentialProjectileArray(i, saveState)) {
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Try False ! ");
 					// previous method failed
 					// Les projectiles pouvant être issus de différentes Attack Proj, le + simple est de tous les détruire et refaire
 					if (AllProjectiles.Contains(i)) {
@@ -424,41 +436,35 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 						AllProjectiles.Add(i, FProjectileArray());
 						UAttackProjectile* subProjectileAttack = nullptr;
 						for (auto& simpProj : saveState.projectiles[i].Projectiles) {
+							//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(i) + " - " + FString::SanitizeFloat(simpProj.auxiliaryInfo));
 							if (attackSeq->GetProjectileAttack(simpProj.auxiliaryInfo, subProjectileAttack)) {
-
+								//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(i) + " - " + FString::SanitizeFloat(subProjectileAttack->GetAuxInfo()));
 								AHitBoxGroupProjectile* projectile = subProjectileAttack->SpwanHitBoxGroup();
 								projectile->applySimplifiedVersion(simpProj);
 								AllProjectiles[i].Projectiles.Add(projectile);
 							}
 						}
+						//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Contains " +FString::SanitizeFloat(AllProjectiles[i].Projectiles.Num()));
 					}
 				}
+				/*else {
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Try true ! ");
+				}*/
 			}
 		}
-
-		//GEngine->AddOnScreenDebugMessage(0, 15.0f, FColor::Yellow, "Proj absents mais présents dans le saveState");
-		/**/
-			// TODO : sequentielles
-			// Ajouter des int Aux aux Attack ou AtttackProj + mettre param opt de SetUp avec l'aux		-> OK
-			// + Ajouter des int Aux aux projectiles													-> OK
-			// + Ajouter des int Aux aux simplifiedProjectiles											-> OK
-			// Connection de l'info :
-				// Att seq -> att																		-> OK
-				// att -> proj																			-> OK
-				// proj -> proj simp																	-> OK
-				// proj simp attcomp																	-> 
 	}
 
 	CleanUpProjectile(); // in case we have destroy some projectiles during rollback
 }
 bool UGodAttackComponent::TryApplySequentialProjectileArray(int idAtt, FAttacksSaveState& saveState) {
 	if (!AllProjectiles.Contains(idAtt) || !saveState.projectiles.Contains(idAtt))
-		return false;
+		return false;	// there is no projectiles in the save state or in the scene
 	else if (AllProjectiles[idAtt].Projectiles.Num() != saveState.projectiles[idAtt].Projectiles.Num())
-		return false;
+		return false;	// there is not the same amount of projectiles registered in the save state on in the scene
 	else
 		for (int j = 0; j < saveState.projectiles[idAtt].Projectiles.Num(); j++) {
-			if (AllProjectiles[idAtt].Projectiles[j] != nullptr && AllProjectiles[idAtt].Projectiles[j]->auxiliaryInfo == saveState.projectiles[idAtt].Projectiles[j].auxiliaryInfo)
+			if (!IsValid(AllProjectiles[idAtt].Projectiles[j]) && AllProjectiles[idAtt].Projectiles[j]->auxiliaryInfo == saveState.projectiles[idAtt].Projectiles[j].auxiliaryInfo)
+				// the projectile number j exists and was spawned by the same attack than the simpProj number (=> same class)
 				AllProjectiles[idAtt].Projectiles[j]->applySimplifiedVersion(saveState.projectiles[idAtt].Projectiles[j]);
 			else
 				return false;

@@ -44,6 +44,7 @@ FSimplifiedProjectile AHitBoxGroupProjectile::getSimplifiedVersion() {
 }*/
 void AHitBoxGroupProjectile::applySimplifiedVersion(const FSimplifiedProjectile& simple) {
 	facingRight = simple.facingRight;
+	alreadyHit = simple.alreadyHit;
 	LifeTime = simple.lifeTime;
 	SetActorTransform(simple.transform);
 }

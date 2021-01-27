@@ -21,18 +21,12 @@ public:
 	UPROPERTY(Category = "HitCreation", EditAnywhere, BlueprintReadWrite)
 		FName SocketToAttachTo;
 
-	//UPROPERTY(Category = "Track", VisibleAnywhere, BlueprintReadWrite)
-	//	TArray<AHitBoxGroupProjectile*> Projectiles;
-
-
 
 public:
 	UAttackProjectile();
 
 	UFUNCTION(BlueprintCallable)
 	AHitBoxGroupProjectile* SpwanHitBoxGroup();
-	//UFUNCTION(BlueprintCallable)
-		//void DestroyAllProjectiles();
 
 	virtual void OnActiveNotify() override;
 

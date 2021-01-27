@@ -20,6 +20,7 @@ struct MYTHBUSTERS_API FSimplifiedProjectile
 	GENERATED_BODY()
 
 	bool facingRight;
+	bool alreadyHit;
 	int lifeTime;
 	FTransform transform;
 	int auxiliaryInfo;

@@ -69,8 +69,10 @@ void UGodMovementComponent::ChangeMovementState(EMovementState NewState)
 {
 	ChangeMovementStateDelegate.ExecuteIfBound(NewState);
 	MovementState = NewState;
+	DirectionalInfluence = Velocity;
 	HorizontalPreviousSpeed = Velocity.X;
 	VerticalPreviousSpeed = Velocity.Y;
+	IsPushable = true;
 	switch (MovementState)
 	{
 		case EMovementState::WallHit:
@@ -83,6 +85,9 @@ void UGodMovementComponent::ChangeMovementState(EMovementState NewState)
 			break;
 		case EMovementState::FlyingTurnaroud:
 			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Turnaround");
+			break;
+		case EMovementState::Ejected:
+			IsPushable = false;
 			break;
 	}
 }
@@ -184,6 +189,9 @@ void UGodMovementComponent::ComputeNewVelocity() {
 			{
 				Eject(EjectionVelocity);
 			}
+			break;
+		case EMovementState::Attacking:
+			ComputeAttackingVelocity();
 			break;
 		//case EMovementState::DeathEjected:
 			
@@ -699,6 +707,23 @@ void UGodMovementComponent::ComputeFlyingVelocity()
 		}
 		break;
 	}
+}
+
+void UGodMovementComponent::ComputeAttackingVelocity()
+{
+	Velocity = FVector2D::ZeroVector;
+	UGodAttackComponent* AttackComponent = Cast<AGod>(GetOwner())->GetGodAttackComponent();
+	UAttack* Attack = AttackComponent->Attacks[AttackComponent->currentAttack];
+	
+	DirectionalInfluence.X = FMath::Clamp(DirectionalInfluence.X + _MovementInput.X * Attack->GetDirectionalInfluenceAcceleration()*DELTA_TIME, -Attack->GetMaxDirectionalInfluenceSpeed(), Attack->GetMaxDirectionalInfluenceSpeed());
+	DirectionalInfluence.Y = FMath::Clamp(DirectionalInfluence.Y + _MovementInput.Y * Attack->GetDirectionalInfluenceAcceleration()*DELTA_TIME, -Attack->GetMaxDirectionalInfluenceSpeed(), Attack->GetMaxDirectionalInfluenceSpeed());
+	if (Attack->GetInducedMovement() != FVector2D())
+	{
+		FVector2D induced = Attack->GetInducedMovement();
+		Velocity = induced;
+	}
+		
+	Velocity += DirectionalInfluence;
 }
 
 void UGodMovementComponent::ComputePushVelocity(const AActor* OtherActor)

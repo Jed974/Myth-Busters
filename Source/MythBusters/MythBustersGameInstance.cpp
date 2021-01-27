@@ -137,7 +137,7 @@ bool __cdecl mb_advance_frame_callback(int)
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Advance frame callback");
     SSendableInputs inputs[NUM_PLAYERS] = { 0 };
     int disconnect_flags;
-
+    GEngine->GameViewport->bDisableWorldRendering = false;
     // Make sure we fetch new inputs from GGPO and use those to update
     // the game state instead of reading from the keyboard.
     ggpo_synchronize_input(UMythBustersGameInstance::Instance->ggpo, (void*)inputs, UMythBustersGameInstance::Instance->PacketSize * NUM_PLAYERS, &disconnect_flags);

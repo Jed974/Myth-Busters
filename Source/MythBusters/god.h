@@ -302,7 +302,9 @@ public:
 
 	/// Called by GodAnimInstance to get values nec. for animations blendSpace
 	virtual float GetAnimValues(int _idValueToGet);
-
+	/// Called to set up the skeletal mesh custom depth pencil
+	UFUNCTION(BlueprintCallable)
+	void SetUpCustomPencilDeth(int depth);
 	
 	/// Allow to change good state properly (with canMove and other ajustements)
 	//UFUNCTION(BlueprintCallable)
@@ -316,7 +318,9 @@ public:
 	// Component getters methods
 	USkeletalMeshComponent* GetSkeletalMesh();
 	UGodMovementComponent* GetGodMovementComponent() { return GodMovement; };
+	UGodAttackComponent* GetGodAttackComponent() { return GodAttack; };
 	UGodBoostComponent* GetGodBoostComponent() { return GodBoost; };
+	UGodShieldComponent* GetGodShieldComponent() { return GodShield; };
 
 	/// Method called when the god hits a hitBoxGroup
 	UFUNCTION(BlueprintCallable)
@@ -344,13 +348,18 @@ struct SAbstractGod
 
 	FAttacksSaveState AttackSaveState;
 	SMovementSaveState MovementSaveState;
+	TArray<FBoost> Boosts;
+	FShieldSaveState ShieldSaveState;
+
 
 	void Init(AGod* ref)
 	{
 		Ref = ref;
 		AttackSaveState = FAttacksSaveState();
+		Boosts.Init(FBoost(), 5);
 		MovementSaveState = SMovementSaveState();
 		MovementSaveState.Init(Ref->GetGodMovementComponent());
+		ShieldSaveState = FShieldSaveState();
 	};
 
 	void Observe()
@@ -360,6 +369,9 @@ struct SAbstractGod
 		canMove = Ref->canMove;
 		State = Ref->State;
 		MovementSaveState.Observe();
+		AttackSaveState = Ref->GetGodAttackComponent()->SaveAttacksState();
+		Boosts = Ref->GetGodBoostComponent()->SaveBoostState();
+		ShieldSaveState = Ref->GetGodShieldComponent()->SaveShieldState();
 	};
 
 	void Apply()
@@ -369,5 +381,8 @@ struct SAbstractGod
 		Ref->canMove = canMove;
 		Ref->State = State;
 		MovementSaveState.Apply();
+		Ref->GetGodAttackComponent()->LoadAttacksState(AttackSaveState);
+		Ref->GetGodBoostComponent()->LoadBoostState(Boosts);
+		Ref->GetGodShieldComponent()->LoadShieldState(ShieldSaveState);
 	};
 };

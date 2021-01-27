@@ -9,6 +9,17 @@ class AGod;
 #include "GodShieldComponent.generated.h"
 
 
+
+
+USTRUCT(BlueprintType)
+struct MYTHBUSTERS_API FShieldSaveState {
+	GENERATED_BODY()
+
+	bool out;
+	int lifeTime;
+	float angle;
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MYTHBUSTERS_API UGodShieldComponent : public UActorComponent
 {
@@ -40,10 +51,16 @@ protected:
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void SetNoneCustomColors(int idPlayer);
 
 	bool StartShield();
 	void StopShield();
 
 	void OrientShieldX(float AxisValue);
 	void OrientShieldY(float AxisValue);
+
+	UFUNCTION(BlueprintCallable)
+	FShieldSaveState SaveShieldState();
+	UFUNCTION(BlueprintCallable)
+	void LoadShieldState(FShieldSaveState &ShSvSt);
 };

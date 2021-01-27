@@ -26,6 +26,20 @@ void UGodShieldComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	}
 }
 
+
+void UGodShieldComponent::SetNoneCustomColors(int idPlayer) {
+	switch (idPlayer) {
+		case 1:
+			ShieldBaseColor = FColor::FromHex("0061FFFF"); //FColor(0,0.5,1,1);
+			ShieldFresnelColor = FColor::FromHex("FFBC00FF"); //FColor(0.15, 0, 1, 1);
+			break;
+		case 2:
+			ShieldBaseColor = FColor::FromHex("DB0013FF"); //FColor(1, 0, 1, 1);
+			ShieldFresnelColor = FColor::FromHex("0072FFFF"); //FColor(0.7, 0, 1, 1);
+			break;
+	}
+}
+
 bool UGodShieldComponent::StartShield() { 
 	if (CurrentShield != nullptr)
 		return false;
@@ -59,4 +73,25 @@ void UGodShieldComponent::OrientShieldX(float AxisValue) {
 }
 void UGodShieldComponent::OrientShieldY(float AxisValue) {
 	CurrentShield->SetInputDirectionVectorY(AxisValue * -1);
+}
+
+FShieldSaveState UGodShieldComponent::SaveShieldState() {
+	FShieldSaveState ShSvSt;
+	ShSvSt.out = CurrentShield != nullptr;
+	ShSvSt.lifeTime = ShSvSt.out ? CurrentShield->GetLifeTime() : shieldLifeTime;
+	ShSvSt.angle = ShSvSt.out ? CurrentShield->GetAngle() : 0;
+	return ShSvSt;
+}
+void UGodShieldComponent::LoadShieldState(FShieldSaveState &ShSvSt) {
+	if (ShSvSt.out) {
+		if (CurrentShield == nullptr)
+			StartShield();
+		CurrentShield->SetLifeTime(ShSvSt.lifeTime);
+		CurrentShield->SetAngle(ShSvSt.angle);
+	}
+	else {
+		if (CurrentShield != nullptr)
+			StopShield();
+		shieldLifeTime = ShSvSt.lifeTime;
+	}
 }
