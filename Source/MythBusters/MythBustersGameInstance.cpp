@@ -557,12 +557,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
   * Run a single frame of the game.
   */
   void UMythBustersGameInstance::MythBusters_RunFrame()
-  {
-
-      for (auto i : SelectedGods) {
-          GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::FromInt(i));
-    }
-     
+  {   
 
     GGPOErrorCode result = GGPO_ERRORCODE_GENERAL_FAILURE;
     int disconnect_flags;
