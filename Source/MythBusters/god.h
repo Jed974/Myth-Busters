@@ -355,11 +355,11 @@ struct SAbstractGod
 	void Init(AGod* ref)
 	{
 		Ref = ref;
-		AttackSaveState = FAttacksSaveState();
-		Boosts.Init(FBoost(), 5);
+		//AttackSaveState = FAttacksSaveState();
+		//Boosts.Init(FBoost(), 5);
 		MovementSaveState = SMovementSaveState();
 		MovementSaveState.Init(Ref->GetGodMovementComponent());
-		ShieldSaveState = FShieldSaveState();
+		//ShieldSaveState = FShieldSaveState();
 	};
 
 	void Observe()
@@ -369,9 +369,9 @@ struct SAbstractGod
 		canMove = Ref->canMove;
 		State = Ref->State;
 		MovementSaveState.Observe();
-		AttackSaveState = Ref->GetGodAttackComponent()->SaveAttacksState();
-		Boosts = Ref->GetGodBoostComponent()->SaveBoostState();
-		ShieldSaveState = Ref->GetGodShieldComponent()->SaveShieldState();
+		//AttackSaveState = Ref->GetGodAttackComponent()->SaveAttacksState();
+		//Boosts = Ref->GetGodBoostComponent()->SaveBoostState();
+		//ShieldSaveState = Ref->GetGodShieldComponent()->SaveShieldState();
 	};
 
 	void Apply()
@@ -381,8 +381,8 @@ struct SAbstractGod
 		Ref->canMove = canMove;
 		Ref->State = State;
 		MovementSaveState.Apply();
-		Ref->GetGodAttackComponent()->LoadAttacksState(AttackSaveState);
-		Ref->GetGodBoostComponent()->LoadBoostState(Boosts);
-		Ref->GetGodShieldComponent()->LoadShieldState(ShieldSaveState);
+		//Ref->GetGodAttackComponent()->LoadAttacksState(AttackSaveState);
+		//Ref->GetGodBoostComponent()->LoadBoostState(Boosts);
+		//Ref->GetGodShieldComponent()->LoadShieldState(ShieldSaveState);
 	};
 };
