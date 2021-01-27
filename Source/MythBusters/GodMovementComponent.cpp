@@ -72,6 +72,7 @@ void UGodMovementComponent::ChangeMovementState(EMovementState NewState)
 	DirectionalInfluence = Velocity;
 	HorizontalPreviousSpeed = Velocity.X;
 	VerticalPreviousSpeed = Velocity.Y;
+	IsPushable = true;
 	switch (MovementState)
 	{
 		case EMovementState::WallHit:
@@ -84,6 +85,9 @@ void UGodMovementComponent::ChangeMovementState(EMovementState NewState)
 			break;
 		case EMovementState::FlyingTurnaroud:
 			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Turnaround");
+			break;
+		case EMovementState::Ejected:
+			IsPushable = false;
 			break;
 	}
 }
@@ -188,6 +192,7 @@ void UGodMovementComponent::ComputeNewVelocity() {
 			break;
 		case EMovementState::Attacking:
 			ComputeAttackingVelocity();
+			break;
 		//case EMovementState::DeathEjected:
 			
 			//break;
