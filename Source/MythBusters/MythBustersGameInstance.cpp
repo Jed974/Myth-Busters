@@ -578,7 +578,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         LocalInputs.MakeSendable();
 
         //While god selection information is initiated localy but not recieved, send local selection 
-        if (SelectedGods[3] == 0) {
+        /*if (SelectedGods[3] == 0) {
             GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Sending god selection");
             if (SelectedGods[0] == 0) {
                 LocalInputs.SendableInputs.Actions = ThorSelectedCode;
@@ -592,7 +592,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
                 LocalInputs.SendableInputs.Actions = GodSelectionReceived;
                 SelectedGods[2] = 0;
             }
-        }
+        }*/
 
         while (!GGPO_SUCCEEDED(result) && ngs.players[GGPOPlayerIndex].state == Running)
         {
@@ -613,23 +613,23 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         if (GGPO_SUCCEEDED(result)) {
 
             //Receive confirmation that remote gameinstance received local god selection
-            if (SelectedGods[3] == 0 && Inputs[GGPOPlayerIndex].Actions == GodSelectionReceived) {
-                SelectedGods[3] = 1;
-                Inputs[GGPOPlayerIndex].Actions = (char)0b0000000;
-            }
-            //Receive god selection info
-            if (SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == ThorSelectedCode) {
-                GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR IS SELECTED");
-                SelectedGods[1] = 0;
-                SelectedGods[2] = 1;
-                Inputs[GGPOPlayerIndex].Actions = (char)0b0000000;
-            }
-            else if ( SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == Thor2SelectedCode) {
-                GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR2 IS SELECTED");
-                SelectedGods[1] = 1;
-                SelectedGods[2] = 1;
-                Inputs[GGPOPlayerIndex].Actions = (char)0b0000000;
-            }
+            //if (SelectedGods[3] == 0 && Inputs[GGPOPlayerIndex].Actions == GodSelectionReceived) {
+            //    SelectedGods[3] = 1;
+            //    Inputs[GGPOPlayerIndex].Actions = NoActionCode;
+            //}
+            ////Receive god selection info
+            //if (SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == ThorSelectedCode) {
+            //    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR IS SELECTED");
+            //    SelectedGods[1] = 0;
+            //    SelectedGods[2] = 1;
+            //    Inputs[GGPOPlayerIndex].Actions = NoActionCode;
+            //}
+            //else if ( SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == Thor2SelectedCode) {
+            //    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR2 IS SELECTED");
+            //    SelectedGods[1] = 1;
+            //    SelectedGods[2] = 1;
+            //    Inputs[GGPOPlayerIndex].Actions = NoActionCode;
+            //}
 
              // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
              // the game by 1 frame using those inputs.

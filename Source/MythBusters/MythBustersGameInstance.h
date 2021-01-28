@@ -226,7 +226,5 @@ public:
 	char ThorSelectedCode = 0b01111111;
 	char Thor2SelectedCode = 0b01111110;
 	char GodSelectionReceived = 0b01111101;
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void SpawnSelectedGods();
+	char NoActionCode = 0b0000000;
 };
