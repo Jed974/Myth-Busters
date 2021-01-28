@@ -109,6 +109,7 @@ struct SInputs
 			act += 0b00010000;
 		}
 		//act = AGod::SendGodSelection(act);
+		act = SendGodSelection(act);
 		SendableInputs.Actions = act;
 	};
 	void Readable(SSendableInputs const * const Inputs)
@@ -123,8 +124,11 @@ struct SInputs
 			InputActions[DASH].State = ((Inputs->Actions & 0b00001000) != 0) ? Pressed : Released;
 			InputActions[SHIELD].State = ((Inputs->Actions & 0b00010000) != 0) ? Pressed : Released;
 			//AGod::ReadGodSelection(Inputs->Actions);
+			ReadGodSelection(Inputs->Actions);
 		}		
 	};
+	char SendGodSelection(char act);
+	void ReadGodSelection(char act);
 };
 
 UENUM(BlueprintType)
@@ -340,9 +344,9 @@ public:
 	/// Method to call to transmit Porjectile to register to the GodAttackComponent
 	void RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack);
 	// Method to add GodSelection to action char
-	static char SendGodSelection(char act);
+	//static char SendGodSelection(char act);
 	//Method to read GodSelection and modify gamestate
-	static void ReadGodSelection(char act);
+	//static void ReadGodSelection(char act);
 };
 
 

@@ -673,7 +673,7 @@ void AGod::HandleAttackNotify(ENotifyType notifyType) {
 void AGod::RegisterProjectile(AHitBoxGroupProjectile* _projectile, int _idAttack) {
 	GodAttack->RegisterProjectile(_projectile, _idAttack);
 }
-char AGod::SendGodSelection(char act) {
+char SInputs::SendGodSelection(char act) {
 	if (UMythBustersGameInstance::Instance->gs._framenumber == 1) {
 		if (UMythBustersGameInstance::Instance->SelectedGods[0] == 1) {
 			act += 0b00100000;
@@ -682,9 +682,11 @@ char AGod::SendGodSelection(char act) {
 	return act;
 }
 
-void AGod::ReadGodSelection(char act) {
+void SInputs::ReadGodSelection(char act) {
 	if (UMythBustersGameInstance::Instance->SelectedGods[1] == -1) {
 		UMythBustersGameInstance::Instance->SelectedGods[1] = ((act & 0b00010000) != 0) ? 1 : 0;
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Read %i", ((act & 0b00010000) != 0) ? 1 : 0);
 	}
 }
+
 
