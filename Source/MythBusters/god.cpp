@@ -520,7 +520,7 @@ float AGod::GetAnimValues(int _idValueToGet) {
 			return 0;
 	}
 }
-void AGod::SetUpCustomPencilDeth(int depth) {
+void AGod::SetPlayerColor(int depth) {
 	//SkeletalMesh->CustomDepthStencilValue = depth;
 	SkeletalMesh->SetCustomDepthStencilValue(depth);
 	SkeletalMesh->bRenderCustomDepth = true;

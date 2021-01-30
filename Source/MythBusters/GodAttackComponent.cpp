@@ -88,7 +88,7 @@ bool UGodAttackComponent::StartNormalAttack(EAttackDirection _attackDirection) {
 				return false;
 			break;
 		case EAttackDirection::FORWARD:
-			if (Attacks[1] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[1] != nullptr && Attacks[1]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 1;
 				Attacks[1]->StartAttack();
 			}
@@ -96,7 +96,7 @@ bool UGodAttackComponent::StartNormalAttack(EAttackDirection _attackDirection) {
 				return false;
 			break;
 		case EAttackDirection::BACKWARD:
-			if (Attacks[2] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[2] != nullptr && Attacks[2]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 2;
 				Attacks[2]->StartAttack();
 			}
@@ -104,7 +104,7 @@ bool UGodAttackComponent::StartNormalAttack(EAttackDirection _attackDirection) {
 				return false;
 			break;
 		case EAttackDirection::UP:
-			if (Attacks[3] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[3] != nullptr && Attacks[3]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 3;
 				Attacks[3]->StartAttack();
 			}
@@ -112,7 +112,7 @@ bool UGodAttackComponent::StartNormalAttack(EAttackDirection _attackDirection) {
 				return false;
 			break;
 		case EAttackDirection::DOWN:
-			if (Attacks[4] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[4] != nullptr && Attacks[4]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 4;
 				Attacks[4]->StartAttack();
 			}
@@ -132,7 +132,7 @@ bool UGodAttackComponent::StartSpecialAttack(EAttackDirection _attackDirection) 
 		switch (_attackDirection)
 		{
 		case EAttackDirection::NEUTRAL:
-			if (Attacks[5] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[5] != nullptr && Attacks[5]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 5;
 				Attacks[5]->StartAttack();
 			}
@@ -140,7 +140,7 @@ bool UGodAttackComponent::StartSpecialAttack(EAttackDirection _attackDirection) 
 				return false;
 			break;
 		case EAttackDirection::FORWARD:
-			if (Attacks[6] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[6] != nullptr && Attacks[6]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 6;
 				Attacks[6]->StartAttack();
 			}
@@ -148,7 +148,7 @@ bool UGodAttackComponent::StartSpecialAttack(EAttackDirection _attackDirection) 
 				return false;
 			break;
 		case EAttackDirection::BACKWARD:
-			if (Attacks[7] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[7] != nullptr && Attacks[7]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 7;
 				Attacks[7]->StartAttack();
 			}
@@ -156,7 +156,7 @@ bool UGodAttackComponent::StartSpecialAttack(EAttackDirection _attackDirection) 
 				return false;
 			break;
 		case EAttackDirection::UP:
-			if (Attacks[8] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[8] != nullptr && Attacks[8]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 8;
 				Attacks[8]->StartAttack();
 			}
@@ -164,7 +164,7 @@ bool UGodAttackComponent::StartSpecialAttack(EAttackDirection _attackDirection) 
 				return false;
 			break;
 		case EAttackDirection::DOWN:
-			if (Attacks[9] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[9] != nullptr && Attacks[9]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 9;
 				Attacks[9]->StartAttack();
 			}
@@ -184,7 +184,7 @@ bool UGodAttackComponent::StartPushAttack(EAttackDirection _attackDirection) {
 		switch (_attackDirection)
 		{
 		case EAttackDirection::NEUTRAL:
-			if (Attacks[10] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[10] != nullptr && Attacks[10]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 10;
 				Attacks[10]->StartAttack();
 			}
@@ -192,7 +192,7 @@ bool UGodAttackComponent::StartPushAttack(EAttackDirection _attackDirection) {
 				return false;
 			break;
 		case EAttackDirection::FORWARD:
-			if (Attacks[10] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[10] != nullptr && Attacks[10]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 10;
 				Attacks[10]->StartAttack();
 			}
@@ -200,7 +200,7 @@ bool UGodAttackComponent::StartPushAttack(EAttackDirection _attackDirection) {
 				return false;
 			break;
 		case EAttackDirection::BACKWARD:
-			if (Attacks[11] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[11] != nullptr && Attacks[11]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 11;
 				Attacks[11]->StartAttack();
 			}
@@ -208,7 +208,7 @@ bool UGodAttackComponent::StartPushAttack(EAttackDirection _attackDirection) {
 				return false;
 			break;
 		case EAttackDirection::UP:
-			if (Attacks[12] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[12] != nullptr && Attacks[12]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 12;
 				Attacks[12]->StartAttack();
 			}
@@ -216,7 +216,7 @@ bool UGodAttackComponent::StartPushAttack(EAttackDirection _attackDirection) {
 				return false;
 			break;
 		case EAttackDirection::DOWN:
-			if (Attacks[13] != nullptr && Attacks[0]->GetAttackState() == EAttackState::OFF) {
+			if (Attacks[13] != nullptr && Attacks[13]->GetAttackState() == EAttackState::OFF) {
 				currentAttack = 13;
 				Attacks[13]->StartAttack();
 			}

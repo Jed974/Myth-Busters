@@ -30,12 +30,12 @@ void UGodShieldComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 void UGodShieldComponent::SetNoneCustomColors(int idPlayer) {
 	switch (idPlayer) {
 		case 1:
-			ShieldBaseColor = FColor::FromHex("0061FFFF"); //FColor(0,0.5,1,1);
-			ShieldFresnelColor = FColor::FromHex("FFBC00FF"); //FColor(0.15, 0, 1, 1);
-			break;
-		case 2:
 			ShieldBaseColor = FColor::FromHex("DB0013FF"); //FColor(1, 0, 1, 1);
 			ShieldFresnelColor = FColor::FromHex("0072FFFF"); //FColor(0.7, 0, 1, 1);
+			break;
+		case 2:
+			ShieldBaseColor = FColor::FromHex("0061FFFF"); //FColor(0,0.5,1,1);
+			ShieldFresnelColor = FColor::FromHex("FFBC00FF"); //FColor(0.15, 0, 1, 1);
 			break;
 	}
 }
