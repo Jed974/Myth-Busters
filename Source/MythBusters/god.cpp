@@ -255,6 +255,10 @@ void AGod::ChangeGodState(EGodState NewState)
 	else if (State == EGodState::Shielding && NewState != EGodState::Shielding) {
 		GodShield->StopShield();
 	}
+	// Security anti-bad rotation
+	if (State == EGodState::FlyingTurnaround && NewState != EGodState::Flying) {
+		InstantTurn();
+	}
 
 	State = NewState;
 	canMove = true;
