@@ -47,7 +47,7 @@ fletcher32_checksum(short* data, size_t len)
     // Second reduction step to reduce sums to 16 bits 
     sum1 = (sum1 & 0xffff) + (sum1 >> 16);
     sum2 = (sum2 & 0xffff) + (sum2 >> 16);
-    return sum2 << 16 | sum1;
+    return sum2 << 16 | sum1;poevent
 }
 
 /*
@@ -757,17 +757,17 @@ void UMythBustersGameInstance::MainThreadSleep(float time)
 }
 
 char UMythBustersGameInstance::SendGodSelection(char act) {
-    if (UMythBustersGameInstance::Instance->gs._framenumber == 1) {
+    if (UMythBustersGameInstance::Instance->gs._framenumber < 100) {
         if (UMythBustersGameInstance::Instance->SelectedGods[0] == 1) {
-            act += 0b00100000;
+            return act + 0b00100000;
         }
     }
-    return act;
+    return act + 0b01000000;
 }
 
 void UMythBustersGameInstance::ReadGodSelection(char act) {
-    if (UMythBustersGameInstance::Instance->SelectedGods[1] == -1) {
-        UMythBustersGameInstance::Instance->SelectedGods[1] = ((act & 0b00010000) != 0) ? 1 : 0;
+    if ((act & 0b00100000) != 0 || (act & 0b00100000) != 0){
+        UMythBustersGameInstance::Instance->SelectedGods[1] = ((act & 0b00100000) != 0) ? 1 : 0;
         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Read %i", ((act & 0b00010000) != 0) ? 1 : 0);
     }
 }

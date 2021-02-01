@@ -7,6 +7,7 @@
 #include "god.h"
 #include "HitBoxGroup.h"
 #include "Engine/World.h"
+#include <Runtime\Engine\Classes\Sound\SoundCue.h>
 #include "GodAnimInstance.generated.h"
 
 
@@ -42,7 +43,8 @@ public:
 	UPROPERTY(Category = "BlendSpace Values", EditAnywhere, BlueprintReadWrite)
 		float EjectY;
 
-
+	UPROPERTY(Category = "Sound", EditAnywhere, BlueprintReadWrite)
+		USoundCue* hurt_cue;
 
 	UPROPERTY(Category = "Animations", EditAnywhere, BlueprintReadWrite)
 		UAnimSequenceBase* ShieldAnimation;
