@@ -312,7 +312,7 @@ FAttacksSaveState UGodAttackComponent::SaveAttacksState() {
 	// Attaque courrante
 	if (currentAttack != -1) {
 		// id
-		_saveState.idCurrentSubAttack = currentAttack;
+		_saveState.idCurrentAttack = currentAttack;
 
 		// Récupérer le saveState
 		_saveState.montageFrame = Attacks[currentAttack]->GetAttackFrame();
@@ -352,7 +352,7 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 	}
 
 	// Stop montage animations
-	if (currentAttack != -1 && saveState.idCurrentSubAttack == -1) {
+	if (currentAttack != -1 && saveState.idCurrentAttack == -1) {
 		AGod* god = Cast<AGod>(GetOwner());
 		if (god != nullptr) {
 			UGodAnimInstance* AnimIntance = Cast<UGodAnimInstance>(god->GetSkeletalMesh()->GetAnimInstance());
@@ -363,7 +363,7 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 
 	
 	// Go back to past attack
-	currentAttack = saveState.idCurrentSubAttack;
+	currentAttack = saveState.idCurrentAttack;
 	if (currentAttack != -1)
 		Attacks[currentAttack]->ApplySaveState(saveState.attackState);
 
@@ -382,7 +382,7 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 				// We had some projectiles but thez are all gone now => recreate them
 				AllProjectiles.Add(i, FProjectileArray());
 				for (auto& simplified : saveState.projectiles[i].Projectiles) {
-					AHitBoxGroupProjectile* projectile = attackProjectile->SpwanHitBoxGroup();
+					AHitBoxGroupProjectile* projectile = attackProjectile->SpawnHitBoxGroup();
 					projectile->applySimplifiedVersion(simplified);
 					AllProjectiles[i].Projectiles.Add(projectile);
 				}
@@ -401,7 +401,7 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 					// Il y a moins de projectiles in game que dans le save state : ajouter le manque					
 					int manque = FMath::Abs(saveState.projectiles[i].Projectiles.Num() - AllProjectiles[i].Projectiles.Num());
 					for (int j = 0; j < manque; j++) {
-						AHitBoxGroupProjectile* projectile = attackProjectile->SpwanHitBoxGroup();
+						AHitBoxGroupProjectile* projectile = attackProjectile->SpawnHitBoxGroup();
 						AllProjectiles[i].Projectiles.Add(projectile);
 					}
 				}
@@ -439,7 +439,7 @@ void UGodAttackComponent::LoadAttacksState(FAttacksSaveState saveState) {
 							//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(i) + " - " + FString::SanitizeFloat(simpProj.auxiliaryInfo));
 							if (attackSeq->GetProjectileAttack(simpProj.auxiliaryInfo, subProjectileAttack)) {
 								//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::SanitizeFloat(i) + " - " + FString::SanitizeFloat(subProjectileAttack->GetAuxInfo()));
-								AHitBoxGroupProjectile* projectile = subProjectileAttack->SpwanHitBoxGroup();
+								AHitBoxGroupProjectile* projectile = subProjectileAttack->SpawnHitBoxGroup();
 								projectile->applySimplifiedVersion(simpProj);
 								AllProjectiles[i].Projectiles.Add(projectile);
 							}

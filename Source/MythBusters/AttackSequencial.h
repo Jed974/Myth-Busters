@@ -8,7 +8,13 @@ class UAttackProjectile;
 #include "AttackSequencial.generated.h"
 
 /**
+ * Special kind of attack that play several subAttacks on a unique montage in once
+ * Anim notifies to use :
+ * - ... (notifies needed by the first subAttack except AttackAnimOver)
+ * - AttackAnimNext (as many as ther are subAttack to trigger
+ * - ... (idem for the current subAttack)
  * 
+ * Of course, ends the attack with AttackAnimOver
  */
 UCLASS()
 class MYTHBUSTERS_API UAttackSequencial : public UAttack
@@ -16,14 +22,16 @@ class MYTHBUSTERS_API UAttackSequencial : public UAttack
 	GENERATED_BODY()
 
 protected :
+	/// Classes of the different attacks to perform, first attack being the one with index 0
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, CATEGORY = "Attacks", meta = (AllowPrivateAccess = "true"))
 		TArray<TSubclassOf<UAttack>> AttacksToPerform;
 
+	/// Instances of the attacks to perform
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Attacks", meta = (AllowPrivateAccess = "true"))
 	TArray<UAttack*> Attacks;
 
-	//UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Attacks", meta = (AllowPrivateAccess = "true"))
-	int idCurrentSubAttack = 0;
+	/// Current subAttack index in Attacks.
+	int idCurrentAttack = 0;
 
 
 public :
@@ -37,7 +45,6 @@ public :
 
 	virtual void ApplySaveState(UAttackSaveState _saveState, bool _playAnimation = true) override;
 	virtual UAttackSaveState GetSaveState() override;
-	//virtual void LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad = -1, bool LoadAnimation = true) override;
 	virtual EAttackState GetAttackState() override;
 
 	virtual void OnActiveNotify() override;
@@ -45,5 +52,6 @@ public :
 	virtual void OnChangeNotify() override;
 	virtual void OnNextNotify() override;
 
+	/// Tries to cast Attacks[id_Att] into a UAttackProjectile, put the result into outAttack and returns if it was successful
 	bool GetProjectileAttack(int id_Att, UAttackProjectile* &outAttack);
 };

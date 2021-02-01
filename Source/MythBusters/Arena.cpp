@@ -63,21 +63,10 @@ bool AArena::IsEjected(float _velocityNorm, FHitResult& _hitResult)
 			Grounds[0]->Explode();
 		else
 			Grounds[idHit + 1]->Explode();
-
-		
-		/*
-		UStaticMeshComponent* _explodedElement = CreateDefaultSubobject<UStaticMeshComponent>("exploded");
-		_explodedElement->SetStaticMesh(explodeMesh);
-		_explodedElement->AddLocalRotation(FQuat(FRotator(idHit * 10, 0, 0)));
-		_explodedElement->SetupAttachment(Root);
-		*/
-		
+				
 		FActorSpawnParameters _spawnParams;
-
 		GetWorld()->SpawnActor<AActor>(explodeActor, FVector::ZeroVector, Grounds[idHit]->GetRelativeRotation(), _spawnParams);
 
-
-		//EGodEjected();
 		return true;
 	}
 	else

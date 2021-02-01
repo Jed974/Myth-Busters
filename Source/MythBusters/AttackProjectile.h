@@ -8,7 +8,7 @@ extern class AHitBoxGroupProjectile;
 #include "AttackProjectile.generated.h"
 
 /**
- * 
+ * Attack spawning a projectiles that evolves on its own during a specified lifetime
  */
 UCLASS()
 class MYTHBUSTERS_API UAttackProjectile : public UAttack//, public FTickableGameObject
@@ -16,21 +16,28 @@ class MYTHBUSTERS_API UAttackProjectile : public UAttack//, public FTickableGame
 	GENERATED_BODY()
 	
 public:
+	/// HitBoxGroupProjectile to spawn
 	UPROPERTY(Category = "HitCreation", EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<AHitBoxGroupProjectile> projectileToSpawn;
+
+	/// Socket to spawn the projectile to
 	UPROPERTY(Category = "HitCreation", EditAnywhere, BlueprintReadWrite)
-		FName SocketToAttachTo;
+		FName SocketToSpawnTo;
 
 
 public:
 	UAttackProjectile();
 
+	/// Spawns the projectile
 	UFUNCTION(BlueprintCallable)
-	AHitBoxGroupProjectile* SpwanHitBoxGroup();
+	AHitBoxGroupProjectile* SpawnHitBoxGroup();
 
 	virtual void OnActiveNotify() override;
 
 	/*
+	* === Methods needed to make an attack a TickableGameObject ===
+	*			eventually useless for AttackProjectile
+	*			but may be needed for futur attack types
 	void Tick(float DeltaTime) override;
 	bool IsTickable() const override;
 	bool IsTickableInEditor() const override;

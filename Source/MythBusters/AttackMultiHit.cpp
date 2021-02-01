@@ -18,10 +18,10 @@ void UAttackMultiHit::StopAttack() {
 }
 
 
-void UAttackMultiHit::SpwanHitBoxGroup(int id, bool alreadyHit) {
+void UAttackMultiHit::SpawnHitBoxGroup(int id, bool alreadyHit) {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "AttackSingleHit started an attack !");
 
-	FTransform _spawnTransform = god->GetRootComponent()->GetSocketTransform(SocketToAttachTo);
+	FTransform _spawnTransform = god->GetRootComponent()->GetSocketTransform(SocketToSpawnTo);
 
 	FActorSpawnParameters _spawnParams;
 	_spawnParams.Instigator = god;
@@ -29,8 +29,8 @@ void UAttackMultiHit::SpwanHitBoxGroup(int id, bool alreadyHit) {
 	hitBoxGroup = GetWorld()->SpawnActor<AHitBoxGroup>(hitBoxGroupsToSpawn[id], _spawnTransform.GetLocation(), _spawnTransform.GetRotation().Rotator(), _spawnParams);
 
 	FAttachmentTransformRules _attTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
-	if (SocketToAttachTo != "NONE")
-		hitBoxGroup->AttachToComponent(god->GetSkeletalMesh(), _attTransformRules, SocketToAttachTo);
+	if (SocketToSpawnTo != "NONE")
+		hitBoxGroup->AttachToComponent(god->GetSkeletalMesh(), _attTransformRules, SocketToSpawnTo);
 	else
 		hitBoxGroup->AttachToComponent(god->GetSkeletalMesh(), _attTransformRules);
 	hitBoxGroup->facingRight = god->GetGodMovementComponent()->GetIsFacingRight();	
@@ -69,13 +69,13 @@ void UAttackMultiHit::ApplySaveState(UAttackSaveState _saveState, bool _playAnim
 	Super::ApplySaveState(_saveState, _playAnimation);
 	switch (attackState) {
 	case EAttackState::HITACTIVE1:
-		SpwanHitBoxGroup(0, _saveState.auxAlreadyHit);
+		SpawnHitBoxGroup(0, _saveState.auxAlreadyHit);
 		break;
 	case EAttackState::HITACTIVE2:
-		SpwanHitBoxGroup(1, _saveState.auxAlreadyHit);
+		SpawnHitBoxGroup(1, _saveState.auxAlreadyHit);
 		break;
 	case EAttackState::HITACTIVE3:
-		SpwanHitBoxGroup(2, _saveState.auxAlreadyHit);
+		SpawnHitBoxGroup(2, _saveState.auxAlreadyHit);
 		break;
 	default:
 		break;
@@ -99,11 +99,11 @@ void UAttackMultiHit::ApplySaveState(UAttackSaveState _saveState, bool _playAnim
 }*/
 
 void UAttackMultiHit::OnActiveNotify() {
-	SpwanHitBoxGroup(0);
+	SpawnHitBoxGroup(0);
 }
 void UAttackMultiHit::OnChangeNotify() {
 	DestroyHitBoxGroup();
-	SpwanHitBoxGroup(idHitboxGroup + 1);
+	SpawnHitBoxGroup(idHitboxGroup + 1);
 }
 void UAttackMultiHit::OnInactiveNotify() {
 	DestroyHitBoxGroup();
