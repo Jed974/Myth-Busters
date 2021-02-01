@@ -51,7 +51,7 @@ fletcher32_checksum(short* data, size_t len)
 }
 
 /*
- * vw_begin_game_callback --
+ * mb_begin_game_callback --
  *
  * The begin game callback.  We don't need to do anything special here,
  * so just return true.
@@ -63,7 +63,7 @@ bool __cdecl mb_begin_game_callback(const char*)
 }
 
 /*
- * vw_on_event_callback --
+ * mb_on_event_callback --
  *
  * Notification from GGPO that something has happened.  Update the status
  * text at the bottom of the screen to notify the user.
@@ -127,7 +127,7 @@ bool __cdecl mb_on_event_callback(GGPOEvent* info)
 
 
 /*
- * vw_advance_frame_callback --
+ * mb_advance_frame_callback --
  *
  * Notification from GGPO we should step foward exactly 1 frame
  * during a rollback.
@@ -174,7 +174,7 @@ bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len)
 }
 
 /*
- * vw_save_game_state_callback --
+ * mb_save_game_state_callback --
  *
  * Save the current state to a buffer and return it to GGPO via the
  * buffer and len parameters.
@@ -203,7 +203,7 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
 }
 
 /*
- * vw_log_game_state --
+ * mb_log_game_state --
  *
  * Log the gamestate.  Used by the synctest debugging tool.
  */
@@ -247,9 +247,9 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
  }
 
  /*
-  * vw_free_buffer --
+  * mb_free_buffer_callback --
   *
-  * Free a save state buffer previously returned in vw_save_game_state_callback.
+  * Free a save state buffer previously returned in mb_save_game_state_callback.
   */
   void __cdecl mb_free_buffer_callback(void* buffer)
   {
@@ -257,9 +257,9 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
   }
 
   /*
-  * vw_free_buffer --
+  * mb_end_rollback_callback --
   *
-  * Free a save state buffer previously returned in vw_save_game_state_callback.
+  * Called after all frames of a rollback have been simulated
   */
   bool __cdecl mb_end_rollback_callback()
   {
@@ -302,9 +302,9 @@ bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* 
 
 
   /*
-   * VectorWar_Init --
+   * MythBusters_Init --
    *
-   * Initialize the vector war game.  This initializes the game state and
+   * Initialize the game online.  This initializes the game state and
    * the video renderer and creates a new network session.
    */
 void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators)
@@ -365,13 +365,6 @@ void UMythBustersGameInstance::MythBusters_Init(unsigned short localport, int nu
     }
 }
 
-/*void UMythBustersGameInstance::CreateLocalPlayer()
-{
-    GGPOPlayer Player;
-    Player.size = sizeof(GGPOPlayer);
-    Player.type = GGPO_PLAYERTYPE_LOCAL;
-    Players.EmplaceAt(0, Player);
-}*/
 
 void UMythBustersGameInstance::CreateRemotePlayer(FString IPAdress)
 {
@@ -413,41 +406,9 @@ void UMythBustersGameInstance::StartGGPO()
     GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Start GGPO");
 }
 
-/*
- * VectorWar_InitSpectator --
- *
- * Create a new spectator session
- */
- /*void
- VectorWar_InitSpectator(HWND hwnd, unsigned short localport, int num_players, char* host_ip, unsigned short host_port)
- {
-     GGPOErrorCode result;
-     renderer = new GDIRenderer(hwnd);
-
-     // Initialize the game state
-     gs.Init(hwnd, num_players);
-     ngs.num_players = num_players;
-
-     // Fill in a ggpo callbacks structure to pass to start_session.
-     GGPOSessionCallbacks cb = { 0 };
-     cb.begin_game = vw_begin_game_callback;
-     cb.advance_frame = vw_advance_frame_callback;
-     cb.load_game_state = vw_load_game_state_callback;
-     cb.save_game_state = vw_save_game_state_callback;
-     cb.free_buffer = vw_free_buffer;
-     cb.on_event = vw_on_event_callback;
-     cb.log_game_state = vw_log_game_state;
-
-     result = ggpo_start_spectating(&ggpo, &cb, "vectorwar", num_players, sizeof(int), localport, host_ip, host_port);
-
-     ggpoutil_perfmon_init(hwnd);
-
-     renderer->SetStatusText("Starting new spectator session");
- }*/
-
 
  /*
-  * VectorWar_DisconnectPlayer --
+  * MythBusters_DisconnectPlayer --
   *
   * Disconnects a player from this session.
   */
@@ -465,22 +426,8 @@ void UMythBustersGameInstance::StartGGPO()
       }
   }
 
-
-  /*
-   * VectorWar_DrawCurrentFrame --
-   *
-   * Draws the current frame without modifying the game state.
-   */
-   /*void
-   VectorWar_DrawCurrentFrame()
-   {
-       if (renderer != nullptr) {
-           renderer->Draw(gs, ngs);
-       }
-   }*/
-
    /*
-    * VectorWar_AdvanceFrame --
+    * MythBusters_AdvanceFrame --
     *
     * Advances the game state by exactly 1 frame using the inputs specified
     * for player 1 and player 2.
@@ -552,7 +499,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
  }*/
 
  /*
-  * VectorWar_RunFrame --
+  * MythBusters_RunFrame --
   *
   * Run a single frame of the game.
   */
@@ -577,24 +524,6 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
     #endif
         LocalInputs.MakeSendable();
 
-        //Inputs[GGPOPlayerIndex].Actions = SendGodSelection(Inputs[GGPOPlayerIndex].Actions);
-        //While god selection information is initiated localy but not recieved, send local selection 
-        /*if (SelectedGods[3] == 0) {
-            GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Sending god selection");
-            if (SelectedGods[0] == 0) {
-                LocalInputs.SendableInputs.Actions = ThorSelectedCode;
-            }
-            else
-            {
-                LocalInputs.SendableInputs.Actions = Thor2SelectedCode;
-            }
-            if (SelectedGods[2] == 1) {
-                GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Confirmation received !");
-                LocalInputs.SendableInputs.Actions = GodSelectionReceived;
-                SelectedGods[2] = 0;
-            }
-        }*/
-
         while (!GGPO_SUCCEEDED(result) && ngs.players[GGPOPlayerIndex].state == Running)
         {
             result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &LocalInputs.SendableInputs, PacketSize);
@@ -613,26 +542,6 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         result = ggpo_synchronize_input(ggpo, (void*)Inputs, PacketSize * NUM_PLAYERS, &disconnect_flags);
         if (GGPO_SUCCEEDED(result)) {
 
-            //ReadGodSelection(Inputs[GGPOPlayerIndex].Actions);
-            //Receive confirmation that remote gameinstance received local god selection
-            //if (SelectedGods[3] == 0 && Inputs[GGPOPlayerIndex].Actions == GodSelectionReceived) {
-            //    SelectedGods[3] = 1;
-            //    Inputs[GGPOPlayerIndex].Actions = NoActionCode;
-            //}
-            ////Receive god selection info
-            //if (SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == ThorSelectedCode) {
-            //    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR IS SELECTED");
-            //    SelectedGods[1] = 0;
-            //    SelectedGods[2] = 1;
-            //    Inputs[GGPOPlayerIndex].Actions = NoActionCode;
-            //}
-            //else if ( SelectedGods[1] == -1 && Inputs[GGPOPlayerIndex].Actions == Thor2SelectedCode) {
-            //    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Recieved God Selection info: THOR2 IS SELECTED");
-            //    SelectedGods[1] = 1;
-            //    SelectedGods[2] = 1;
-            //    Inputs[GGPOPlayerIndex].Actions = NoActionCode;
-            //}
-
              // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
              // the game by 1 frame using those inputs.
              MythBusters_AdvanceFrame(Inputs, disconnect_flags);
@@ -646,13 +555,13 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
   }
 
   /*
-   * VectorWar_Idle --
+   * MythBusters_Idle --
    *
    * Spend our idle time in ggpo so it can use whatever time we have left over
    * for its internal bookkeeping.
    */
    /*void
-   VectorWar_Idle(int time)
+   MythBusters_Idle(int time)
    {
        ggpo_idle(ggpo, time);
    }*/
@@ -755,7 +664,7 @@ void UMythBustersGameInstance::MainThreadSleep(float time)
 {
     FPlatformProcess::Sleep(time);
 }
-
+/*
 char UMythBustersGameInstance::SendGodSelection(char act) {
     if (UMythBustersGameInstance::Instance->gs._framenumber < 100) {
         if (UMythBustersGameInstance::Instance->SelectedGods[0] == 1) {
@@ -770,121 +679,4 @@ void UMythBustersGameInstance::ReadGodSelection(char act) {
         UMythBustersGameInstance::Instance->SelectedGods[1] = ((act & 0b00100000) != 0) ? 1 : 0;
         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Read %i", ((act & 0b00010000) != 0) ? 1 : 0);
     }
-}
-
-
-/*
-#pragma region StaticMethod
-
-void UMythBustersGameInstance::Static_MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators)
-{
-    if (GEngine->GetWorld() != nullptr && GEngine->GetWorld()->GetGameInstance() != nullptr)
-    {
-        //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
-
-        if (Instance != nullptr)
-        {
-            Instance->MythBusters_Init(localport, num_players, players, num_spectators);
-        }
-        else
-        {
-            if (GEngine)
-                GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("GGPOManagerInstance is null ! (on Static_MythBusters_Init)"));
-        }
-    }
-    
-}
-void UMythBustersGameInstance::Static_MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port)
-{
-    //UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World())
-    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
-    if (Instance != nullptr)
-    {
-        //GGPOManagerInstance->MythBusters_InitSpectator(localport, num_players, host_ip, host_port);
-    }
-    else
-    {
-        if(GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("GGPOManagerInstance is null ! (on Static_MythBusters_InitSpectator)"));
-    }
-}
-void UMythBustersGameInstance::Static_MythBusters_DrawCurrentFrame()
-{
-    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
-    if (Instance != nullptr)
-    {
-    //GGPOManagerInstance->MythBusters_DrawCurrentFrame();
-    }
-    else
-    {
-        if(GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("GGPOManagerInstance is null ! (on Static_MythBusters_DrawCurrentFrame)"));
-    }
- }
-void UMythBustersGameInstance::Static_MythBusters_AdvanceFrame(int inputs[], int disconnect_flags)
-{
-    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
-    if (Instance != nullptr)
-    {
-        Instance->MythBusters_AdvanceFrame(inputs, disconnect_flags);
-    }
-    else
-    {
-        if(GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("GGPOManagerInstance is null ! (on Static_MythBusters_AdvanceFrame)"));
-    }
-}
-void UMythBustersGameInstance::Static_MythBusters_RunFrame()
-{
-    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
-    if (Instance != nullptr)
-    {
-        //GGPOManagerInstance->MythBusters_RunFrame();
-    }
-    else
-    {
-        if(GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("GGPOManagerInstance is null ! (on Static_MythBusters_RunFrame)"));
-    }
-}
-void UMythBustersGameInstance::Static_MythBusters_Idle(int time)
-{
-    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
-    if (Instance != nullptr)
-    {
-        //GGPOManagerInstance->MythBusters_Idle(time);
-    }
-    else
-    {
-        if(GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("GGPOManagerInstance is null ! (on Static_MythBusters_Idle)"));
-    }
-}
-void UMythBustersGameInstance::Static_MythBusters_DisconnectPlayer(int player)
-{
-    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
-    if (Instance != nullptr)
-    {
-        //GGPOManagerInstance->MythBusters_DisconnectPlayer(player);
-    }
-    else
-    {
-        if(GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("GGPOManagerInstance is null ! (on Static_MythBusters_DisconnectPlayer)"));
-    }
-}
-void UMythBustersGameInstance::Static_MythBusters_Exit()
-{
-    //UMythBustersGameInstance* Instance = dynamic_cast<UMythBustersGameInstance*>(UGameplayStatics::GetGameInstance(GEngine->GetWorldContexts()[0].World()));
-    if (Instance != nullptr)
-    {
-        //GGPOManagerInstance->MythBusters_Exit();
-    }
-    else
-    {
-        if(GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("GGPOManagerInstance is null ! (on Static_MythBusters_Exit)"));
-    }
-}
-#pragma endregion
-*/
+}*/

@@ -13,7 +13,9 @@ DECLARE_DELEGATE_OneParam(FChangeMovementStateDelegate, EMovementState);
 DECLARE_DELEGATE(FInstantTurnDelegate);
 
 
-
+/*
+	The state of the movement the character is in
+*/
 UENUM(BlueprintType)
 enum class EMovementState : uint8 {
 	Flying,
@@ -26,6 +28,9 @@ enum class EMovementState : uint8 {
 	Attacking
 };
 
+/*
+	The sub state of the horizontal movement the character is in
+*/
 UENUM(BlueprintType)
 enum class EHorizontalMovementState : uint8
 {
@@ -41,6 +46,9 @@ enum class EHorizontalMovementState : uint8
 	SprintHorizontalStop,
 };
 
+/*
+	The sub state of the vertical movement the character is in
+*/
 UENUM(BlueprintType)
 enum class EVerticalMovementState : uint8
 {
@@ -56,6 +64,9 @@ enum class EVerticalMovementState : uint8
 	SprintVerticalStop,
 };
 
+/*
+	Component to describe all the movement of a god (dashing, turnaround...)
+*/
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MYTHBUSTERS_API UGodMovementComponent : public UActorComponent
 {
@@ -75,6 +86,7 @@ public:
 	FChangeMovementStateDelegate ChangeMovementStateDelegate;
 	FInstantTurnDelegate InstantTurnDelegate;
 
+	// The current state of the character movement
 	UPROPERTY(BlueprintReadOnly)
 		EMovementState MovementState;
 	
@@ -172,25 +184,43 @@ public:
 
 	EHorizontalMovementState HorizontalMovementState;
 	EVerticalMovementState VerticalMovementState;
-
+	
+	
+	// Current Speed Vector
 	UPROPERTY(BlueprintReadOnly)
 	FVector2D Velocity;
+	
+	// Current Dash Direction
 	FVector2D DashDir;
+	
+	// Current Speed Vector of the push movement when colliding with another god
 	FVector2D PushVelocity;
+	
+	// Can be pushed ?
 	UPROPERTY(BlueprintReadOnly)
 	bool IsPushable;
+	
+	// Current Speed Vector when ejected
 	FVector2D EjectionVelocity;
 
+	// Current Direction vector inputted when doing an attack to influence movement a little
 	FVector2D DirectionalInfluence;
 
+	// Normalize joystick input vector
 	FVector2D _MovementInput;
 
+	// Current Absolute Horizontal Speed
 	float HorizontalSpeed;
+
+	// Horizontal Speed at the end of the last movement (after a movement state change)
 	float HorizontalPreviousSpeed;
 	int CurrentHorizontalStateTimer;
-
 	int CurrentVerticalStateTimer;
+
+	// Current Absolute Horizontal Speed
 	float VerticalSpeed;
+
+	// Vertical Speed at the end of the last movement (after a movement state change)
 	float VerticalPreviousSpeed;
 
 	int DashFrameCounter = 0;
@@ -199,10 +229,13 @@ public:
 	int EjectionFrameCounter = 0;
 	int WallHitFrameCounter = 0;
 
+	// The character is currently facing right ?
 	UPROPERTY(BlueprintReadOnly)
 		bool isFacingRight;
+	// The character is currently facing up ?
 	UPROPERTY(BlueprintReadOnly)
 		bool isFacingUp;
+	// Other god or arena to collide with
 	UPROPERTY(BlueprintReadWrite)
 		AActor* CollidingActor;
 
@@ -213,7 +246,7 @@ public:
 protected:
 	
 	
-	
+	// Constant 0.016ms to multiply during movement
 	float DELTA_TIME;
 
 	

@@ -12,13 +12,18 @@ class AHitBoxGroup;
 #include "god.generated.h"
 
 
-
+/*
+	The state of a action input
+*/
 enum EInputActionState
 {
 	Released,
 	Pressed
 };
 
+/*
+	The type of Input Action or Axis
+*/
 enum EInputSpecifier
 {
 	NORMAL,
@@ -30,11 +35,18 @@ enum EInputSpecifier
 	VERTICAL
 };
 
+/*
+	Describe an Axis Input (like a joystick for exemple)
+*/
 struct SInputAxis
 {
 	float Value;
 };
 
+
+/*
+	Describe an Action Input (like a button press for exemple)
+*/
 struct SInputAction
 {
 	SInputAction() : State(EInputActionState::Released), PreviousState(EInputActionState::Released) {};
@@ -43,6 +55,9 @@ struct SInputAction
 	bool Consumed = false;
 };
 
+/*
+	Optimize Input struct to minimize packet size when sending online
+*/
 struct SSendableInputs
 {
 	float VerticalAxis;
@@ -50,6 +65,9 @@ struct SSendableInputs
 	char Actions;
 };
 
+/*
+	Describe all the possible Inputs for a God
+*/
 struct SInputs
 {
 
@@ -108,8 +126,6 @@ struct SInputs
 		if (InputActions[SHIELD].State == Pressed){
 			act += 0b00010000;
 		}
-		//act = AGod::SendGodSelection(act);
-		//act = SendGodSelection(act);
 		SendableInputs.Actions = act;
 	};
 	void Readable(SSendableInputs const * const Inputs)
@@ -123,14 +139,13 @@ struct SInputs
 			InputActions[PUSH].State = ((Inputs->Actions & 0b00000100) != 0) ? Pressed : Released;
 			InputActions[DASH].State = ((Inputs->Actions & 0b00001000) != 0) ? Pressed : Released;
 			InputActions[SHIELD].State = ((Inputs->Actions & 0b00010000) != 0) ? Pressed : Released;
-			//AGod::ReadGodSelection(Inputs->Actions);
-			//ReadGodSelection(Inputs->Actions);
 		}		
 	};
-	//char SendGodSelection(char act);
-	//void ReadGodSelection(char act);
 };
 
+/*
+	All the state a God can be in
+*/
 UENUM(BlueprintType)
 enum class EGodState : uint8 {
 	Flying UMETA(DisplayName = "Flying"),
@@ -145,6 +160,10 @@ enum class EGodState : uint8 {
 	Dead UMETA(DisplayName = "Dead")
 };
 
+
+/*
+	Character class for all the Playable Characters
+*/
 UCLASS()
 class MYTHBUSTERS_API AGod : public APawn
 {
@@ -154,15 +173,22 @@ public:
 	// Sets default values for this actor's properties
 	AGod();
 	
+	// Hurtbox and collision handling
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
 		UCapsuleComponent* CapsuleComponent;
+	// Total damage received by the god
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
 		float GodDamage = 0.0f;
 
+	// Input Storage
 	SInputs Inputs;
+	// Online Input Storage
 	SInputs GGPOInputs;
+	// Read Input from variable to execute specific actions
 	void ReadInputs(SInputs* Inputs);
+	// Write Axis Input Value in a variable
 	void WriteInputs(EInputSpecifier Specifier, float Value);
+	// Write Action Input State in a variable
 	void WriteInputs(EInputSpecifier Specifier, EInputActionState State);
 	void WriteHorizontalAxis(float Value);
 	void WriteVerticalAxis(float Value);
@@ -178,40 +204,41 @@ public:
 	void ReleaseDash();
 
 protected:
-	
+	// Appearance of the character
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Components", meta = (AllowPrivateAccess = "true"))
 		USkeletalMeshComponent* SkeletalMesh;
-
+	// Component to handle all flying mouvement (dashing, turnaround...)
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Movement", meta = (AllowPrivateAccess = "true"))
 		UGodMovementComponent* GodMovement;
-
+	// Component to handle shield Ability
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Shield", meta = (AllowPrivateAccess = "true"))
 		UGodShieldComponent* GodShield;
-
+	// The state of attack the character is in
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
 		EAttackDirection attackState;
+	// Component to describe all the attacks a character can do
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
 		UGodAttackComponent* GodAttack;
-
+	// Component to handle all the boost a character has
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, CATEGORY = "Boost", meta = (AllowPrivateAccess = "true"))
 		UGodBoostComponent* GodBoost;
 
-
+	// Joystick deadzones
 	float HorizontalDeadZone = 0.15f;
 	float VerticalDeadZone = 0.15f;
 	
-
+	//If the character is online
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		bool netplay = false;
 
-	// Boolean de GameMode (ne sont pas sensé changer au cours d'une partie) :
+	// Boolean to limit character ability in certain game modes
 	bool canDash = true;
 	bool canAttNorm = true;
 	bool canAttSpe = true;
 	bool canAttPush = true;
 	bool canShield = true;
 
-	
+	// Time window (in frame) to input a backward attack during the beginning of a turnaround
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, CATEGORY = "Attack", meta = (AllowPrivateAccess = "true"))
 	int BackwardAttackFrameWindow = 0;
 
@@ -349,7 +376,12 @@ public:
 	//static void ReadGodSelection(char act);
 };
 
+/*
+	Class to store the whole state of the character each frame.
+	It is only the necessary variables to completely describe the character.
+	Useful for rollbacks.
 
+*/
 struct SAbstractGod
 {
 	AGod* Ref;
