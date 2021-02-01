@@ -577,7 +577,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
     #endif
         LocalInputs.MakeSendable();
 
-        Inputs[GGPOPlayerIndex].Actions = SendGodSelection(Inputs[GGPOPlayerIndex].Actions);
+        //Inputs[GGPOPlayerIndex].Actions = SendGodSelection(Inputs[GGPOPlayerIndex].Actions);
         //While god selection information is initiated localy but not recieved, send local selection 
         /*if (SelectedGods[3] == 0) {
             GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Sending god selection");
@@ -613,7 +613,7 @@ void UMythBustersGameInstance::MythBusters_AdvanceFrame(SSendableInputs inputs[]
         result = ggpo_synchronize_input(ggpo, (void*)Inputs, PacketSize * NUM_PLAYERS, &disconnect_flags);
         if (GGPO_SUCCEEDED(result)) {
 
-            ReadGodSelection(Inputs[GGPOPlayerIndex].Actions);
+            //ReadGodSelection(Inputs[GGPOPlayerIndex].Actions);
             //Receive confirmation that remote gameinstance received local god selection
             //if (SelectedGods[3] == 0 && Inputs[GGPOPlayerIndex].Actions == GodSelectionReceived) {
             //    SelectedGods[3] = 1;
