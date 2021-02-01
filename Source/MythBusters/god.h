@@ -108,8 +108,6 @@ struct SInputs
 		if (InputActions[SHIELD].State == Pressed){
 			act += 0b00010000;
 		}
-		//act = AGod::SendGodSelection(act);
-		//act = SendGodSelection(act);
 		SendableInputs.Actions = act;
 	};
 	void Readable(SSendableInputs const * const Inputs)
@@ -123,12 +121,8 @@ struct SInputs
 			InputActions[PUSH].State = ((Inputs->Actions & 0b00000100) != 0) ? Pressed : Released;
 			InputActions[DASH].State = ((Inputs->Actions & 0b00001000) != 0) ? Pressed : Released;
 			InputActions[SHIELD].State = ((Inputs->Actions & 0b00010000) != 0) ? Pressed : Released;
-			//AGod::ReadGodSelection(Inputs->Actions);
-			//ReadGodSelection(Inputs->Actions);
 		}		
 	};
-	//char SendGodSelection(char act);
-	//void ReadGodSelection(char act);
 };
 
 UENUM(BlueprintType)
