@@ -47,7 +47,7 @@ fletcher32_checksum(short* data, size_t len)
     // Second reduction step to reduce sums to 16 bits 
     sum1 = (sum1 & 0xffff) + (sum1 >> 16);
     sum2 = (sum2 & 0xffff) + (sum2 >> 16);
-    return sum2 << 16 | sum1;poevent
+    return sum2 << 16 | sum1;
 }
 
 /*
