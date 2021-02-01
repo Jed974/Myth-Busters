@@ -13,7 +13,7 @@ UAttackSequencial::UAttackSequencial() : UAttack() {
 
 void UAttackSequencial::StartAttack() {
 	Super::StartAttack();
-	idCurrentSubAttack = 0;
+	idCurrentAttack = 0;
 }
 void UAttackSequencial::StopAttack() {
 	for (int i = 0; i < Attacks.Num(); i++) {
@@ -23,7 +23,7 @@ void UAttackSequencial::StopAttack() {
 }
 void UAttackSequencial::OverAttack() {
 	Super::OverAttack();
-	idCurrentSubAttack = -1;
+	idCurrentAttack = -1;
 	for (int i = 0; i < Attacks.Num(); i++) {
 		if (Attacks[i] != nullptr)
 			Attacks[i]->OverAttack();
@@ -41,7 +41,7 @@ void UAttackSequencial::SetUpAttack(AGod* _god, int _idAttack, int _auxInfo) {
 
 
 void UAttackSequencial::ApplySaveState(UAttackSaveState _saveState, bool _playAnimation) {
-	idCurrentSubAttack = _saveState.auxiliaryInfo;
+	idCurrentAttack = _saveState.auxiliaryInfo;
 	//if (_saveState.attackState_Saved != EAttackState::OFF)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat((int)_saveState.attackState_Saved));
 	//curveAbscissa = _saveState.inducedMovementAbscissa;
@@ -60,38 +60,23 @@ void UAttackSequencial::ApplySaveState(UAttackSaveState _saveState, bool _playAn
 			 stuff....
 		else*/
 
-		if (Attacks[idCurrentSubAttack] != nullptr)
-			Attacks[idCurrentSubAttack]->ApplySaveState(_saveState, false); //LoadAtAttackStateAndFrame(_stateToLoad, -1, false);
+		if (Attacks[idCurrentAttack] != nullptr)
+			Attacks[idCurrentAttack]->ApplySaveState(_saveState, false); //LoadAtAttackStateAndFrame(_stateToLoad, -1, false);
 
 		PlayMontageFromCurrentState(_saveState.animationFrame_Saved);	// the animation is handle by sequential animation only
 	}
 }
 UAttackSaveState UAttackSequencial::GetSaveState() {
 	UAttackSaveState svst = Super::GetSaveState();
-	svst.auxiliaryInfo = idCurrentSubAttack;
+	svst.auxiliaryInfo = idCurrentAttack;
 	return svst;
 }
-/*void UAttackSequencial::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
-	if (_stateToLoad == EAttackState::OFF)
-		OverAttack();
-	else {
-		attackState = EAttackState::START;
-
-		// if currentAttack is aim attack + state of wait -> aim attack handles animation
-			// stuff....
-		//else
-		if (Attacks[idCurrentSubAttack] != nullptr)
-			Attacks[idCurrentSubAttack]->LoadAtAttackStateAndFrame(_stateToLoad, -1, false);
-
-		PlayMontageFromCurrentState(_animationFrameToLoad);	// the animation is handle by sequential animation only
-	}
-}*/
 EAttackState UAttackSequencial::GetAttackState() {
 	if (attackState == EAttackState::OFF)
 		return EAttackState::OFF;		// If the attack is off, we tell so
 	else {
-		if (Attacks[idCurrentSubAttack] != nullptr) {
-			EAttackState subState = Attacks[idCurrentSubAttack]->GAS();//GetAttackState();
+		if (Attacks[idCurrentAttack] != nullptr) {
+			EAttackState subState = Attacks[idCurrentAttack]->GAS();//GetAttackState();
 			if (subState != EAttackState::OFF)
 				return subState;
 			else
@@ -104,36 +89,34 @@ EAttackState UAttackSequencial::GetAttackState() {
 
 
 void UAttackSequencial::OnActiveNotify() {
-	if (idCurrentSubAttack != -1 && idCurrentSubAttack < Attacks.Num() && Attacks[idCurrentSubAttack] != nullptr)
-		Attacks[idCurrentSubAttack]->OnActiveNotify();
+	if (idCurrentAttack != -1 && idCurrentAttack < Attacks.Num() && Attacks[idCurrentAttack] != nullptr)
+		Attacks[idCurrentAttack]->OnActiveNotify();
 }
 void UAttackSequencial::OnInactiveNotify() {
-	if (idCurrentSubAttack != -1 && idCurrentSubAttack < Attacks.Num() && Attacks[idCurrentSubAttack] != nullptr)
-		Attacks[idCurrentSubAttack]->OnInactiveNotify();
+	if (idCurrentAttack != -1 && idCurrentAttack < Attacks.Num() && Attacks[idCurrentAttack] != nullptr)
+		Attacks[idCurrentAttack]->OnInactiveNotify();
 }
 void UAttackSequencial::OnChangeNotify() {
-	if (idCurrentSubAttack != -1 && idCurrentSubAttack < Attacks.Num() && Attacks[idCurrentSubAttack] != nullptr)
-		Attacks[idCurrentSubAttack]->OnChangeNotify();
+	if (idCurrentAttack != -1 && idCurrentAttack < Attacks.Num() && Attacks[idCurrentAttack] != nullptr)
+		Attacks[idCurrentAttack]->OnChangeNotify();
 }
 void UAttackSequencial::OnNextNotify() {
-	if (idCurrentSubAttack != -1 && idCurrentSubAttack < Attacks.Num() && Attacks[idCurrentSubAttack] != nullptr)
-		Attacks[idCurrentSubAttack]->OverAttack();
+	if (idCurrentAttack != -1 && idCurrentAttack < Attacks.Num() && Attacks[idCurrentAttack] != nullptr)
+		Attacks[idCurrentAttack]->OverAttack();
 
-	idCurrentSubAttack += 1;
+	idCurrentAttack += 1;
 
 	//Security
-	if (idCurrentSubAttack >= Attacks.Num()) {
+	if (idCurrentAttack >= Attacks.Num()) {
 		OverAttack();
 	}
 }
 
 bool UAttackSequencial::GetProjectileAttack(int id_Att, UAttackProjectile* &outAttack) {
-	//if (idCurrentSubAttack != -1 && idCurrentSubAttack < Attacks.Num() && Attacks[idCurrentSubAttack] != nullptr) {
+	if (Attacks.Contains(id_Att)) {
 		outAttack = Cast<UAttackProjectile>(Attacks[id_Att]);
 		return (outAttack != nullptr);
-	/*}
-	else {
-		outAttack = nullptr;
+	}
+	else
 		return false;
-	}*/
 }

@@ -13,9 +13,9 @@ UAttackProjectile::UAttackProjectile() : UAttack() {
 
 
 
-AHitBoxGroupProjectile* UAttackProjectile::SpwanHitBoxGroup() {
+AHitBoxGroupProjectile* UAttackProjectile::SpawnHitBoxGroup() {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "Projectile Launched !");
-	FTransform _spawnTransform = god->GetRootComponent()->GetSocketTransform(SocketToAttachTo);
+	FTransform _spawnTransform = god->GetRootComponent()->GetSocketTransform(SocketToSpawnTo);
 
 	FActorSpawnParameters _spawnParams;
 	_spawnParams.Instigator = god;
@@ -28,7 +28,7 @@ AHitBoxGroupProjectile* UAttackProjectile::SpwanHitBoxGroup() {
 }
 
 void UAttackProjectile::OnActiveNotify() {
-	god->RegisterProjectile(SpwanHitBoxGroup(), idAttackOnGodAttackComponent);
+	god->RegisterProjectile(SpawnHitBoxGroup(), idAttackOnGodAttackComponent);
 	attackState = EAttackState::RECOVER;
 }
 

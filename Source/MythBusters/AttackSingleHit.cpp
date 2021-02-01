@@ -18,10 +18,10 @@ void UAttackSingleHit::StopAttack() {
 }
 
 
-void UAttackSingleHit::SpwanHitBoxGroup(bool alreadyHit) {
+void UAttackSingleHit::SpawnHitBoxGroup(bool alreadyHit) {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "AttackSingleHit started an attack !");
 
-	FTransform _spawnTransform = god->GetRootComponent()->GetSocketTransform(SocketToAttachTo);
+	FTransform _spawnTransform = god->GetRootComponent()->GetSocketTransform(SocketToSpawnTo);
 
 	FActorSpawnParameters _spawnParams;
 	_spawnParams.Instigator = god;
@@ -29,8 +29,8 @@ void UAttackSingleHit::SpwanHitBoxGroup(bool alreadyHit) {
 	hitBoxGroup = GetWorld()->SpawnActor<AHitBoxGroup>(hitBoxGroupToSpawn, _spawnTransform.GetLocation(), _spawnTransform.GetRotation().Rotator(), _spawnParams);
 
 	FAttachmentTransformRules _attTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
-	if (SocketToAttachTo != "NONE")
-		hitBoxGroup->AttachToComponent(god->GetSkeletalMesh(), _attTransformRules, SocketToAttachTo);
+	if (SocketToSpawnTo != "NONE")
+		hitBoxGroup->AttachToComponent(god->GetSkeletalMesh(), _attTransformRules, SocketToSpawnTo);
 	else
 		hitBoxGroup->AttachToComponent(god->GetSkeletalMesh(), _attTransformRules);
 
@@ -56,7 +56,7 @@ void UAttackSingleHit::DestroyHitBoxGroup() {
 void UAttackSingleHit::ApplySaveState(UAttackSaveState _saveState, bool _playAnimation) {
 	Super::ApplySaveState(_saveState, _playAnimation);
 	if (attackState == EAttackState::HITACTIVE1) {
-		SpwanHitBoxGroup(_saveState.auxAlreadyHit);
+		SpawnHitBoxGroup(_saveState.auxAlreadyHit);
 	}
 }
 /*void UAttackSingleHit::LoadAtAttackStateAndFrame(EAttackState _stateToLoad, float _animationFrameToLoad, bool LoadAnimation) {
@@ -67,7 +67,7 @@ void UAttackSingleHit::ApplySaveState(UAttackSaveState _saveState, bool _playAni
 }*/
 
 void UAttackSingleHit::OnActiveNotify() {
-	SpwanHitBoxGroup();
+	SpawnHitBoxGroup();
 }
 void UAttackSingleHit::OnInactiveNotify() {
 	DestroyHitBoxGroup();

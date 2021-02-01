@@ -8,30 +8,9 @@
 #include "HitBoxGroupProjectile.generated.h"
 
 
-/*UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class MYTHBUSTERS_API USimplifiedProjectileArray : public UObject{
-	GENERATED_BODY()
-
-public:
-	TArray<FSimplifiedProjectile> Projectiles;
-};*/
-
-/*USTRUCT(BlueprintType)
-struct FSimplifiedProjectile {
-	GENERATED_BODY()
-
-	//UPROPERTY(Category = "Attack", VisibleAnywhere)
-	bool facingRight;
-	int lifeTime;
-	FTransform transform;
-
-	FSimplifiedProjectile();
-	FSimplifiedProjectile(AHitBoxGroupProjectile* model);
-};*/
-
 
 /**
- * 
+ * HitBoxGroup that isn't attached to the player. It moves at a specific speed and dies automatically after some times
  */
 UCLASS()
 class MYTHBUSTERS_API AHitBoxGroupProjectile : public AHitBoxGroup
@@ -56,14 +35,10 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	/// Return a simplified version of the projectile (for save state)
 	UFUNCTION(BlueprintCallable)
 	FSimplifiedProjectile getSimplifiedVersion();
+	/// Apply a simplified version of the projectile (for load state)
 	UFUNCTION(BlueprintCallable)
 	void applySimplifiedVersion(const FSimplifiedProjectile& simple);
-
-
-	/*UFUNCTION(BlueprintCallable)
-		FSimplifiedProjectile getSimplifiedVersion();
-	UFUNCTION(BlueprintCallable)
-		void applySimplifiedVersion(const FSimplifiedProjectile& simple);*/
 };

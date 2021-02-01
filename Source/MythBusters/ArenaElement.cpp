@@ -13,6 +13,5 @@ int UArenaElement::GetId() {
 }
 
 void UArenaElement::Explode() {
-	//AddLocalRotation(FQuat(FRotator(0, 45, 0)));
 	SetVisibility(false);
 }

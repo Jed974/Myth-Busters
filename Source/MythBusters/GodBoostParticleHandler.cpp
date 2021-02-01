@@ -7,6 +7,3 @@ void UGodBoostParticleHandler::SetUpGod(AActor* owner) {
 	godOwner = Cast<AGod>(owner);
 	InitArray();
 }
-
-//void UGodBoostParticleHandler::SpawnParticleSystem(int boostId, bool boosting) {}
-//void UGodBoostParticleHandler::DeleteParticleSystem(int boostId) {}
