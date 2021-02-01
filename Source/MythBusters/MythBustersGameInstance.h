@@ -227,4 +227,6 @@ public:
 	char Thor2SelectedCode = 0b01111110;
 	char GodSelectionReceived = 0b01111101;
 	char NoActionCode = 0b0000000;
+	char SendGodSelection(char act);
+	void ReadGodSelection(char act);
 };
