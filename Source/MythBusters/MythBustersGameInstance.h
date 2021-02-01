@@ -17,66 +17,12 @@
 #define FRAME_DELAY     2
 //#define SYNC_TEST
 
-struct AbstractCharacter
-{
-	AGod* ref;
-	FTransform transform;
-	FVector2D velocity;
-	float damage;
-};
+/*
+	Class to store the whole state of the game each frame.
+	It is only the necessary variables to completely describe the game.
+	Useful for rollbacks. 
 
-struct AbstractGameState
-{
-	TArray<AbstractCharacter> characters;
-	int _framenumber = 0;
-	void Init(int num_players, UGameInstance* Instance)
-	{
-		for (int i = 0; i < num_players; i++)
-		{
-			AGod* god = (AGod*)Instance->GetLocalPlayers()[i]->PlayerController->GetPawn();
-			AbstractCharacter AbstractGod = AbstractCharacter();
-			AbstractGod.ref = god;
-			AbstractGod.transform = god->GetActorTransform();
-			AbstractGod.velocity = god->GetGodMovementComponent()->Velocity;
-			AbstractGod.damage = god->GodDamage;
-			characters.Add(AbstractGod);
-		}
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "GameState Initiated");
-
-	}
-	void Apply()
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Rollback !");
-		for (int i = 0; i < characters.Num(); i++)
-		{
-			if (characters[i].ref != nullptr)
-			{
-
-				characters[i].ref->SetActorTransform(characters[i].transform);
-				characters[i].ref->GetGodMovementComponent()->Velocity = characters[i].velocity;
-				characters[i].ref->GodDamage = characters[i].damage;
-			}
-
-		}
-	};
-
-	void Observe()
-	{
-		for (int i = 0; i < characters.Num(); i++)
-		{
-			if (characters[i].ref != nullptr)
-			{
-				//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Saving Character " + FString::FromInt(i));
-				characters[i].transform = characters[i].ref->GetActorTransform();
-				characters[i].velocity = characters[i].ref->GetGodMovementComponent()->Velocity;
-				characters[i].damage = characters[i].ref->GodDamage;
-			}
-
-		}
-	};
-};
-
-
+*/
 struct MYTHBUSTERS_API SAbstractGameState
 {
 	TArray<SAbstractGod> Gods;
@@ -93,6 +39,10 @@ struct MYTHBUSTERS_API SAbstractGameState
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "GameState Initiated");
 
 	}
+
+	/*
+		Apply the stored state (variables values) to the real game state (Used when loading a state)
+	*/
 	void Apply()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Rollback !");
@@ -101,15 +51,15 @@ struct MYTHBUSTERS_API SAbstractGameState
 			if (Gods[i].Ref != nullptr)
 			{
 				Gods[i].Apply();
-				//Gods[i].Ref->SetActorTransform(Gods[i].Transform);
-				//Gods[i].ref->GetGodMovementComponent()->Velocity = Gods[i].velocity;
-				//Gods[i].ref->GodDamage = Gods[i].damage;
 			}
 
 		}
 
 
 	}
+	/*
+		Read the real game state and store the state inside the instance variables
+	*/
 	void Observe()
 	{
 		for (int i = 0; i < Gods.Num(); i++)
@@ -118,9 +68,6 @@ struct MYTHBUSTERS_API SAbstractGameState
 			{
 				Gods[i].Observe();
 				//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, "Saving Character " + FString::FromInt(i));
-				//Gods[i].Transform = Gods[i].Ref->GetActorTransform();
-				//characters[i].velocity = characters[i].ref->GetGodMovementComponent()->Velocity;
-				//characters[i].damage = characters[i].ref->GodDamage;
 			}
 
 		}
@@ -130,7 +77,7 @@ struct MYTHBUSTERS_API SAbstractGameState
 
 
 /**
- *
+ * The Game Instance of the game, unique instance, persistent during the entire game. Useful for GGPO online game
  */
 UCLASS()
 class MYTHBUSTERS_API UMythBustersGameInstance : public UGameInstance
@@ -142,22 +89,6 @@ protected:
 	~UMythBustersGameInstance();
 
 public:
-
-	/*static void Static_MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators);
-	static void Static_MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port);
-	static void Static_MythBusters_DrawCurrentFrame();
-	static void Static_MythBusters_AdvanceFrame(int inputs[], int disconnect_flags);
-	static void Static_MythBusters_RunFrame();
-	static void Static_MythBusters_Idle(int time);
-	static void Static_MythBusters_DisconnectPlayer(int player);
-	static void Static_MythBusters_Exit();*/
-
-	/*static bool __cdecl mb_begin_game_callback(const char*);
-	static bool __cdecl mb_on_event_callback(GGPOEvent* info);
-	static bool __cdecl mb_advance_frame_callback(int);
-	static bool __cdecl mb_load_game_state_callback(unsigned char* buffer, int len);
-	static bool __cdecl mb_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int);
-	static void __cdecl mb_free_buffer_callback(void* buffer);*/
 
 	void MythBusters_Init(unsigned short localport, int num_players, TArray<GGPOPlayer> players, int num_spectators);
 	//void MythBusters_InitSpectator(unsigned short localport, int num_players, char* host_ip, unsigned short host_port);
