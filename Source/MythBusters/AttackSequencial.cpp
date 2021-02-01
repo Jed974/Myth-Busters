@@ -113,10 +113,6 @@ void UAttackSequencial::OnNextNotify() {
 }
 
 bool UAttackSequencial::GetProjectileAttack(int id_Att, UAttackProjectile* &outAttack) {
-	if (Attacks.Contains(id_Att)) {
-		outAttack = Cast<UAttackProjectile>(Attacks[id_Att]);
-		return (outAttack != nullptr);
-	}
-	else
-		return false;
+	outAttack = Cast<UAttackProjectile>(Attacks[id_Att]);
+	return (outAttack != nullptr);
 }
